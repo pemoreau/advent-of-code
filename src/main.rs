@@ -66,19 +66,16 @@ fn main() {
     let to_run = get_day(day_num);
 
     // Time it
-    if to_run.0 != noop {
-        println!("Running Part 1");
-        let part1_start = Instant::now();
-        to_run.0(input.clone());
-        let part1_dur = part1_start.elapsed();
-        println!("Took {}", fmt_dur(part1_dur));
-    }
+    run(to_run.0, input.clone());
+    run(to_run.1, input.clone());
+}
+pub type DayFn = fn(String) -> i32;
 
-    if to_run.1 != noop {
-        println!("Running Part 2");
-        let part2_start = Instant::now();
-        to_run.1(input.clone());
-        let part2_dur = part2_start.elapsed();
-        println!("Took {}", fmt_dur(part2_dur));
+fn run(to_run: DayFn, input: String) {
+    if to_run != noop {
+        let start = Instant::now();
+        let result = to_run(input);
+        let duration = start.elapsed();
+        println!("Result = {} in {}", result, fmt_dur(duration));
     }
 }

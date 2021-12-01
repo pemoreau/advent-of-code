@@ -1,6 +1,8 @@
-// use itertools::Itertools;
 fn values(input: String) -> Vec<i32> {
-    input.lines().map(|line| line.parse().unwrap()).collect()
+    input
+        .lines()
+        .map(|line| line.trim().parse().unwrap())
+        .collect()
 }
 
 pub fn increases(values: &Vec<i32>) -> usize {
@@ -9,14 +11,14 @@ pub fn increases(values: &Vec<i32>) -> usize {
     return diff.filter(|&x| x > 0).count();
 }
 
-pub fn part1(input: String) {
+pub fn part1(input: String) -> i32 {
     let values = values(input);
-    println!("increases = {}", increases(&values));
+    return increases(&values).try_into().unwrap();
 }
 
-pub fn part2(input: String) {
+pub fn part2(input: String) -> i32 {
     let values = values(input);
     let sums = values.windows(3).map(|pair| pair[0] + pair[1] + pair[2]);
     let vsums = sums.collect::<Vec<i32>>();
-    println!("increases = {}", increases(&vsums));
+    return increases(&vsums).try_into().unwrap();
 }

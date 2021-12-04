@@ -1,0 +1,94 @@
+use array2d::Array2D;
+
+fn read_boards(input: String) -> (Vec<i32>, Vec<Array2D<i32>>) {
+    let mut lines = input.lines();
+
+    let first_line = lines.next().unwrap();
+
+    let values = first_line
+        .split(',')
+        .map(|s| s.trim().parse::<i32>().unwrap())
+        .collect::<Vec<i32>>();
+    lines.next();
+
+    let mut boards: Vec<Array2D<_>> = Vec::new();
+    let mut integers: Vec<i32> = Vec::new();
+    let mut cpt = 0;
+    lines.for_each(|line| {
+        if !line.is_empty() {
+            cpt += 1;
+            let current = line
+                .split_whitespace()
+                .map(|s| s.parse::<i32>().unwrap())
+                .collect::<Vec<_>>();
+
+            integers.extend(current);
+        }
+        if cpt == 5 {
+            cpt = 0;
+            let board: Array2D<_> = Array2D::from_row_major(&integers, 5, 5);
+            boards.push(board);
+            integers.clear();
+        }
+    });
+    return (values, boards);
+}
+
+pub fn part1(input: String) -> i32 {
+    let (values, boards) = read_boards(input);
+    let success = successful_boards(values, boards);
+    return *success.first().unwrap();
+}
+
+pub fn part2(input: String) -> i32 {
+    let (values, boards) = read_boards(input);
+    let success = successful_boards(values, boards);
+    return *success.last().unwrap();
+}
+
+fn successful_boards(values: Vec<i32>, mut boards: Vec<Array2D<i32>>) -> Vec<i32> {
+    let mut success: Vec<i32> = Vec::new();
+    for value in values {
+        for board in boards.iter_mut() {
+            let res = play(value, board);
+            if res.is_some() {
+                success.push(res.unwrap());
+            }
+        }
+    }
+    return success;
+}
+
+fn play(value: i32, board: &mut Array2D<i32>) -> Option<i32> {
+    for i in 0..board.column_len() {
+        for j in 0..board.row_len() {
+            if board[(i, j)] == value {
+                board[(i, j)] = -1;
+                if completed(board, i, j) {
+                    let sum_positive = board
+                        .as_row_major()
+                        .iter()
+                        .filter(|x| x >= &&0)
+                        .sum::<i32>();
+                    fill_board(-1, board);
+                    return Some(value * sum_positive);
+                }
+            }
+        }
+    }
+    return None;
+}
+
+fn fill_board(value: i32, board: &mut Array2D<i32>) {
+    for i in 0..board.column_len() {
+        for j in 0..board.row_len() {
+            board[(i, j)] = value;
+        }
+    }
+}
+
+fn completed(board: &Array2D<i32>, i: usize, j: usize) -> bool {
+    let completed_row = board.row_iter(i).all(|x| x < &0);
+    let completed_column = board.column_iter(j).all(|x| x < &0);
+    return completed_row || completed_column;
+}

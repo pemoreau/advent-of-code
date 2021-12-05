@@ -10,21 +10,15 @@ fn read_boards(input: String) -> (Vec<i32>, Vec<Array2D<i32>>) {
         .map(|s| s.trim().parse::<i32>().unwrap())
         .collect::<Vec<i32>>();
 
-    let mut boards: Vec<Array2D<_>> = Vec::new();
-    let mut integers: Vec<i32> = Vec::new();
-    for part in parts {
-        for line in part.lines() {
-            let current = line
-                .split_whitespace()
-                .map(|s| s.parse::<i32>().unwrap())
+    let boards = parts
+        .map(|part| {
+            let integers = part
+                .lines()
+                .flat_map(|line| line.split_whitespace().map(|s| s.parse::<i32>().unwrap()))
                 .collect::<Vec<_>>();
-            integers.extend(current);
-        }
-        let board: Array2D<_> = Array2D::from_row_major(&integers, 5, 5);
-        boards.push(board);
-        integers.clear();
-    }
-
+            return Array2D::from_row_major(&integers, 5, 5);
+        })
+        .collect();
     return (values, boards);
 }
 

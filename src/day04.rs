@@ -1,36 +1,30 @@
 use array2d::Array2D;
 
 fn read_boards(input: String) -> (Vec<i32>, Vec<Array2D<i32>>) {
-    let mut lines = input.lines();
+    let mut parts = input.split("\n\n");
 
-    let first_line = lines.next().unwrap();
-
-    let values = first_line
+    let values = parts
+        .next()
+        .unwrap()
         .split(',')
         .map(|s| s.trim().parse::<i32>().unwrap())
         .collect::<Vec<i32>>();
-    lines.next();
 
     let mut boards: Vec<Array2D<_>> = Vec::new();
     let mut integers: Vec<i32> = Vec::new();
-    let mut cpt = 0;
-    lines.for_each(|line| {
-        if !line.is_empty() {
-            cpt += 1;
+    for part in parts {
+        for line in part.lines() {
             let current = line
                 .split_whitespace()
                 .map(|s| s.parse::<i32>().unwrap())
                 .collect::<Vec<_>>();
-
             integers.extend(current);
         }
-        if cpt == 5 {
-            cpt = 0;
-            let board: Array2D<_> = Array2D::from_row_major(&integers, 5, 5);
-            boards.push(board);
-            integers.clear();
-        }
-    });
+        let board: Array2D<_> = Array2D::from_row_major(&integers, 5, 5);
+        boards.push(board);
+        integers.clear();
+    }
+
     return (values, boards);
 }
 

@@ -19,18 +19,20 @@ pub fn simulate(input: String, n: usize) -> i64 {
     });
 
     for _i in 0..n {
-        mult = mult
-            .iter()
-            .enumerate()
-            .fold([0; 9], |mut acc, (index, &m)| {
-                if index == 0 {
-                    acc[6] += m;
-                    acc[8] += m;
-                } else {
-                    acc[index - 1] += m;
-                }
-                acc
-            });
+        // mult = mult
+        //     .iter()
+        //     .enumerate()
+        //     .fold([0; 9], |mut acc, (index, &m)| {
+        //         if index == 0 {
+        //             acc[6] += m;
+        //             acc[8] += m;
+        //         } else {
+        //             acc[index - 1] += m;
+        //         }
+        //         acc
+        //     });
+        mult.rotate_left(1);
+        mult[6] += mult[8];
     }
     return mult.iter().sum::<usize>() as i64;
 }

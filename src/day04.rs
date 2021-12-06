@@ -22,16 +22,16 @@ fn read_boards(input: String) -> (Vec<i32>, Vec<Array2D<i32>>) {
     return (values, boards);
 }
 
-pub fn part1(input: String) -> i32 {
+pub fn part1(input: String) -> i64 {
     let (values, boards) = read_boards(input);
     let success = successful_boards(values, boards);
-    return *success.first().unwrap();
+    return *success.first().unwrap() as i64;
 }
 
-pub fn part2(input: String) -> i32 {
+pub fn part2(input: String) -> i64 {
     let (values, boards) = read_boards(input);
     let success = successful_boards(values, boards);
-    return *success.last().unwrap();
+    return *success.last().unwrap() as i64;
 }
 
 fn successful_boards(values: Vec<i32>, mut boards: Vec<Array2D<i32>>) -> Vec<i32> {

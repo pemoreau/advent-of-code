@@ -11,12 +11,12 @@ pub fn increases(values: &Vec<i32>) -> usize {
     return diff.filter(|&x| x > 0).count();
 }
 
-pub fn part1(input: String) -> i32 {
+pub fn part1(input: String) -> i64 {
     let values = values(input);
     return increases(&values).try_into().unwrap();
 }
 
-pub fn part2(input: String) -> i32 {
+pub fn part2(input: String) -> i64 {
     let values = values(input);
     let sums = values.windows(3).map(|pair| pair[0] + pair[1] + pair[2]);
     let vsums = sums.collect::<Vec<i32>>();

@@ -10,19 +10,19 @@ fn parse_line1(s: &str) -> (i32, i32, i32, i32) {
 }
 
 const N: usize = 1000;
-pub fn part1(input: String) -> i32 {
+pub fn part1(input: String) -> i64 {
     let values: Vec<_> = input.lines().map(|line| parse_line1(line)).collect();
     let mut board = Array2D::filled_with(0, N, N);
     mark_lines(&mut board, &values);
-    return count(&board);
+    return count(&board) as i64;
 }
 
-pub fn part2(input: String) -> i32 {
+pub fn part2(input: String) -> i64 {
     let values: Vec<_> = input.lines().map(|line| parse_line1(line)).collect();
     let mut board = Array2D::filled_with(0, N, N);
     mark_lines(&mut board, &values);
     mark_diags(&mut board, &values);
-    return count(&board);
+    return count(&board) as i64;
 }
 
 fn mark_lines(board: &mut Array2D<i32>, values: &Vec<(i32, i32, i32, i32)>) {

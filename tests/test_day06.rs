@@ -1,6 +1,5 @@
 use advent_of_code::day06::part1;
 use advent_of_code::day06::part2;
-use advent_of_code::day06::simulate;
 
 const INPUT: &str = "3,4,3,1,2";
 
@@ -15,6 +14,6 @@ fn test_part1() {
 #[test]
 fn test_part2() {
     let expected: i64 = 26984457539;
-    let result = simulate(INPUT.to_string(), 256);
+    let result = part2(INPUT.to_string());
     assert_eq!(expected, result);
 }

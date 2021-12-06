@@ -6,11 +6,11 @@ pub mod day04;
 pub mod day05;
 pub mod day06;
 
-pub fn noop(_inp: String) -> i32 {
+pub fn noop(_inp: String) -> i64 {
     return 0;
 }
 
-pub type DayFn = fn(String) -> i32;
+pub type DayFn = fn(String) -> i64;
 
 pub fn get_day(day: u32) -> (DayFn, DayFn) {
     match day {

@@ -1,4 +1,4 @@
-pub fn part1(input: String) -> i32 {
+pub fn part1(input: String) -> i64 {
     let values: Vec<_> = input.lines().map(|line| line.trim()).collect();
     let mut gamma = 0;
     let mut epsilon = 0;
@@ -25,9 +25,9 @@ pub fn part1(input: String) -> i32 {
     return gamma * epsilon;
 }
 
-pub fn part2(input: String) -> i32 {
+pub fn part2(input: String) -> i64 {
     let values: Vec<_> = input.lines().map(|line| line.trim()).collect();
-    return search(values.clone(), '1') * search(values.clone(), '0');
+    return search(&values, '1') as i64 * search(&values, '0') as i64;
 }
 // convert binary string to decimal
 fn to_int(s: &str) -> i32 {
@@ -38,7 +38,7 @@ fn to_int(s: &str) -> i32 {
     return result;
 }
 
-fn search(values: Vec<&str>, bit: char) -> i32 {
+fn search(values: &Vec<&str>, bit: char) -> i32 {
     let mut candidates = values.clone();
     let word_len = values[0].len();
 

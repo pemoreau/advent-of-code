@@ -7,7 +7,7 @@ fn parse_line1(s: &str) -> (&str, usize) {
 }
 
 // using for-loop style
-pub fn part1(input: String) -> i32 {
+pub fn part1(input: String) -> i64 {
     let values: Vec<_> = input.lines().map(|line| parse_line1(line)).collect();
     let mut horizontal = 0;
     let mut depth = 0;
@@ -27,7 +27,7 @@ pub fn part1(input: String) -> i32 {
 }
 
 // using fold()
-pub fn part2(input: String) -> i32 {
+pub fn part2(input: String) -> i64 {
     let values: Vec<_> = input.lines().map(|line| parse_line1(line)).collect();
     let (horizontal, depth, _aim) =
         values

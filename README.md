@@ -20,3 +20,39 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 4](./src/day04.rs) | ` 1.048ms` | ` 0.841ms` |
 | [day 5](./src/day05.rs) | ` 45.94ms` | ` 46.03ms` |
 | [day 6](./src/day06.rs) | ` 0.010ms` | ` 0.008ms` |
+
+# Comments
+
+## Day 01
+
+nothing special except the use of `windows` function
+
+## Day 02
+
+use `split_one` instead of regex to speed-up parsing
+
+use `for-loop` style and then `fold` for the second part
+
+## Day 03
+
+nothing special
+
+## Day 04
+
+use `split("\n\n")` to separate parts (instead of counting the number of entries)
+
+use `array2d::Array2D` to represent the board but this may be not the best choice
+
+the program contains too many `for-loop` in my opinion
+
+## Day 05
+
+a bit slow due the the use of regex for parsing
+
+discovered the `signum` function
+
+use references to mutable structures
+
+## Day 06
+
+very simple solution thanks to `rotate_left` function

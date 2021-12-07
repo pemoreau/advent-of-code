@@ -1,9 +1,12 @@
 pub fn part1(input: String) -> i64 {
-    return search(input, |a, b| (a - b).abs());
+    search(input, |a, b| (a - b).abs())
 }
 
 pub fn part2(input: String) -> i64 {
-    return search(input, |a, b| (a - b).abs() * ((a - b).abs() + 1) / 2);
+    search(input, |a, b| {
+        let n = (a - b).abs();
+        n * (n + 1) / 2
+    })
 }
 
 pub fn search(input: String, cost: fn(a: i32, b: i32) -> i32) -> i64 {
@@ -14,5 +17,5 @@ pub fn search(input: String, cost: fn(a: i32, b: i32) -> i32) -> i64 {
         .map(|h| values.iter().map(|v| cost(*v, h)).sum::<i32>())
         .min()
         .unwrap();
-    return min_sum as i64;
+    min_sum as i64
 }

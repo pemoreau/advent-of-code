@@ -1,9 +1,9 @@
 pub fn part1(input: String) -> i64 {
-    return simulate(input, 80);
+    simulate(input, 80)
 }
 
 pub fn part2(input: String) -> i64 {
-    return simulate(input, 256);
+    simulate(input, 256)
 }
 
 fn simulate(input: String, n: usize) -> i64 {
@@ -16,5 +16,5 @@ fn simulate(input: String, n: usize) -> i64 {
         mult.rotate_left(1);
         mult[6] += mult[8];
     }
-    return mult.iter().sum::<usize>() as i64;
+    mult.iter().sum::<usize>() as i64
 }

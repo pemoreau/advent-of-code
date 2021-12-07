@@ -10,7 +10,10 @@ pub fn part2(input: String) -> i64 {
 }
 
 pub fn search(input: String, cost: fn(a: i32, b: i32) -> i32) -> i64 {
-    let values = input.split(',').flat_map(str::parse).collect::<Vec<i32>>();
+    let values = input
+        .split(',')
+        .map(|s| s.trim().parse::<i32>().unwrap())
+        .collect::<Vec<i32>>();
     let min_value = values.iter().min().unwrap();
     let max_value = values.iter().max().unwrap();
     let min_sum = (*min_value..*max_value)

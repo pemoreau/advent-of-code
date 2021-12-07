@@ -17,3 +17,19 @@ fn test_part2() {
     let result = part2(INPUT.to_string());
     assert_eq!(expected, result);
 }
+
+#[test]
+fn test_input_part1() {
+    assert_eq!(
+        351092,
+        part1(include_str!("../inputs/day06.txt").to_string())
+    );
+}
+
+#[test]
+fn test_input_part2() {
+    assert_eq!(
+        1595330616005,
+        part2(include_str!("../inputs/day06.txt").to_string())
+    );
+}

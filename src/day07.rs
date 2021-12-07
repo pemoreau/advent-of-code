@@ -7,14 +7,12 @@ pub fn part2(input: String) -> i64 {
 }
 
 pub fn search(input: String, cost: fn(a: i32, b: i32) -> i32) -> i64 {
-    let values: Vec<i32> = input
-        .split(',')
-        .map(|s| s.trim().parse::<i32>().unwrap())
-        .collect();
+    let values = input.split(',').flat_map(str::parse).collect::<Vec<i32>>();
     let min_value = values.iter().min().unwrap();
     let max_value = values.iter().max().unwrap();
-    let h_sum =
-        (*min_value..*max_value).map(|h| (h, values.iter().map(|v| cost(*v, h)).sum::<i32>()));
-    let (_, sum) = h_sum.min_by(|(_, s1), (_, s2)| s1.cmp(s2)).unwrap();
-    return sum as i64;
+    let min_sum = (*min_value..*max_value)
+        .map(|h| values.iter().map(|v| cost(*v, h)).sum::<i32>())
+        .min()
+        .unwrap();
+    return min_sum as i64;
 }

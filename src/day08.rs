@@ -1,18 +1,6 @@
 use itertools::Itertools;
 use std::collections::HashMap;
 
-const INPUT: &str =
-    "be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
-edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
-fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg
-fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb
-aecbfdg fbg gf bafeg dbefa fcge gcbea fcaegb dgceab fcbdga | gecf egdcabf bgf bfgea
-fgeab ca afcebg bdacfeg cfaedg gcfdb baec bfadeg bafgc acf | gebdcfa ecba ca fadegcb
-dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe
-bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbgef
-egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb
-gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce";
-
 pub fn part1(input: String) -> i64 {
     let values = input
         .lines()
@@ -60,7 +48,6 @@ pub fn part2(input: String) -> i64 {
                 .iter()
                 .find(|d| d.len() == 5 && include_string(d, table[7]))
                 .unwrap();
-
             table[6] = lhs
                 .iter()
                 .find(|d| d.len() == 6 && !include_string(d, table[7]))
@@ -92,23 +79,13 @@ pub fn part2(input: String) -> i64 {
                     let key = d.chars().sorted().collect::<String>();
                     (key, i as u8)
                 }));
-            println!("lhs = {:?}", lhs);
-            println!("rhs = {:?}", rhs);
-            println!("table = {:?}", table);
-            println!("map = {:?}", map);
             let number: i64 = rhs.iter().fold(0, |acc, d| {
                 let key = d.chars().sorted().collect::<String>();
-                println!("d={}", d);
-                println!("key={}", key);
                 acc * 10 + map[&key] as i64
             });
-            println!("number = {:?}", number);
             number
         })
         .sum();
-
-    // println!("{:?}", values);
-    println!("{:?}", res);
 
     res
 }

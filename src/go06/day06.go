@@ -18,7 +18,6 @@ func simulate(values []int, n int) int {
 		// rotate array left
 		mult = append(mult[1:], mult[0])
 		mult[6] += mult[8]
-
 	}
 
 	return count(mult)

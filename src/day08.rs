@@ -2,16 +2,12 @@ use itertools::Itertools;
 use std::collections::HashMap;
 
 pub fn part1(input: String) -> i64 {
-    let values = input
+    input
         .lines()
         .flat_map(|line| {
             let parts = line.split("|").collect::<Vec<_>>();
             parts[1].trim().split(" ").collect::<Vec<_>>()
         })
-        .collect::<Vec<_>>();
-
-    values
-        .iter()
         .filter(|d| [2, 4, 3, 7].contains(&d.len()))
         .count() as i64
 }

@@ -18,16 +18,16 @@ func BuildSet() set {
 	return make(map[Pos]struct{})
 }
 
-func (s *set) Add(value Pos) {
-	(*s)[value] = struct{}{}
+func (s set) Add(value Pos) {
+	s[value] = struct{}{}
 }
 
-func (s *set) Contains(value Pos) bool {
-	_, ok := (*s)[value]
+func (s set) Contains(value Pos) bool {
+	_, ok := s[value]
 	return ok
 }
-func (s *set) Len() int {
-	return len(*s)
+func (s set) Len() int {
+	return len(s)
 }
 
 func BuildMatrix(lines []string) matrix {
@@ -62,23 +62,23 @@ func smallerThanNeighboors(m matrix, i, j int) bool {
 	return true
 }
 
-func explore(m matrix) [](*set) {
-	collectedBassin := [](*set){}
+func explore(m matrix) [](set) {
+	collectedBassin := [](set){}
 	for i := range m {
 		for j := range m[i] {
 			if m[i][j] == 9 {
 				// already visited: skip
 			} else {
 				newBasin := BuildSet()
-				collectNeighboors(Pos{i, j}, m, &newBasin)
-				collectedBassin = append(collectedBassin, &newBasin)
+				collectNeighboors(Pos{i, j}, m, newBasin)
+				collectedBassin = append(collectedBassin, newBasin)
 			}
 		}
 	}
 	return collectedBassin
 }
 
-func collectNeighboors(p Pos, m matrix, collected *set) {
+func collectNeighboors(p Pos, m matrix, collected set) {
 	if collected.Contains(p) {
 		return
 	}

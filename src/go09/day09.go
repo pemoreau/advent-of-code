@@ -109,13 +109,8 @@ func Part1(input string) int {
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	m := BuildMatrix(lines)
-	duplicate := make(matrix, len(m))
-	for i := range m {
-		duplicate[i] = make([]uint8, len(m[i]))
-		copy(duplicate[i], m[i])
-	}
 
-	collectedBassin := explore(duplicate)
+	collectedBassin := explore(m) // m is modified here
 	sizes := []int{}
 	for _, s := range collectedBassin {
 		sizes = append(sizes, s.Len())

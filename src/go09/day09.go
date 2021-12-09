@@ -1,29 +1,34 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
+	"io/ioutil"
 	"sort"
 	"strings"
 	"time"
 )
 
-func ReadFile(filename string) []string {
-	file, err := os.Open(filename)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
-	res := []string{}
-	for scanner.Scan() {
-		res = append(res, scanner.Text())
-	}
-	return res
+type matrix [][]uint8
+type Pos struct {
+	i, j int
+}
+type set map[Pos]struct{}
+
+func BuildSet() set {
+	return make(map[Pos]struct{})
 }
 
-type matrix [][]uint8
+func (s *set) Add(value Pos) {
+	(*s)[value] = struct{}{}
+}
+
+func (s *set) Contains(value Pos) bool {
+	_, ok := (*s)[value]
+	return ok
+}
+func (s *set) Len() int {
+	return len(*s)
+}
 
 func BuildMatrix(lines []string) matrix {
 	m := make([][]uint8, len(lines))
@@ -35,10 +40,6 @@ func BuildMatrix(lines []string) matrix {
 		}
 	}
 	return m
-}
-
-type Pos struct {
-	i, j int
 }
 
 func neighboors(m matrix, i, j int) []Pos {
@@ -78,43 +79,13 @@ func smallerThanNeighboors(m matrix, i, j int) bool {
 	return true
 }
 
-func Part1(m matrix) int {
-	res := 0
-	for i := range m {
-		for j := range m[i] {
-			if smallerThanNeighboors(m, i, j) {
-				res += int(m[i][j] + 1)
-			}
-		}
-	}
-	return res
-}
-
-type set map[Pos]struct{}
-
-func NewSet() set {
-	return make(map[Pos]struct{})
-}
-
-func (s *set) Add(value Pos) {
-	(*s)[value] = struct{}{}
-}
-
-func (s *set) Contains(value Pos) bool {
-	_, ok := (*s)[value]
-	return ok
-}
-func (s *set) Len() int {
-	return len(*s)
-}
-
 func explore(m matrix) [](*set) {
 	collectedBassin := [](*set){}
 	for i := range m {
 		for j := range m[i] {
 			if m[i][j] == 9 {
 			} else {
-				newBasin := NewSet()
+				newBasin := BuildSet()
 				collectNeighboors(Pos{i, j}, m, &newBasin)
 				collectedBassin = append(collectedBassin, &newBasin)
 			}
@@ -137,7 +108,23 @@ func collectNeighboors(p Pos, m matrix, collected *set) {
 	}
 }
 
-func Part2(m matrix) int {
+func Part1(input string) int {
+	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
+	m := BuildMatrix(lines)
+	res := 0
+	for i := range m {
+		for j := range m[i] {
+			if smallerThanNeighboors(m, i, j) {
+				res += int(m[i][j] + 1)
+			}
+		}
+	}
+	return res
+}
+
+func Part2(input string) int {
+	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
+	m := BuildMatrix(lines)
 	duplicate := make(matrix, len(m))
 	for i := range m {
 		duplicate[i] = make([]uint8, len(m[i]))
@@ -154,14 +141,13 @@ func Part2(m matrix) int {
 }
 
 func main() {
-	lines := ReadFile("../../inputs/day09.txt")
-	m := BuildMatrix(lines)
+	content, _ := ioutil.ReadFile("../../inputs/day09.txt")
 
 	start := time.Now()
-	fmt.Println("part1: ", Part1(m))
+	fmt.Println("part1: ", Part1(string(content)))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(m))
+	fmt.Println("part2: ", Part2(string(content)))
 	fmt.Println(time.Since(start))
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"strings"
+	"io/ioutil"
 	"testing"
 )
 
@@ -12,8 +12,7 @@ const input = `2199943210
 9899965678`
 
 func TestPart1(t *testing.T) {
-	m := BuildMatrix(strings.Split(input, "\n"))
-	result := Part1(m)
+	result := Part1(input)
 	expected := 15
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -21,8 +20,7 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	m := BuildMatrix(strings.Split(input, "\n"))
-	result := Part2(m)
+	result := Part2(input)
 	expected := 1134
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -30,9 +28,8 @@ func TestPart2(t *testing.T) {
 }
 
 func TestPart1Input(t *testing.T) {
-	lines := ReadFile("../../inputs/day09.txt")
-	m := BuildMatrix(lines)
-	result := Part1(m)
+	content, _ := ioutil.ReadFile("../../inputs/day09.txt")
+	result := Part1(string(content))
 	expected := 562
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -40,9 +37,8 @@ func TestPart1Input(t *testing.T) {
 }
 
 func TestPart2Input(t *testing.T) {
-	lines := ReadFile("../../inputs/day09.txt")
-	m := BuildMatrix(lines)
-	result := Part2(m)
+	content, _ := ioutil.ReadFile("../../inputs/day09.txt")
+	result := Part2(string(content))
 	expected := 1076922
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)

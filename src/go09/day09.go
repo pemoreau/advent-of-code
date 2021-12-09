@@ -43,35 +43,18 @@ func BuildMatrix(lines []string) matrix {
 }
 
 func neighboors(m matrix, i, j int) []Pos {
-	p1 := Pos{i - 1, j}
-	p2 := Pos{i + 1, j}
-	p3 := Pos{i, j - 1}
-	p4 := Pos{i, j + 1}
-
-	if i == 0 && j == 0 {
-		return []Pos{p2, p4}
-	} else if i == 0 && j == len(m[i])-1 {
-		return []Pos{p2, p3}
-	} else if i == len(m)-1 && j == 0 {
-		return []Pos{p1, p4}
-	} else if i == len(m)-1 && j == len(m[i])-1 {
-		return []Pos{p1, p3}
-	} else if i == 0 {
-		return []Pos{p2, p3, p4}
-	} else if i == len(m)-1 {
-		return []Pos{p1, p3, p4}
-	} else if j == 0 {
-		return []Pos{p1, p2, p4}
-	} else if j == len(m[i])-1 {
-		return []Pos{p1, p2, p3}
-	} else {
-		return []Pos{p1, p2, p3, p4}
+	res := []Pos{}
+	pos := []Pos{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
+	for _, p := range pos {
+		if p.i >= 0 && p.i < len(m) && p.j >= 0 && p.j < len(m[p.i]) {
+			res = append(res, p)
+		}
 	}
+	return res
 }
 
 func smallerThanNeighboors(m matrix, i, j int) bool {
-	n := neighboors(m, i, j)
-	for _, p := range n {
+	for _, p := range neighboors(m, i, j) {
 		if !(m[i][j] < m[p.i][p.j]) {
 			return false
 		}
@@ -84,6 +67,7 @@ func explore(m matrix) [](*set) {
 	for i := range m {
 		for j := range m[i] {
 			if m[i][j] == 9 {
+				// already visited: skip
 			} else {
 				newBasin := BuildSet()
 				collectNeighboors(Pos{i, j}, m, &newBasin)
@@ -102,7 +86,7 @@ func collectNeighboors(p Pos, m matrix, collected *set) {
 		return
 	}
 	collected.Add(p)
-	m[p.i][p.j] = 9
+	m[p.i][p.j] = 9 // mark as visited
 	for _, n := range neighboors(m, p.i, p.j) {
 		collectNeighboors(n, m, collected)
 	}

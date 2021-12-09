@@ -1,6 +1,6 @@
 # Advent Of Code 2021
 
-Learning Rust
+Learning Rust and Go
 
 # Commands
 
@@ -35,9 +35,13 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
 ## Day 01
 
+### Rust
+
 nothing special except the use of `windows` function
 
 ## Day 02
+
+### Rust
 
 use `split_one` instead of regex to speed-up parsing
 
@@ -45,9 +49,13 @@ use `for-loop` style and then `fold` for the second part
 
 ## Day 03
 
+### Rust
+
 nothing special
 
 ## Day 04
+
+### Rust
 
 use `split("\n\n")` to separate parts (instead of counting the number of entries)
 
@@ -57,6 +65,8 @@ the program contains too many `for-loop` in my opinion
 
 ## Day 05
 
+### Rust
+
 a bit slow due the the use of regex for parsing
 
 discovered the `signum` function
@@ -65,12 +75,30 @@ use references to mutable structures
 
 ## Day 06
 
+### Rust
+
 very simple solution thanks to `rotate_left` function
 
 ## Day 07
+
+### Rust
 
 use a cost function as parameter
 
 ## Day 08
 
+### Rust
+
 use a HashMap with sorted letters as keys
+
+## Day 09
+
+### Go
+
+explore search space using a set of visited positions (`type set map[Pos]struct{}`), with positions defined as
+
+```go
+type Pos struct {
+	i, j int
+}
+```

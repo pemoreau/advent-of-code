@@ -62,8 +62,8 @@ func smallerThanNeighboors(m matrix, i, j int) bool {
 	return true
 }
 
-func explore(m matrix) [](set) {
-	collectedBassin := [](set){}
+func explore(m matrix) []set {
+	collectedBassin := []set{}
 	for i := range m {
 		for j := range m[i] {
 			if m[i][j] == 9 {
@@ -111,7 +111,7 @@ func Part2(input string) int {
 	m := BuildMatrix(lines)
 
 	collectedBassin := explore(m) // m is modified here
-	sizes := []int{}
+	sizes := make([]int, 0, len(collectedBassin))
 	for _, s := range collectedBassin {
 		sizes = append(sizes, s.Len())
 	}

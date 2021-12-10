@@ -102,3 +102,16 @@ type Pos struct {
 	i, j int
 }
 ```
+
+Today I learned that `struct` are always passed by value (i.e. function parameters are mutable copies), but reference types (which correspond to slice, map, channel, interface, and function types) are passed by reference.
+To be more precise, slice and map are passed by value (like any other value in Go), but these values are references to underlying data-structures.
+
+This is why `matrix` and `set` can be passed without `*` as function arguments, and still be mutable.
+
+See [Dave Cheney's article](https://dave.cheney.net/2017/04/30/if-a-map-isnt-a-reference-variable-what-is-it) for more explanations
+
+`[]int{}` and `make([]int, 0)` are equivalent but the later can be used to defined the capacity of the underlaying array. For instance: `make([]int, 0, len(collectedBassin))`.
+
+## Day 10
+
+### Go

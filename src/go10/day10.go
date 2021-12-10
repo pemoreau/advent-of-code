@@ -47,37 +47,23 @@ var closing = map[rune]rune{
 	'<': '>',
 }
 
-func parseCorrupted(line string) (int, error) {
-	score := map[rune]int{
-		')': 3,
-		']': 57,
-		'}': 1197,
-		'>': 25137,
-	}
-	stack := BuildStack()
-	for _, c := range line {
-		if c == '(' || c == '[' || c == '{' || c == '<' {
-			stack.Push(c)
-		} else {
-			p, err := stack.Pop()
-			if err != nil {
-				return 0, errors.New("empty stack")
-			}
-			if closing[p] != c {
-				return score[c], nil
-			}
-		}
-	}
-	return 0, errors.New("complete line")
+var corruptedScore = map[rune]int{
+	')': 3,
+	']': 57,
+	'}': 1197,
+	'>': 25137,
 }
 
-func parseAutocomplete(line string) (int, error) {
-	score := map[rune]int{
-		'(': 1,
-		'[': 2,
-		'{': 3,
-		'<': 4,
-	}
+var autoScore = map[rune]int{
+	'(': 1,
+	'[': 2,
+	'{': 3,
+	'<': 4,
+}
+
+func parseLine(line string) (corrupted int, auto int) {
+	corrupted = 0
+	auto = 0
 	stack := BuildStack()
 	for _, c := range line {
 		if c == '(' || c == '[' || c == '{' || c == '<' {
@@ -85,32 +71,28 @@ func parseAutocomplete(line string) (int, error) {
 		} else {
 			p, err := stack.Pop()
 			if err != nil {
-				return 0, errors.New("empty stack")
+				return corrupted, auto
 			}
 			if closing[p] != c {
-				return 0, errors.New("corrupted line: " + line)
+				return corruptedScore[c], auto
 			}
 		}
 	}
 	if !stack.IsEmpty() {
-		res := 0
 		for !stack.IsEmpty() {
 			p, _ := stack.Pop()
-			res = (5 * res) + score[p]
+			auto = (5 * auto) + autoScore[p]
 		}
-		return res, nil
 	}
-	return 0, errors.New("complete line:" + line)
+	return corrupted, auto
 }
 
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	res := 0
 	for line := range lines {
-		score, err := parseCorrupted(lines[line])
-		if err == nil {
-			res += score
-		}
+		corrupted, _ := parseLine(lines[line])
+		res += corrupted
 	}
 	return res
 }
@@ -119,9 +101,9 @@ func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	scores := []int{}
 	for line := range lines {
-		score, err := parseAutocomplete(lines[line])
-		if err == nil {
-			scores = append(scores, score)
+		_, auto := parseLine(lines[line])
+		if auto > 0 {
+			scores = append(scores, auto)
 		}
 	}
 	sort.Ints(scores)

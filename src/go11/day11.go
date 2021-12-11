@@ -44,6 +44,17 @@ func increase_neighbours_energy(m matrix, x, y int) {
 	m[y][x].energy -= 1
 }
 
+func clear_flashed(m matrix) {
+	for y := range m {
+		for x := range m[y] {
+			if m[y][x].flashed {
+				m[y][x].flashed = false
+				m[y][x].energy = 0
+			}
+		}
+	}
+}
+
 func flash(m matrix) int {
 	continue_flashing := true
 	flashed := 0
@@ -60,22 +71,13 @@ func flash(m matrix) int {
 			}
 		}
 	}
+	clear_flashed(m)
 	return flashed
 }
 
-func clear_flashed(m matrix) bool {
-	all_flashed := true
-	for y := range m {
-		for x := range m[y] {
-			if m[y][x].flashed {
-				m[y][x].flashed = false
-				m[y][x].energy = 0
-			} else {
-				all_flashed = false
-			}
-		}
-	}
-	return all_flashed
+func step(m matrix) int {
+	increase_energy(m)
+	return flash(m)
 }
 
 func Part1(input string) int {
@@ -84,9 +86,7 @@ func Part1(input string) int {
 
 	res := 0
 	for i := 1; i <= 100; i++ {
-		increase_energy(m)
-		res += flash(m)
-		clear_flashed(m)
+		res += step(m)
 	}
 	return res
 }
@@ -94,11 +94,11 @@ func Part1(input string) int {
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	m := BuildMatrix(lines)
+	n := len(m) * len(m[0])
 
 	for i := 1; ; i++ {
-		increase_energy(m)
-		flash(m)
-		if clear_flashed(m) {
+		flashed := step(m)
+		if flashed == n {
 			return i
 		}
 	}

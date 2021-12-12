@@ -44,39 +44,19 @@ func BuildGraph(lines []string) Graph {
 	return g
 }
 
-func (g *Graph) explore1(src, dest *Node, count int) int {
+// twice is use for 2nd part only: should be true for 1st part
+func (g *Graph) explore(src *Node, dest *Node, count int, twice bool) int {
 	if src == dest {
 		return count + 1
 	}
+
 	for _, nextNode := range src.next {
-		visitable := !nextNode.small || nextNode.visited == 0
+		visitable := !nextNode.small || (nextNode.visited == 0) || (nextNode.label != "start" && !twice)
 		if visitable {
+			twiceUsed := nextNode.small && nextNode.visited == 1
 			nextNode.visited += 1
-			count = g.explore1(nextNode, dest, count)
+			count = g.explore(nextNode, dest, count, twice || twiceUsed)
 			nextNode.visited -= 1
-		}
-	}
-
-	return count
-}
-
-func (g *Graph) explore2(src *Node, dest *Node, count int, twice bool) int {
-	if src == dest {
-		return count + 1
-	}
-
-	for _, nextNode := range src.next {
-		if !nextNode.small || (nextNode.visited == 0) || (nextNode.label != "start" && !twice) {
-			allowTwice := nextNode.small && nextNode.visited == 1
-			if allowTwice {
-				twice = true
-			}
-			nextNode.visited += 1
-			count = g.explore2(nextNode, dest, count, twice)
-			nextNode.visited -= 1
-			if allowTwice {
-				twice = false
-			}
 		}
 	}
 	return count
@@ -88,7 +68,7 @@ func Part1(input string) int {
 	start := g.nodes["start"]
 	end := g.nodes["end"]
 	start.visited = 1
-	return g.explore1(start, end, 0)
+	return g.explore(start, end, 0, true)
 }
 
 func Part2(input string) int {
@@ -97,7 +77,7 @@ func Part2(input string) int {
 	start := g.nodes["start"]
 	end := g.nodes["end"]
 	start.visited = 1
-	return g.explore2(start, end, 0, false)
+	return g.explore(start, end, 0, false)
 }
 
 func main() {

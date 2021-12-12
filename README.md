@@ -120,3 +120,23 @@ See [Dave Cheney's article](https://dave.cheney.net/2017/04/30/if-a-map-isnt-a-r
 ### Go
 
 Use a stack for parsing the input
+
+## Day 11
+
+### Go
+
+Use 2d array to represent the board. The code involves many nested `for-loop` but it is quite natural in Golang
+
+### Rust
+
+Also used 2d array in Rust. The code is similar to the one written in Go, making the result a bit awkward in Rust.
+Tried to represent the board using a 1d-array, but this did not improved the code so much.
+I am not very satisfied by this solution.
+
+## Day 12
+
+### Go
+
+I have lost a lot of time because I did not immediately understood the second part.
+I first came with a solution that builds the list of paths, but it was a bit slow.
+I then simplified the code to get a more efficient solution (~36ms for part 2 on my 2013 mac).

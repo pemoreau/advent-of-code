@@ -69,10 +69,11 @@ func (g *Graph) explore1(src, dest string, count int) int {
 	return count
 }
 
-func (g *Graph) explore2(src, dest string, count int, twice bool) int {
+func (g *Graph) explore2(src string, dest string, count int, twice bool) int {
 	if src == dest {
 		return count + 1
 	}
+
 	srcNode := g.nodes[src]
 	for _, nextLabel := range srcNode.next {
 		nextNode := g.nodes[nextLabel]
@@ -89,7 +90,6 @@ func (g *Graph) explore2(src, dest string, count int, twice bool) int {
 			}
 		}
 	}
-
 	return count
 }
 

@@ -14,30 +14,23 @@ type Graph struct {
 
 type Node struct {
 	label   string
+	small   bool
 	visited int
-	next    []string
+	next    []*Node
 }
 
 func (g *Graph) addNode(label string) *Node {
 	if _, ok := g.nodes[label]; !ok {
-		g.nodes[label] = &Node{label: label}
+		g.nodes[label] = &Node{label: label, small: unicode.IsLower(rune(label[0]))}
 	}
 	return g.nodes[label]
 }
 
 func (g *Graph) addEdge(src, dest string) {
-	n := g.addNode(src)
-	n.next = append(n.next, dest)
-	n = g.addNode(dest)
-	n.next = append(n.next, src)
-}
-
-func (g *Graph) String() string {
-	var sb strings.Builder
-	for _, n := range g.nodes {
-		sb.WriteString(fmt.Sprintf("%s: %s\n", n.label, n.next))
-	}
-	return sb.String()
+	srcNode := g.addNode(src)
+	destNode := g.addNode(dest)
+	srcNode.next = append(srcNode.next, destNode)
+	destNode.next = append(destNode.next, srcNode)
 }
 
 func BuildGraph(lines []string) Graph {
@@ -51,17 +44,15 @@ func BuildGraph(lines []string) Graph {
 	return g
 }
 
-func (g *Graph) explore1(src, dest string, count int) int {
+func (g *Graph) explore1(src, dest *Node, count int) int {
 	if src == dest {
 		return count + 1
 	}
-	srcNode := g.nodes[src]
-	for _, nextLabel := range srcNode.next {
-		nextNode := g.nodes[nextLabel]
-		visitable := unicode.IsUpper(rune(nextNode.label[0])) || nextNode.visited == 0
+	for _, nextNode := range src.next {
+		visitable := !nextNode.small || nextNode.visited == 0
 		if visitable {
 			nextNode.visited += 1
-			count = g.explore1(nextLabel, dest, count)
+			count = g.explore1(nextNode, dest, count)
 			nextNode.visited -= 1
 		}
 	}
@@ -69,23 +60,21 @@ func (g *Graph) explore1(src, dest string, count int) int {
 	return count
 }
 
-func (g *Graph) explore2(src string, dest string, count int, twice bool) int {
+func (g *Graph) explore2(src *Node, dest *Node, count int, twice bool) int {
 	if src == dest {
 		return count + 1
 	}
 
-	srcNode := g.nodes[src]
-	for _, nextLabel := range srcNode.next {
-		nextNode := g.nodes[nextLabel]
-		lower := unicode.IsLower(rune(nextNode.label[0]))
-		if !lower || (lower && nextNode.visited == 0) || (lower && nextLabel != "start" && !twice) {
-			if lower && nextNode.visited == 1 {
+	for _, nextNode := range src.next {
+		if !nextNode.small || (nextNode.visited == 0) || (nextNode.label != "start" && !twice) {
+			allowTwice := nextNode.small && nextNode.visited == 1
+			if allowTwice {
 				twice = true
 			}
 			nextNode.visited += 1
-			count = g.explore2(nextLabel, dest, count, twice)
+			count = g.explore2(nextNode, dest, count, twice)
 			nextNode.visited -= 1
-			if lower && nextNode.visited == 1 {
+			if allowTwice {
 				twice = false
 			}
 		}
@@ -96,15 +85,19 @@ func (g *Graph) explore2(src string, dest string, count int, twice bool) int {
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	g := BuildGraph(lines)
-	g.nodes["start"].visited = 1
-	return g.explore1("start", "end", 0)
+	start := g.nodes["start"]
+	end := g.nodes["end"]
+	start.visited = 1
+	return g.explore1(start, end, 0)
 }
 
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	g := BuildGraph(lines)
-	g.nodes["start"].visited = 1
-	return g.explore2("start", "end", 0, false)
+	start := g.nodes["start"]
+	end := g.nodes["end"]
+	start.visited = 1
+	return g.explore2(start, end, 0, false)
 }
 
 func main() {

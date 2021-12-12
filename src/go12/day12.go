@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"strings"
 	"time"
 	"unicode"
@@ -15,10 +16,6 @@ type Node struct {
 	label   string
 	visited int
 	next    []string
-}
-
-func (g *Graph) getNode(label string) *Node {
-	return g.nodes[label]
 }
 
 func (g *Graph) addNode(label string) *Node {
@@ -43,19 +40,6 @@ func (g *Graph) String() string {
 	return sb.String()
 }
 
-func (n *Node) isVisited() bool {
-	if unicode.IsUpper(rune(n.label[0])) {
-		return false
-	}
-	return n.visited
-}
-
-func (n *Node) setVisited(value bool) {
-	if !unicode.IsUpper(rune(n.label[0])) {
-		n.visited = value
-	}
-}
-
 func BuildGraph(lines []string) Graph {
 	g := Graph{nodes: map[string]*Node{}}
 	for _, l := range lines {
@@ -67,19 +51,44 @@ func BuildGraph(lines []string) Graph {
 	return g
 }
 
-func (g *Graph) explore(src, dest string, count int) int {
+func (g *Graph) explore1(src, dest string, count int) int {
 	if src == dest {
-		println("found", src, dest)
 		return count + 1
 	}
-	n := g.nodes[src]
-	n.setVisited(true)
-	for _, label := range n.next {
-		if !g.nodes[label].isVisited() {
-			count = g.explore(label, dest, count)
+	srcNode := g.nodes[src]
+	for _, nextLabel := range srcNode.next {
+		nextNode := g.nodes[nextLabel]
+		visitable := unicode.IsUpper(rune(nextNode.label[0])) || nextNode.visited == 0
+		if visitable {
+			nextNode.visited += 1
+			count = g.explore1(nextLabel, dest, count)
+			nextNode.visited -= 1
 		}
 	}
-	n.setVisited(false)
+
+	return count
+}
+
+func (g *Graph) explore2(src, dest string, count int, twice bool) int {
+	if src == dest {
+		return count + 1
+	}
+	srcNode := g.nodes[src]
+	for _, nextLabel := range srcNode.next {
+		nextNode := g.nodes[nextLabel]
+		lower := unicode.IsLower(rune(nextNode.label[0]))
+		if !lower || (lower && nextNode.visited == 0) || (lower && nextLabel != "start" && !twice) {
+			if lower && nextNode.visited == 1 {
+				twice = true
+			}
+			nextNode.visited += 1
+			count = g.explore2(nextLabel, dest, count, twice)
+			nextNode.visited -= 1
+			if lower && nextNode.visited == 1 {
+				twice = false
+			}
+		}
+	}
 
 	return count
 }
@@ -87,66 +96,25 @@ func (g *Graph) explore(src, dest string, count int) int {
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	g := BuildGraph(lines)
-	println(g.String())
-	res := g.explore("start", "end", 0)
-
-	return res
+	g.nodes["start"].visited = 1
+	return g.explore1("start", "end", 0)
 }
 
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	g := BuildGraph(lines)
-	println(g.String())
-	return 0
+	g.nodes["start"].visited = 1
+	return g.explore2("start", "end", 0, false)
 }
 
-const input1 = `start-A
-start-b
-A-c
-A-b
-b-d
-A-end
-b-end`
-
-//
-//const input2 = `dc-end
-//HN-start
-//start-kj
-//dc-start
-//dc-HN
-//LN-dc
-//HN-end
-//kj-sa
-//kj-HN
-//kj-dc`
-//
-//const input3 = `fs-end
-//he-DX
-//fs-he
-//start-DX
-//pj-DX
-//end-zg
-//zg-sl
-//zg-pj
-//pj-he
-//RW-he
-//fs-DX
-//pj-RW
-//zg-RW
-//start-pj
-//he-WI
-//zg-he
-//pj-fs
-//start-RW`
-
 func main() {
-	//content, _ := ioutil.ReadFile("../../inputs/day12.txt")
+	content, _ := ioutil.ReadFile("../../inputs/day12.txt")
 
 	start := time.Now()
-	//fmt.Println("part1: ", Part1(string(content)))
+	fmt.Println("part1: ", Part1(string(content)))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(string(input1)))
+	fmt.Println("part2: ", Part2(string(content)))
 	fmt.Println(time.Since(start))
 }

@@ -44,7 +44,7 @@ func BuildGraph(lines []string) Graph {
 	return g
 }
 
-// twice is use for 2nd part only: should be true for 1st part
+// twice is used for 2nd part only: should be true for 1st part
 func (g *Graph) explore(src *Node, dest *Node, count int, twice bool) int {
 	if src == dest {
 		return count + 1

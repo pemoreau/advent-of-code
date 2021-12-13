@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"strconv"
@@ -12,6 +13,7 @@ type Pos struct {
 	x int
 	y int
 }
+
 type Instr struct {
 	axis  rune
 	value int
@@ -69,36 +71,36 @@ func step(screen set, inst Instr) {
 		switch inst.axis {
 		case 'x':
 			if p.x > d {
-				screen.Add(Pos{d - (p.x - d), p.y})
+				screen.Add(Pos{2*d - p.x, p.y})
 				screen.Remove(p)
 			}
 		case 'y':
 			if p.y > d {
-				screen.Add(Pos{p.x, d - (p.y - d)})
+				screen.Add(Pos{p.x, 2*d - p.y})
 				screen.Remove(p)
 			}
 		}
 	}
 }
 
-func display(pos set, inst []Instr) {
+func display(pos set) {
 	screen := [6][40]rune{}
-	for _, inst := range inst {
-		step(pos, inst)
-	}
 	for p := range pos {
 		screen[p.y][p.x] = '#'
 	}
+
+	var buf bytes.Buffer
 	for _, line := range screen {
 		for _, c := range line {
 			if c == 0 {
-				fmt.Print(" ")
+				buf.WriteRune(' ')
 			} else {
-				fmt.Print(string(c))
+				buf.WriteRune(c)
 			}
 		}
-		fmt.Println()
+		buf.WriteRune('\n')
 	}
+	fmt.Println(buf.String())
 }
 
 func Part1(input string) int {
@@ -113,7 +115,10 @@ func Part2(input string) int {
 	parts := strings.SplitN(strings.TrimSuffix(input, "\n"), "\n\n", 2)
 	pos := BuildPos(parts[0])
 	inst := BuildInstr(parts[1])
-	display(pos, inst)
+	for _, inst := range inst {
+		step(pos, inst)
+	}
+	display(pos)
 	return 0
 }
 

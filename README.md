@@ -33,7 +33,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 10](./src/day10.rs) | ` 0.137ms` | ` 0.134ms` | [day 10](./src/go10/day10.go)            | ` 0.152ms` | ` 0.151ms` |
 | [day 11](./src/day11.rs) | ` 0.186ms` | ` 0.420ms` | [day 11](./src/go11/day11.go)            | ` 0.211`   | ` 0.422ms` |
 |                          |            |            | [day 12](./src/go12/day12.go)            | ` 0.161ms` | ` 3.944ms` |
-| [day 13](./src/day13.rs) | ` 0.156ms` | ` 0.118ms` |                                          |            |            |
+| [day 13](./src/day13.rs) | ` 0.156ms` | ` 0.118ms` | [day 13](./src/go13/day13.go)            | ` 0.441ms` | ` 0.706ms` |
 
 # Comments
 
@@ -108,6 +108,7 @@ type Pos struct {
 ```
 
 Today I learned that `struct` are always passed by value (i.e. function parameters are mutable copies), but reference types (which correspond to slice, map, channel, interface, and function types) are passed by reference.
+
 To be more precise, slice and map are passed by value (like any other value in Go), but these values are references to underlying data-structures.
 
 This is why `matrix` and `set` can be passed without `*` as function arguments, and still be mutable.
@@ -131,7 +132,9 @@ Use 2d array to represent the board. The code involves many nested `for-loop` bu
 ### Rust
 
 Also used 2d array in Rust. The code is similar to the one written in Go, making the result a bit awkward in Rust.
+
 Tried to represent the board using a 1d-array, but this did not improved the code so much.
+
 I am not very satisfied by this solution.
 
 ## Day 12
@@ -139,7 +142,9 @@ I am not very satisfied by this solution.
 ### Go
 
 I have lost a lot of time because I did not immediately understood the second part.
+
 I first came with a solution that builds the list of paths, but it was a bit slow.
+
 I then simplified the code to get a more efficient solution (~36ms for part 2 on my 2013 mac).
 
 ## Day 13
@@ -147,4 +152,15 @@ I then simplified the code to get a more efficient solution (~36ms for part 2 on
 ### Rust
 
 Used a list of tuples to avoid creating a 2d-array
+
 But the second part needed the construction of such a 2d-array
+
+### Go
+
+Done in Go after the first Rust implementation.
+
+Use a set (`map[Pos]struct{}`) to store the positions
+
+And then a 2d-array to display the result
+
+Once again I found the Go version easier to write

@@ -22,7 +22,7 @@ func buildRules(input string) matrix {
 	return res
 }
 
-func step(o [26][26]int, rules matrix) [26][26]int {
+func step(o *[26][26]int, rules *matrix) [26][26]int {
 	res := [26][26]int{}
 	for i := 0; i < 26; i++ {
 		for j := 0; j < 26; j++ {
@@ -36,7 +36,7 @@ func step(o [26][26]int, rules matrix) [26][26]int {
 	return res
 }
 
-func computeOccurrences(o [26][26]int, first, last byte) [26]int {
+func computeOccurrences(o *[26][26]int, first, last byte) [26]int {
 	res := [26]int{}
 	res[first-'A'] = 1
 	res[last-'A'] = 1
@@ -59,12 +59,12 @@ func solve(subject string, part2 string, n int) int {
 		o[subject[i]-'A'][subject[i+1]-'A'] += 1
 	}
 	for i := 0; i < n; i++ {
-		o = step(o, rules)
+		o = step(&o, &rules)
 	}
 
 	first := subject[0]
 	last := subject[len(subject)-1]
-	occurrence := computeOccurrences(o, first, last)
+	occurrence := computeOccurrences(&o, first, last)
 	max := 0
 	min := math.MaxInt64
 	for _, n := range occurrence {

@@ -1,5 +1,4 @@
 use advent_of_code::day13::part1;
-use advent_of_code::day13::part2;
 
 const INPUT: &str = "6,10
 0,14
@@ -37,10 +36,10 @@ fn test_part1() {
 //     assert_eq!(expected, result);
 // }
 
-// #[test]
-// fn test_input_part1() {
-//     assert_eq!(1681, part1(include_str!("../inputs/day11.txt").to_string()));
-// }
+#[test]
+fn test_input_part1() {
+    assert_eq!(795, part1(include_str!("../inputs/day13.txt").to_string()));
+}
 
 // #[test]
 // fn test_input_part2() {

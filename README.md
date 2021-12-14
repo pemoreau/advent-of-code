@@ -34,6 +34,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 11](./src/day11.rs) | ` 0.186ms` | ` 0.420ms` | [day 11](./src/go11/day11.go)            | ` 0.211`   | ` 0.422ms` |
 |                          |            |            | [day 12](./src/go12/day12.go)            | ` 0.161ms` | ` 3.944ms` |
 | [day 13](./src/day13.rs) | ` 0.156ms` | ` 0.118ms` | [day 13](./src/go13/day13.go)            | ` 0.441ms` | ` 0.706ms` |
+|                          |            |            | [day 14](./src/go12/day14.go)            | ` 0.750ms` | ` 0.633ms` |
 
 # Comments
 
@@ -145,7 +146,7 @@ I have lost a lot of time because I did not immediately understood the second pa
 
 I first came with a solution that builds the list of paths, but it was a bit slow.
 
-I then simplified the code to get a more efficient solution (~36ms for part 2 on my 2013 mac).
+I then simplified the code to get a more efficient solution (~3.8ms for part 2 on my 2013 mac).
 
 ## Day 13
 
@@ -164,3 +165,30 @@ Use a set (`map[Pos]struct{}`) to store the positions
 And then a 2d-array to display the result
 
 Once again I found the Go version easier to write
+
+I have written a code of the form:
+
+```
+func step(screen map[Pos]struct{}, inst Instr) {
+	for p := range screen {
+        ...
+		screen.Add(Pos{2*d - p.x, p.y})
+		screen.Remove(p)
+    }
+}
+```
+
+This shows that you can mutate a map while iterating over it.
+
+## Day 14
+
+### Go
+
+I have used a 2d-array for the rules (`[26][26]byte`) and a 2d-array for counting the pairs (`[26][26]int{}`). Maybe a `map` would have been more efficient. I did not have time to compare the two solutions.
+
+Also used the following construct to statically include the input file :
+
+```
+//go:embed input.txt
+var input string
+```

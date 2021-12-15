@@ -55,23 +55,18 @@ func BuildMatrix(lines []string) matrix {
 
 func buildMegaMatrix(m matrix) matrix {
 	mm := make([][]uint8, 5*len(m))
-	// fmt.Println("mm", len(mm))
 	for j, l := range m {
 		for kj := 0; kj < 5; kj++ {
 			new_j := kj*len(m) + j
 			mm[new_j] = make([]uint8, 5*len(l))
 			for i, risk := range l {
-				// fmt.Println("mmj", len(mm[new_j]))
 				for ki := 0; ki < 5; ki++ {
 					new_i := ki*len(l) + i
 					new_risk := risk + uint8(ki) + uint8(kj)
 					if new_risk > 9 {
 						new_risk = new_risk % 9
 					}
-					// fmt.Printf("(%d, %d) -> (%d, %d) risk=%d -> %d\n", i, j, new_i, new_j, risk, new_risk)
-					// fmt.Printf("len(mm)=%d, len(mm[new_j])=%d\n", len(mm), len(mm[new_j]))
 					mm[new_j][new_i] = uint8(new_risk)
-					// fmt.Println(mm[new_j][new_i])
 				}
 			}
 		}
@@ -91,7 +86,6 @@ func neighboors(m matrix, i, j int) []Pos {
 			res = append(res, p)
 		}
 	}
-	// fmt.Printf("neighboors(%d, %d) = %v\n", i, j, len(res))
 	return res
 }
 
@@ -140,7 +134,6 @@ func path(start, to Pos, m matrix) (path []Pos, distance int) {
 		}
 
 		for _, neighbor := range neighboors(m, current.i, current.j) {
-			// fmt.Println("neighbor", neighbor.String())
 			newCost := costSoFar[current] + int(m[neighbor.j][neighbor.i])
 			if _, ok := costSoFar[neighbor]; !ok || newCost < costSoFar[neighbor] {
 				costSoFar[neighbor] = newCost
@@ -150,7 +143,6 @@ func path(start, to Pos, m matrix) (path []Pos, distance int) {
 			}
 		}
 	}
-
 }
 
 // A PriorityQueue implements heap.Interface and holds Items.
@@ -182,7 +174,7 @@ func (pq *PriorityQueue) Pop() interface{} {
 	old := *pq
 	n := len(old)
 	item := old[n-1]
-	// old[n-1] = nil  // avoid memory leak
+	old[n-1] = nil  // avoid memory leak
 	item.index = -1 // for safety
 	*pq = old[0 : n-1]
 	return item

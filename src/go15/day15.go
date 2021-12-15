@@ -9,127 +9,93 @@ import (
 )
 
 //go:embed input.txt
-var input string
-
-//go:embed input_test.txt
-var input_test string
+var input_day string
 
 func Part1(input string) int {
-	// lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	// m := BuildMatrix(lines)
-	// _, cost, _ := path(m[0][0], m[len(m)-1][len(m[0])-1], m)
-	// return int(cost)
-	return 0
+	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
+	m := BuildMatrix(lines)
+	from := Pos{0, 0}
+	to := Pos{j: len(m) - 1, i: len(m[0]) - 1}
+	_, cost := path(from, to, m)
+	return cost
 }
 
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := BuildMatrix(lines)
-	mm := buildMegaMatrix(m)
-	from := mm[0][0]
-	to := mm[len(mm)-1][len(mm[0])-1]
-	fmt.Printf("from=%v, to=%v\n", from, to)
-	_, cost, _ := path(from, to, mm)
-	// fmt.Println(p, cost, b)
-	return int(cost)
+	m := buildMegaMatrix(BuildMatrix(lines))
+	from := Pos{0, 0}
+	to := Pos{j: len(m) - 1, i: len(m[0]) - 1}
+	_, cost := path(from, to, m)
+	return cost
 }
 
 func main() {
 	start := time.Now()
-	fmt.Println("part1: ", Part1(string(input)))
+	fmt.Println("part1: ", Part1(string(input_day)))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(string(input_test)))
+	fmt.Println("part2: ", Part2(string(input_day)))
 	fmt.Println(time.Since(start))
 }
 
-type matrix [][]*node
+type matrix [][]uint8
 
 func BuildMatrix(lines []string) matrix {
-	m := make([][]*node, len(lines))
+	m := make([][]uint8, len(lines))
 	for j, l := range lines {
 		l = strings.TrimSpace(l)
-		m[j] = make([]*node, len(l))
+		m[j] = make([]uint8, len(l))
 		for i, c := range l {
-			m[j][i] = &node{
-				i:    i,
-				j:    j,
-				risk: uint8(c - '0'),
-			}
+			m[j][i] = uint8(c - '0')
 		}
 	}
 	return m
 }
 
 func buildMegaMatrix(m matrix) matrix {
-	mm := make([][]*node, 5*len(m))
+	mm := make([][]uint8, 5*len(m))
 	// fmt.Println("mm", len(mm))
 	for j, l := range m {
 		for kj := 0; kj < 5; kj++ {
 			new_j := kj*len(m) + j
-			mm[new_j] = make([]*node, 5*len(l))
-			for i, n := range l {
-				risk := n.risk
+			mm[new_j] = make([]uint8, 5*len(l))
+			for i, risk := range l {
 				// fmt.Println("mmj", len(mm[new_j]))
 				for ki := 0; ki < 5; ki++ {
 					new_i := ki*len(l) + i
 					new_risk := risk + uint8(ki) + uint8(kj)
 					if new_risk > 9 {
-						new_risk = 1
+						new_risk = new_risk % 9
 					}
 					// fmt.Printf("(%d, %d) -> (%d, %d) risk=%d -> %d\n", i, j, new_i, new_j, risk, new_risk)
 					// fmt.Printf("len(mm)=%d, len(mm[new_j])=%d\n", len(mm), len(mm[new_j]))
-					mm[new_j][new_i] = &node{
-						i:    new_i,
-						j:    new_j,
-						risk: new_risk,
-					}
+					mm[new_j][new_i] = uint8(new_risk)
 					// fmt.Println(mm[new_j][new_i])
 				}
 			}
 		}
 	}
-	// for j := 0; j < len(mm); j++ {
-	// 	for i := 0; i < len(mm[j]); i++ {
-	// 		fmt.Printf("%d, %d: %v\n", i, j, mm[j][i])
-	// 	}
-	// }
 	return mm
 }
 
-type node struct {
-	i, j   int
-	risk   uint8
-	cost   float64
-	rank   float64
-	parent *node
-	open   bool
-	closed bool
-	index  int
+func (p Pos) String() string {
+	return fmt.Sprintf("(%d, %d)", p.i, p.j)
 }
 
-func (n *node) String() string {
-	return fmt.Sprintf("(%d, %d) risk=%d", n.i, n.j, n.risk)
-}
-
-type pos struct{ i, j int }
-
-func neighboors(m matrix, i, j int) []*node {
-	res := []*node{}
-	pos := []pos{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
+func neighboors(m matrix, i, j int) []Pos {
+	pos := []struct{ i, j int }{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
+	res := []Pos{}
 	for _, p := range pos {
-		if p.i >= 0 && p.i < len(m) && p.j >= 0 && p.j < len(m[p.i]) {
-			res = append(res, m[p.j][p.i])
+		if p.j >= 0 && p.j < len(m) && p.i >= 0 && p.i < len(m[0]) {
+			res = append(res, p)
 		}
 	}
-	// fmt.Printf("neighboors(%d, %d) = %v\n", i, j, res)
+	// fmt.Printf("neighboors(%d, %d) = %v\n", i, j, len(res))
 	return res
 }
 
-// PathEstimatedCost uses Manhattan distance to estimate orthogonal distance
-// between non-adjacent nodes.
-func manhattanDistance(from, to *node) float64 {
+func manhattanDistance(from, to Pos) int {
 	absX := from.i - to.i
 	if absX < 0 {
 		absX = -absX
@@ -138,54 +104,53 @@ func manhattanDistance(from, to *node) float64 {
 	if absY < 0 {
 		absY = -absY
 	}
-	return float64(absX + absY)
+	return absX + absY
 }
 
-func path(from, to *node, m matrix) (path []node, distance float64, found bool) {
-	nq := &PriorityQueue{}
-	heap.Init(nq)
-	from.open = true
-	heap.Push(nq, from)
+type Pos struct{ i, j int }
+type node struct {
+	Pos
+	priority int
+	index    int
+}
+
+func path(start, to Pos, m matrix) (path []Pos, distance int) {
+	frontier := &PriorityQueue{}
+	heap.Init(frontier)
+	heap.Push(frontier, &node{Pos: start, priority: 0})
+
+	cameFrom := map[Pos]Pos{start: start}
+	costSoFar := map[Pos]int{start: 0}
 
 	for {
-		if nq.Len() == 0 {
+		if frontier.Len() == 0 {
 			// There's no path, return found false.
 			return
 		}
-		current := heap.Pop(nq).(*node) // https://go.dev/ref/spec#Type_assertions
-		current.open = false
-		current.closed = true
-
+		current := heap.Pop(frontier).(*node).Pos
 		if current == to {
 			// Found a path to the goal.
-			p := []node{}
+			path := []Pos{}
 			curr := current
-			for curr != nil {
-				p = append(p, *curr)
-				curr = curr.parent
+			for curr != start {
+				path = append(path, curr)
+				curr = cameFrom[curr]
 			}
-			return p, current.cost, true
+			return path, costSoFar[to]
 		}
 
 		for _, neighbor := range neighboors(m, current.i, current.j) {
 			// fmt.Println("neighbor", neighbor.String())
-			cost := current.cost + float64(neighbor.risk)
-			if cost < neighbor.cost {
-				if neighbor.open {
-					heap.Remove(nq, neighbor.index)
-				}
-				neighbor.open = false
-				neighbor.closed = false
-			}
-			if !neighbor.open && !neighbor.closed {
-				neighbor.cost = cost
-				neighbor.open = true
-				neighbor.rank = cost + manhattanDistance(neighbor, to)
-				neighbor.parent = current
-				heap.Push(nq, neighbor)
+			newCost := costSoFar[current] + int(m[neighbor.j][neighbor.i])
+			if _, ok := costSoFar[neighbor]; !ok || newCost < costSoFar[neighbor] {
+				costSoFar[neighbor] = newCost
+				priority := newCost + manhattanDistance(neighbor, to)
+				heap.Push(frontier, &node{Pos: neighbor, priority: priority})
+				cameFrom[neighbor] = current
 			}
 		}
 	}
+
 }
 
 // A PriorityQueue implements heap.Interface and holds Items.
@@ -197,7 +162,7 @@ func (pq PriorityQueue) Len() int {
 }
 
 func (pq PriorityQueue) Less(i, j int) bool {
-	return pq[i].rank < pq[j].rank
+	return pq[i].priority < pq[j].priority
 }
 
 func (pq PriorityQueue) Swap(i, j int) {
@@ -217,7 +182,7 @@ func (pq *PriorityQueue) Pop() interface{} {
 	old := *pq
 	n := len(old)
 	item := old[n-1]
-	old[n-1] = nil  // avoid memory leak
+	// old[n-1] = nil  // avoid memory leak
 	item.index = -1 // for safety
 	*pq = old[0 : n-1]
 	return item

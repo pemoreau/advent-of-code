@@ -36,6 +36,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 13](./src/day13.rs) | ` 0.156ms` | ` 0.118ms` | [day 13](./src/go13/day13.go)            | ` 0.441ms` | ` 0.706ms` |
 |                          |            |            | [day 14](./src/go14/day14.go)            | ` 0.075ms` | ` 0.056ms` |
 |                          |            |            | [day 15](./src/go15/day15.go)            | ` 11.64ms` | ` 344.0ms` |
+|                          |            |            | [day 16](./src/go16/day16.go)            | ` 0.121ms` | ` 0.718ms` |
 
 # Comments
 
@@ -193,3 +194,55 @@ Also used the following construct to statically include the input file :
 //go:embed input.txt
 var input string
 ```
+
+## Day 15
+
+### Go
+
+Lost a lot of time because I made a mistake when building the mega-matrix but I have discovered a very nice website: https://www.redblobgames.com/
+
+And in partiular articles from Amit (https://theory.stanford.edu/~amitp/GameProgramming/)
+
+## Day 16
+
+### Go
+
+Not too difficult today but I had several problems with Golang.
+My function `extract` takes a position (`index`) as an argument and returns the new value for this index.
+
+I would have liked to write my code as follows:
+
+```
+    next, index := bit(bytes, index)
+    res, index := extract(bytes, index, 4)
+	for next {
+		next, index = bit(bytes, index)
+		v, index := extract(bytes, index, 4)
+		res = res<<4 + v
+	}
+```
+
+but this is not possible because in the `for-loop`, using `v, index :=` declare a new `index` variable with shallow the previous one.
+I had to write the code as follows:
+
+```
+    res, index = extract(bytes, index, 4)
+	for next {
+		next, index = bit(bytes, index)
+		var v uint64
+		v, index = extract(bytes, index, 4)
+		res = res<<4 + v
+	}
+```
+
+Another example is:
+
+```
+    for index < end {
+		var res Packet
+		res, index = decode(bytes, index)
+		packets = append(packets, res)
+	}
+```
+
+Where I cannot use the short declaration syntax for `res, index :=` becasue the `index` variable should not be shallowed.

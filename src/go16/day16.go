@@ -71,21 +71,20 @@ func (l LitteralValue) eval() int {
 }
 
 func (o Operator) eval() int {
-	if o.id == 0 {
+	switch o.id {
+	case 0:
 		res := 0
 		for _, p := range o.packets {
 			res += p.eval()
 		}
 		return res
-	}
-	if o.id == 1 {
+	case 1:
 		res := 1
 		for _, p := range o.packets {
 			res *= p.eval()
 		}
 		return res
-	}
-	if o.id == 2 {
+	case 2:
 		res := math.MaxInt
 		for _, p := range o.packets {
 			a := p.eval()
@@ -94,8 +93,7 @@ func (o Operator) eval() int {
 			}
 		}
 		return res
-	}
-	if o.id == 3 {
+	case 3:
 		res := 0
 		for _, p := range o.packets {
 			a := p.eval()
@@ -104,35 +102,22 @@ func (o Operator) eval() int {
 			}
 		}
 		return res
-	}
-	if o.id == 5 {
-		a := o.packets[0].eval()
-		b := o.packets[1].eval()
-		if a > b {
-			return 1
-		} else {
-			return 0
-		}
-	}
-	if o.id == 6 {
-		a := o.packets[0].eval()
-		b := o.packets[1].eval()
-		if a < b {
-			return 1
-		} else {
-			return 0
-		}
-	}
-	if o.id == 7 {
-		a := o.packets[0].eval()
-		b := o.packets[1].eval()
-		if a == b {
-			return 1
-		} else {
-			return 0
-		}
+	case 5:
+		return toInt(o.packets[0].eval() > o.packets[1].eval())
+	case 6:
+		return toInt(o.packets[0].eval() < o.packets[1].eval())
+	case 7:
+		return toInt(o.packets[0].eval() == o.packets[1].eval())
 	}
 	return 0
+}
+
+func toInt(b bool) int {
+	if b {
+		return 1
+	} else {
+		return 0
+	}
 }
 
 func (h Header) String() string {

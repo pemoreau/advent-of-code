@@ -3,6 +3,8 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"regexp"
+	"strconv"
 	"time"
 )
 
@@ -45,41 +47,64 @@ func simulate(initialVelocity Pos, target Area) (maxHeight int, reached bool) {
 	return
 }
 
-func Part1(input string) int {
-	target := Area{upperLeft: Pos{206, -57}, lowerRight: Pos{250, -105}}
+func parseInput(in string) Area {
+	reg := regexp.MustCompile(`target area: x=([0-9\-]+)\.\.([0-9\-]+), y=([0-9\-]+)\.\.([0-9\-]+)`)
+	g := reg.FindStringSubmatch(in)
+	x1, _ := strconv.Atoi(g[1])
+	x2, _ := strconv.Atoi(g[2])
+	y1, _ := strconv.Atoi(g[3])
+	y2, _ := strconv.Atoi(g[4])
+	return Area{
+		upperLeft:  Pos{x1, y2},
+		lowerRight: Pos{x2, y1},
+	}
 
-	maxHeight := 0
-	bestVelocity := Pos{0, 0}
-	for vx := 0; vx <= 200; vx++ {
-		for vy := 0; vy <= 500; vy++ {
-			h, r := simulate(Pos{vx, vy}, target)
-			if r && h > maxHeight {
-				maxHeight = h
-				bestVelocity = Pos{vx, vy}
-			}
+}
+
+func stepX(x, vx, min, max int) int {
+	res := vx
+	for x <= max && vx > 0 {
+		x += vx
+		if vx > 0 {
+			vx -= 1
+		} else if vx < 0 {
+			vx += 1
+		}
+		if x >= min && x <= max {
+			return res
 		}
 	}
-	fmt.Println(maxHeight, bestVelocity)
+	return 0
+}
 
-	return maxHeight
+func Part1(input string) int {
+	target := parseInput(input)
+	y := target.lowerRight.y
+	return y * (y + 1) / 2
 }
 
 func Part2(input string) int {
-	target := Area{upperLeft: Pos{206, -57}, lowerRight: Pos{250, -105}}
-	// target = Area{upperLeft: Pos{20, -5}, lowerRight: Pos{30, -10}}
+	target := parseInput(input)
 
-	reached := []Pos{}
-	for vx := 0; vx <= 250; vx++ {
-		for vy := -110; vy <= 500; vy++ {
+	vxs := []int{}
+	for vx := 0; vx <= target.lowerRight.x; vx++ {
+		if v := stepX(0, vx, target.upperLeft.x, target.lowerRight.x); v != 0 {
+			vxs = append(vxs, v)
+		}
+	}
+
+	reached := 0
+	for _, vx := range vxs {
+		for vy := target.lowerRight.y; vy <= -target.lowerRight.y; vy++ {
 			_, r := simulate(Pos{vx, vy}, target)
 			if r {
-				reached = append(reached, Pos{vx, vy})
+				reached += 1
 			}
 		}
 	}
-	// fmt.Println(reached)
 
-	return len(reached)
+	return reached
+
 }
 
 func main() {

@@ -37,6 +37,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                          |            |            | [day 14](./src/go14/day14.go)            | ` 0.075ms` | ` 0.056ms` |
 |                          |            |            | [day 15](./src/go15/day15.go)            | ` 11.64ms` | ` 344.0ms` |
 |                          |            |            | [day 16](./src/go16/day16.go)            | ` 0.121ms` | ` 0.071ms` |
+|                          |            |            | [day 17](./src/go17/day17.go)            | ` 0.133ms` | ` 0.424ms` |
 
 # Comments
 
@@ -260,3 +261,7 @@ In a second step, the type discrimination (instead of dynamic dispathing) is don
 After finishing the puzzle I discovered the [bitio](https://github.com/icza/bitio) library. I will try it when I have time.
 
 ## Day 17
+
+### Go
+
+Brute force approach. Not very proud of it.

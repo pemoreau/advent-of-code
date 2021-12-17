@@ -24,14 +24,18 @@ func extract(bytes []byte, bit_start uint32, length uint32) (uint64, uint32) {
 	}
 	var res uint64 = 0
 	for i := bit_start; i < bit_start+length; i++ {
+		res = res << 1
 		b, _ := bit(bytes, i)
 		if b {
-			res = 2*res + 1
-		} else {
-			res = res * 2
+			res += 1
 		}
 	}
 	return res, bit_start + length
+}
+
+// pattern explained here: https://eli.thegreenplace.net/2018/go-and-algebraic-data-types/
+type Packet interface {
+	isTree()
 }
 
 type Header struct {
@@ -39,9 +43,9 @@ type Header struct {
 	id      uint8
 }
 
-type LitteralValue struct {
+type Value struct {
 	Header
-	value int64
+	value uint64
 }
 
 type Operator struct {
@@ -49,65 +53,72 @@ type Operator struct {
 	packets []Packet
 }
 
-type Packet interface {
-	sumVersion() int
-	eval() int
-}
+func (_ Value) isTree()    {}
+func (_ Operator) isTree() {}
 
-func (l LitteralValue) sumVersion() int {
-	return int(l.Header.version)
-}
-
-func (o Operator) sumVersion() int {
-	res := int(o.Header.version)
-	for _, p := range o.packets {
-		res += p.sumVersion()
+func sumVersion(t Packet) int {
+	switch nt := t.(type) {
+	case Value:
+		return int(nt.version)
+	case Operator:
+		res := int(nt.version)
+		for _, p := range nt.packets {
+			res += sumVersion(p)
+		}
+		return res
+	default:
+		log.Fatalf("unexpected type %T", nt)
 	}
-	return res
+	return 0
 }
 
-func (l LitteralValue) eval() int {
-	return int(l.value)
-}
+func eval(t Packet) int {
+	switch nt := t.(type) {
+	case Value:
+		return int(nt.value)
+	case Operator:
+		switch nt.id {
+		case 0:
+			res := 0
+			for _, p := range nt.packets {
+				res += eval(p)
+			}
+			return res
+		case 1:
+			res := 1
+			for _, p := range nt.packets {
+				res *= eval(p)
+			}
+			return res
+		case 2:
+			res := math.MaxInt
+			for _, p := range nt.packets {
+				a := eval(p)
+				if a < res {
+					res = a
+				}
+			}
+			return res
+		case 3:
+			res := 0
+			for _, p := range nt.packets {
+				a := eval(p)
+				if a > res {
+					res = a
+				}
+			}
+			return res
+		case 5:
+			return toInt(eval(nt.packets[0]) > eval(nt.packets[1]))
+		case 6:
+			return toInt(eval(nt.packets[0]) < eval(nt.packets[1]))
+		case 7:
+			return toInt(eval(nt.packets[0]) == eval(nt.packets[1]))
+		}
+		return 0
 
-func (o Operator) eval() int {
-	switch o.id {
-	case 0:
-		res := 0
-		for _, p := range o.packets {
-			res += p.eval()
-		}
-		return res
-	case 1:
-		res := 1
-		for _, p := range o.packets {
-			res *= p.eval()
-		}
-		return res
-	case 2:
-		res := math.MaxInt
-		for _, p := range o.packets {
-			a := p.eval()
-			if a < res {
-				res = a
-			}
-		}
-		return res
-	case 3:
-		res := 0
-		for _, p := range o.packets {
-			a := p.eval()
-			if a > res {
-				res = a
-			}
-		}
-		return res
-	case 5:
-		return toInt(o.packets[0].eval() > o.packets[1].eval())
-	case 6:
-		return toInt(o.packets[0].eval() < o.packets[1].eval())
-	case 7:
-		return toInt(o.packets[0].eval() == o.packets[1].eval())
+	default:
+		log.Fatalf("unexpected type %T", nt)
 	}
 	return 0
 }
@@ -123,67 +134,63 @@ func toInt(b bool) int {
 func (h Header) String() string {
 	return fmt.Sprintf("version:%d id:%d", h.version, h.id)
 }
-func (l LitteralValue) String() string {
+func (l Value) String() string {
 	return fmt.Sprintf("LV: %s value=%d", l.Header, l.value)
 }
 func (o Operator) String() string {
 	return fmt.Sprintf("Op: %s packets=%v", o.Header, o.packets)
 }
 
-func decode(bytes []byte, bit_start uint32) (Packet, uint32) {
-	var index uint32 = bit_start
-	version, index := extract(bytes, uint32(index), 3)
+func decode(bytes []byte, bit_start uint32) (packet Packet, index uint32) {
+	version, index := extract(bytes, uint32(bit_start), 3)
 	id, index := extract(bytes, index, 3)
 	header := Header{version: uint8(version), id: uint8(id)}
 
 	if id == 4 {
 		var next bool
-		var res uint64
+		var value uint64
 
 		next, index = bit(bytes, index)
-		res, index = extract(bytes, index, 4)
+		value, index = extract(bytes, index, 4)
 		for next {
 			next, index = bit(bytes, index)
 			var v uint64
 			v, index = extract(bytes, index, 4)
-			res = res<<4 + v
+			value = value<<4 + v
 		}
-		return LitteralValue{
+		packet = Value{
 			Header: header,
-			value:  int64(res),
-		}, index
+			value:  value,
+		}
+		return
 	} else {
 		var lengthTypeId bool
-		var length uint64
 
+		packets := make([]Packet, 0)
 		lengthTypeId, index = bit(bytes, index)
 		if !lengthTypeId {
+			var length uint64
 			length, index = extract(bytes, index, 15)
 			end := index + uint32(length)
-			packets := make([]Packet, 0)
 			for index < end {
 				var res Packet
 				res, index = decode(bytes, index)
 				packets = append(packets, res)
 			}
-			return Operator{
-				Header:  header,
-				packets: packets,
-			}, index
 		} else {
+			var length uint64
 			length, index = extract(bytes, index, 11)
-			packets := make([]Packet, length)
 			for i := 0; i < int(length); i++ {
 				var res Packet
 				res, index = decode(bytes, index)
-				packets[i] = res
+				packets = append(packets, res)
 			}
-			return Operator{
-				Header:  header,
-				packets: packets,
-			}, index
-
 		}
+		packet = Operator{
+			Header:  header,
+			packets: packets,
+		}
+		return
 	}
 }
 
@@ -199,13 +206,13 @@ func decodeString(s string) Packet {
 func Part1(input string) int {
 	s := strings.TrimSuffix(input, "\n")
 	res := decodeString(s)
-	return res.sumVersion()
+	return sumVersion(res)
 }
 
 func Part2(input string) int {
 	s := strings.TrimSuffix(input, "\n")
 	res := decodeString(s)
-	return res.eval()
+	return eval(res)
 }
 
 func main() {

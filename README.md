@@ -214,24 +214,26 @@ I would have liked to write my code as follows:
 
 ```
     next, index := bit(bytes, index)
-    res, index := extract(bytes, index, 4)
+	value, index = extract(bytes, index, 4)
 	for next {
 		next, index = bit(bytes, index)
 		v, index := extract(bytes, index, 4)
-		res = res<<4 + v
+		value = value<<4 + v
 	}
 ```
 
-but this is not possible because in the `for-loop`, using `v, index :=` declare a new `index` variable with shallow the previous one.
-I had to write the code as follows:
+but this is not possible because in the `for-loop`, using `v, index :=` declares a new `index` variable which shallows the previous one.
+
+The solution is to declare `v` before the assignment:
 
 ```
-    res, index = extract(bytes, index, 4)
+    next, index = bit(bytes, index)
+	value, index = extract(bytes, index, 4)
 	for next {
 		next, index = bit(bytes, index)
 		var v uint64
 		v, index = extract(bytes, index, 4)
-		res = res<<4 + v
+		value = value<<4 + v
 	}
 ```
 
@@ -245,4 +247,16 @@ Another example is:
 	}
 ```
 
-Where I cannot use the short declaration syntax for `res, index :=` becasue the `index` variable should not be shallowed.
+where I cannot use the short declaration syntax for `res, index :=` becasue the `index` variable should not be shallowed.
+
+The second part of the problem is very interesting because we have to find a way to construct an expression-tree and to define evaluation functions.
+
+In general we can use inheritance. In Golang I have defined structs and an interface (`Packet`).
+
+As explained here: https://eli.thegreenplace.net/2018/go-and-algebraic-data-types/, a key point is to define a function (`isTree` for example) which is common to all struct that belong to the interface.
+
+In a second step, the type discrimination (instead of dynamic dispathing) is done by the `switch` statement and the use of `t.(type)` construct
+
+After finishing the puzzle I discovered the [bitio](https://github.com/icza/bitio) library. I will try it when I have time.
+
+## Day 17

@@ -75,9 +75,12 @@ func add(l1 flattree, l2 flattree) flattree {
 }
 
 func removeIndex(s flattree, i int) flattree {
+	// fmt.Printf("removeIndex %d %v\n", i, s)
 	res := make(flattree, i, len(s)-1)
 	copy(res, s[:i])
-	return append(res, s[i+1:]...)
+	res = append(res, s[i+1:]...)
+	// fmt.Printf("removeIndex res %v\n", res)
+	return res
 }
 
 func replaceIndex(s flattree, i int, a value, b value) flattree {
@@ -88,24 +91,24 @@ func replaceIndex(s flattree, i int, a value, b value) flattree {
 	return append(res, s[i+1:]...)
 }
 
-func explode(l flattree) (flattree, bool) {
-	for i := 0; i < len(l)-1; i++ {
-		if l[i].depth >= 5 && l[i].depth == l[i+1].depth {
-			if i > 0 {
-				l[i-1].v += l[i].v
-			}
-			if i < len(l)-2 {
-				l[i+2].v += l[i+1].v
-			}
-			l[i].v = 0
-			l[i].depth -= 1
-			res := removeIndex(l, i+1)
-			// fmt.Println("explode", res)
-			return res, true
-		}
-	}
-	return l, false
-}
+// func explode(l flattree) (flattree, bool) {
+// 	for i := 0; i < len(l)-1; i++ {
+// 		if l[i].depth >= 5 && l[i].depth == l[i+1].depth {
+// 			if i > 0 {
+// 				l[i-1].v += l[i].v
+// 			}
+// 			if i < len(l)-2 {
+// 				l[i+2].v += l[i+1].v
+// 			}
+// 			l[i].v = 0
+// 			l[i].depth -= 1
+// 			res := removeIndex(l, i+1)
+// 			// fmt.Println("explode", res)
+// 			return res, true
+// 		}
+// 	}
+// 	return l, false
+// }
 
 func split(l flattree) (flattree, bool) {
 	for i := 0; i < len(l); i++ {
@@ -114,24 +117,57 @@ func split(l flattree) (flattree, bool) {
 			b := l[i].v - a
 			newDepth := l[i].depth + 1
 			res := replaceIndex(l, i, value{a, newDepth}, value{b, newDepth})
-			// fmt.Printf("split %d %v\n", l[i].v, res)
 			return res, true
 		}
 	}
 	return l, false
 }
 
-func normalize(l flattree) flattree {
+func explodeStar(l flattree) (flattree, bool) {
 	res := l
-	reduced := true
-	for reduced {
-		res, reduced = explode(res)
-		if !reduced {
-			res, reduced = split(res)
+	reduced := false
+	i := 0
+	for i < len(res)-1 {
+		if res[i].depth >= 5 && res[i].depth == res[i+1].depth {
+			left := res[i].v
+			right := res[i+1].v
+			res = removeIndex(res, i+1)
+			res[i].v = 0
+			res[i].depth -= 1
+			if i > 0 {
+				res[i-1].v += left
+			}
+			if i < len(res)-1 {
+				res[i+1].v += right
+			}
+			reduced = true
+		} else {
+			i++
 		}
 	}
-	return res
+	return res, reduced
 }
+
+func normalize(l flattree) flattree {
+	reduced := true
+	for reduced {
+		l, _ = explodeStar(l)
+		l, reduced = split(l)
+	}
+	return l
+}
+
+// func normalize(l flattree) flattree {
+// 	res := l
+// 	reduced := true
+// 	for reduced {
+// 		res, reduced = explodeStar(res)
+// 		if !reduced {
+// 			res, reduced = split(res)
+// 		}
+// 	}
+// 	return res
+// }
 
 func (s *stack) PushMagnitude(v value) {
 	if s.IsEmpty() {
@@ -161,6 +197,9 @@ func Magnitude(l flattree) int {
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 
+	// e, _ := explodeStar(Parse("[[[[[9,8],1],2],3],4]"))
+	// fmt.Printf("e=%v\n", e)
+	// return 0
 	exp := flattree{}
 	for _, l := range lines {
 		exp = add(exp, Parse(l))

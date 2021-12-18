@@ -18,6 +18,8 @@ type value struct {
 	depth int
 }
 
+type flattree []value
+
 func (v value) String() string {
 	if v.depth >= 0 {
 		return fmt.Sprintf("%d(%d)", v.v, v.depth)
@@ -25,29 +27,8 @@ func (v value) String() string {
 	return fmt.Sprintf("%d", v.v)
 }
 
-func add(l1 []value, l2 []value) []value {
-	if len(l1) == 0 {
-		return l2
-	}
-	if len(l2) == 0 {
-		return l1
-	}
-	res := append(l1, l2...)
-	for i, _ := range res {
-		res[i].depth += 1
-	}
-	return res
-}
-
-func buildPair(a, b int) []value {
-	return []value{
-		{a, 1},
-		{b, 1},
-	}
-}
-
-func Parse(s string) []value {
-	res := []value{}
+func Parse(s string) flattree {
+	res := flattree{}
 	depth := 0
 	i := 0
 	for i < len(s) {
@@ -76,20 +57,38 @@ func Parse(s string) []value {
 	return res
 }
 
-func removeIndex(s []value, index int) []value {
-	ret := make([]value, 0)
-	ret = append(ret, s[:index]...)
-	return append(ret, s[index+1:]...)
-}
-func replaceIndex(s []value, index int, a value, b value) []value {
-	ret := []value{}
-	ret = append(ret, s[:index]...)
-	ret = append(ret, a)
-	ret = append(ret, b)
-	return append(ret, s[index+1:]...)
+func add(l1 flattree, l2 flattree) flattree {
+	if len(l1) == 0 {
+		return l2
+	}
+	if len(l2) == 0 {
+		return l1
+	}
+
+	res := flattree{}
+	res = append(res, l1...)
+	res = append(res, l2...)
+	for i, _ := range res {
+		res[i].depth += 1
+	}
+	return res
 }
 
-func explode(l []value) ([]value, bool) {
+func removeIndex(s flattree, i int) flattree {
+	res := make(flattree, i, len(s)-1)
+	copy(res, s[:i])
+	return append(res, s[i+1:]...)
+}
+
+func replaceIndex(s flattree, i int, a value, b value) flattree {
+	res := make(flattree, i, len(s)+1)
+	copy(res, s[:i])
+	res = append(res, a)
+	res = append(res, b)
+	return append(res, s[i+1:]...)
+}
+
+func explode(l flattree) (flattree, bool) {
 	for i := 0; i < len(l)-1; i++ {
 		if l[i].depth >= 5 && l[i].depth == l[i+1].depth {
 			if i > 0 {
@@ -108,7 +107,7 @@ func explode(l []value) ([]value, bool) {
 	return l, false
 }
 
-func split(l []value) ([]value, bool) {
+func split(l flattree) (flattree, bool) {
 	for i := 0; i < len(l); i++ {
 		if l[i].v >= 10 {
 			a := l[i].v / 2
@@ -122,18 +121,7 @@ func split(l []value) ([]value, bool) {
 	return l, false
 }
 
-// func normalize(l []value) []value {
-// 	for {
-// 		var re, rs bool
-// 		l, re = explode(l)
-// 		l, rs = split(l)
-// 		if !re && !rs {
-// 			return l
-// 		}
-// 	}
-// }
-
-func normalize(l []value) []value {
+func normalize(l flattree) flattree {
 	res := l
 	reduced := true
 	for reduced {
@@ -160,7 +148,7 @@ func (s *stack) PushMagnitude(v value) {
 	}
 }
 
-func Magnitude(l []value) int {
+func Magnitude(l flattree) int {
 	stack := BuildStack()
 	for _, v := range l {
 		stack.PushMagnitude(v)
@@ -171,67 +159,27 @@ func Magnitude(l []value) int {
 }
 
 func Part1(input string) int {
-	//s := strings.TrimSuffix(input, "\n")
-
-	// 	input = `[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]
-	// [7,[[[3,7],[4,3]],[[6,3],[8,8]]]]
-	// [[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]
-	// [[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]]
-	// [7,[5,[[3,8],[1,4]]]]
-	// [[2,[2,2]],[8,[8,1]]]
-	// [2,9]
-	// [1,[[[9,3],9],[[9,0],[0,7]]]]
-	// [[[5,[7,4]],7],1]
-	// [[[[4,2],2],6],[8,7]]`
-
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 
-	exp := []value{}
+	exp := flattree{}
 	for _, l := range lines {
-		// fmt.Println("add:", l)
-
 		exp = add(exp, Parse(l))
 		exp = normalize(exp)
-		// fmt.Println("res add:", exp)
 	}
-	// fmt.Println("result:", exp)
-
-	// fmt.Println("magnitude:", Magnitude(Parse("[9,1]")))         // 29
-	// fmt.Println("magnitude:", Magnitude(Parse("[1,9]")))         // 21
-	// fmt.Println("magnitude:", Magnitude(Parse("[[9,1],[1,9]]"))) // 129
-	// fmt.Println("magnitude:", Magnitude(Parse("[[1,2],[[3,4],5]]"))) // 143
-	// fmt.Println("magnitude:", Magnitude(Parse("[[[0,7],4],[[7,8],[6,0]]],[8,1]]")))
-	// l := buildPair(1, 1)
-	// l = add(l, buildPair(2, 2))
-	// l = normalize(l)
-	// l = add(l, buildPair(3, 3))
-	// l = normalize(l)
-	// l = add(l, buildPair(4, 4))
-	// l = normalize(l)
-	// l = add(l, buildPair(5, 5))
-	// l = normalize(l)
-	// l = add(l, buildPair(6, 6))
-	// l = normalize(l)
-
-	// fmt.Println("l", l)
-	// fmt.Println("parse", parse("[[1,1],2]"))
-
 	return Magnitude(exp)
 }
 
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	values := [][]value{}
+	values := []flattree{}
 
 	for _, l := range lines {
 		values = append(values, normalize(Parse(l)))
 	}
 
 	max := 0
-	for i, la := range lines {
-		for j, lb := range lines {
-			a := Parse(la)
-			b := Parse(lb)
+	for i, a := range values {
+		for j, b := range values {
 			if i != j {
 				m := Magnitude(normalize(add(a, b)))
 				if m > max {
@@ -259,7 +207,7 @@ func main() {
 	fmt.Println(time.Since(start))
 }
 
-type stack []value
+type stack flattree
 
 func BuildStack() stack {
 	return make([]value, 0)
@@ -288,10 +236,6 @@ func (s *stack) Peek() (value, error) {
 
 func (s *stack) IsEmpty() bool {
 	return len(*s) == 0
-}
-
-func (s *stack) Size() int {
-	return len(*s)
 }
 
 func (s *stack) String() string {

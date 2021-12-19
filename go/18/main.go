@@ -123,6 +123,8 @@ func split(l flattree) (flattree, bool) {
 	return l, false
 }
 
+// compute explode* in one pass
+// TODO: start with a copy and perfomr side effects
 func explodeStar(l flattree) (flattree, bool) {
 	res := l
 	reduced := false
@@ -148,6 +150,7 @@ func explodeStar(l flattree) (flattree, bool) {
 	return res, reduced
 }
 
+// strategy: (explode* ; split)*
 func normalize(l flattree) flattree {
 	reduced := true
 	for reduced {
@@ -188,7 +191,6 @@ func Magnitude(l flattree) int {
 	stack := BuildStack()
 	for _, v := range l {
 		stack.PushMagnitude(v)
-
 	}
 	top, _ := stack.Pop()
 	return top.v
@@ -197,9 +199,6 @@ func Magnitude(l flattree) int {
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 
-	// e, _ := explodeStar(Parse("[[[[[9,8],1],2],3],4]"))
-	// fmt.Printf("e=%v\n", e)
-	// return 0
 	exp := flattree{}
 	for _, l := range lines {
 		exp = add(exp, Parse(l))
@@ -211,28 +210,25 @@ func Part1(input string) int {
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	values := []flattree{}
-
 	for _, l := range lines {
-		values = append(values, normalize(Parse(l)))
+		values = append(values, Parse(l))
 	}
 
 	max := 0
 	for i, a := range values {
-		for j, b := range values {
-			if i != j {
-				m := Magnitude(normalize(add(a, b)))
-				if m > max {
-					max = m
-				}
-				m = Magnitude(normalize(add(b, a)))
-				if m > max {
-					max = m
-				}
+		for j := i + 1; j < len(values); j++ {
+			b := values[j]
+			m := Magnitude(normalize(add(a, b)))
+			if m > max {
+				max = m
+			}
+			m = Magnitude(normalize(add(b, a)))
+			if m > max {
+				max = m
 			}
 		}
 	}
 	return max
-
 }
 
 func main() {

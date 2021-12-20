@@ -19,25 +19,28 @@ Learning Rust and Go
 
 Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
-| Rust                     | part A     | part B     | Go                                       | part A     | part B     |
-| :----------------------- | :--------- | :--------- | ---------------------------------------- | ---------- | ---------- |
-| [day 01](./src/day01.rs) | ` 0.089ms` | ` 0.067ms` |                                          |            |            |
-| [day 02](./src/day02.rs) | ` 0.092ms` | ` 0.063ms` |                                          |            |            |
-| [day 03](./src/day03.rs) | ` 0.157ms` | ` 0.084ms` |                                          |            |            |
-| [day 04](./src/day04.rs) | ` 1.048ms` | ` 0.841ms` |                                          |            |            |
-| [day 05](./src/day05.rs) | ` 45.94ms` | ` 46.03ms` |                                          |            |            |
-| [day 06](./src/day06.rs) | ` 0.010ms` | ` 0.008ms` | [day 06](./src/go06/day06.go)            | ` 0.061ms` | ` 0.016ms` |
-| [day 07](./src/day07.rs) | ` 0.274ms` | ` 0.795ms` | [day 07](./src/go07/day07.go)            | ` 4.713ms` | ` 5.214ms` |
-| [day 08](./src/day08.rs) | ` 0.198ms` | ` 1.786ms` |                                          |            |            |
-|                          |            |            | [day 09](./src/go09_simplified/day09.go) | ` 0.189ms` | ` 1.183ms` |
-| [day 10](./src/day10.rs) | ` 0.137ms` | ` 0.134ms` | [day 10](./src/go10/day10.go)            | ` 0.152ms` | ` 0.151ms` |
-| [day 11](./src/day11.rs) | ` 0.186ms` | ` 0.420ms` | [day 11](./src/go11/day11.go)            | ` 0.211`   | ` 0.422ms` |
-|                          |            |            | [day 12](./src/go12/day12.go)            | ` 0.161ms` | ` 3.944ms` |
-| [day 13](./src/day13.rs) | ` 0.156ms` | ` 0.118ms` | [day 13](./src/go13/day13.go)            | ` 0.441ms` | ` 0.706ms` |
-|                          |            |            | [day 14](./src/go14/day14.go)            | ` 0.075ms` | ` 0.056ms` |
-|                          |            |            | [day 15](./src/go15/day15.go)            | ` 11.64ms` | ` 344.0ms` |
-|                          |            |            | [day 16](./src/go16/day16.go)            | ` 0.121ms` | ` 0.071ms` |
-|                          |            |            | [day 17](./src/go17/day17.go)            | ` 0.133ms` | ` 0.424ms` |
+| Rust                          | part A     | part B     | Go                                      | part A     | part B     |
+| :---------------------------- | :--------- | :--------- | --------------------------------------- | ---------- | ---------- |
+| [day 01](./rust/src/day01.rs) | ` 0.089ms` | ` 0.067ms` |                                         |            |            |
+| [day 02](./rust/src/day02.rs) | ` 0.092ms` | ` 0.063ms` |                                         |            |            |
+| [day 03](./rust/src/day03.rs) | ` 0.157ms` | ` 0.084ms` |                                         |            |            |
+| [day 04](./rust/src/day04.rs) | ` 1.048ms` | ` 0.841ms` |                                         |            |            |
+| [day 05](./rust/src/day05.rs) | ` 45.94ms` | ` 46.03ms` |                                         |            |            |
+| [day 06](./rust/src/day06.rs) | ` 0.010ms` | ` 0.008ms` | [day 06](./go/go06/day06.go)            | ` 0.061ms` | ` 0.016ms` |
+| [day 07](./rust/src/day07.rs) | ` 0.274ms` | ` 0.795ms` | [day 07](./go/go07/day07.go)            | ` 4.713ms` | ` 5.214ms` |
+| [day 08](./rust/src/day08.rs) | ` 0.198ms` | ` 1.786ms` |                                         |            |            |
+|                               |            |            | [day 09](./go/go09_simplified/day09.go) | ` 0.189ms` | ` 1.183ms` |
+| [day 10](./rust/src/day10.rs) | ` 0.137ms` | ` 0.134ms` | [day 10](./go/go10/day10.go)            | ` 0.152ms` | ` 0.151ms` |
+| [day 11](./rust/src/day11.rs) | ` 0.186ms` | ` 0.420ms` | [day 11](./go/go11/day11.go)            | ` 0.211`   | ` 0.422ms` |
+|                               |            |            | [day 12](./go/go12/day12.go)            | ` 0.161ms` | ` 3.944ms` |
+| [day 13](./rust/src/day13.rs) | ` 0.156ms` | ` 0.118ms` | [day 13](./go/go13/day13.go)            | ` 0.441ms` | ` 0.706ms` |
+|                               |            |            | [day 14](./go/go14/day14.go)            | ` 0.075ms` | ` 0.056ms` |
+|                               |            |            | [day 15](./go/go15/day15.go)            | ` 11.64ms` | ` 344.0ms` |
+|                               |            |            | [day 16](./go/go16/day16.go)            | ` 0.121ms` | ` 0.071ms` |
+|                               |            |            | [day 17](./go/17/day17.go)              | ` 0.133ms` | ` 0.424ms` |
+|                               |            |            | [day 18](./go/18/day18.go)              | ` 4.071ms` | ` 24.39ms` |
+|                               |            |            | [day 19](./go/19/day19.go)              |            |            |
+|                               |            |            | [day 20](./go/20/day20.go)              | ` 13.37ms` | ` 700.5ms` |
 
 # Comments
 

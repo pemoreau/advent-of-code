@@ -14,15 +14,9 @@ var input_day string
 type Pos struct{ x, y int }
 type Image map[Pos]bool
 
-func step(img Image, convo string) Image {
-	minX, maxX, minY, maxY := findMinMax(img)
-	defaultValue := img[Pos{minX, minY}]
-	addExtraLayer(img, minX, maxX, minY, maxY, defaultValue)
-	// addExtraLayer(img, minX-1, maxX+1, minY-1, maxY+1, defaultValue)
-	// addExtraLayer(img, minX-2, maxX+2, minY-2, maxY+2, defaultValue)
+func step(img Image, convo string, defaultValue bool) Image {
 
 	new_img := Image{}
-
 	for key := range img {
 		neighbors := []Pos{{key.x - 1, key.y - 1},
 			{key.x, key.y - 1},
@@ -81,15 +75,20 @@ func findMinMax(img Image) (minX, maxX, minY, maxY int) {
 	return
 }
 
-func addExtraLayer(img Image, minX, maxX, minY, maxY int, b bool) {
-	for x := minX - 1; x <= maxX+1; x++ {
+func addExtraLayer(img Image, minX, maxX, minY, maxY int, b bool) (newMinX, newMaxX, newMinY, newMaxY int) {
+	newMinX = minX - 1
+	newMaxX = maxX + 1
+	for x := newMinX; x <= newMaxX; x++ {
 		img[Pos{x, minY - 1}] = b
 		img[Pos{x, maxY + 1}] = b
 	}
-	for y := minY - 1; y <= maxY+1; y++ {
+	newMinY = minY - 1
+	newMaxY = maxY + 1
+	for y := newMinY; y <= newMaxY; y++ {
 		img[Pos{minX - 1, y}] = b
 		img[Pos{maxX + 1, y}] = b
 	}
+	return
 }
 
 func solve(input string, n int) int {
@@ -105,10 +104,14 @@ func solve(input string, n int) int {
 	}
 
 	minX, maxX, minY, maxY := findMinMax(img)
-	addExtraLayer(img, minX, maxX, minY, maxY, false)
+	minX, maxX, minY, maxY = addExtraLayer(img, minX, maxX, minY, maxY, false)
 
 	for i := 0; i < n; i++ {
-		img = step(img, convo)
+		defaultValue := img[Pos{minX, minY}]
+		minX, maxX, minY, maxY = addExtraLayer(img, minX, maxX, minY, maxY, defaultValue)
+		// addExtraLayer(img, minX-1, maxX+1, minY-1, maxY+1, defaultValue)
+		// addExtraLayer(img, minX-2, maxX+2, minY-2, maxY+2, defaultValue)
+		img = step(img, convo, defaultValue)
 	}
 
 	return countPixel(img)

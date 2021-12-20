@@ -40,7 +40,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                               |            |            | [day 17](./go/17/day17.go)              | ` 0.133ms` | ` 0.424ms` |
 |                               |            |            | [day 18](./go/18/day18.go)              | ` 4.071ms` | ` 24.39ms` |
 |                               |            |            | [day 19](./go/19/day19.go)              |            |            |
-|                               |            |            | [day 20](./go/20/day20.go)              | ` 13.37ms` | ` 700.5ms` |
+|                               |            |            | [day 20](./go/20/day20.go)              | ` 13.37ms` | ` 683.0ms` |
 
 # Comments
 
@@ -268,3 +268,26 @@ After finishing the puzzle I discovered the [bitio](https://github.com/icza/biti
 ### Go
 
 Brute force approach. Not very proud of it.
+
+## Day 18
+
+### Go
+
+A good day for me. I have used a list of (value, depth) tuples to represent the tree. With this representation, the normalization wrt. explode can be done in one pass. `split` rule is also efficient.
+
+One difficulty is to compute the magnitude. Fopr that I use a stack of `(value,depth)`. when the top of the stack contains two values with the same depth, theyn can be replaced by a new tuple `(3*left+2*right, depth-1)`. This is quite efficient.
+
+The current implementation doesn ot perform side effect. This should be possible to improve the efficiency by doing transformations in place.
+
+## Day 19
+
+### Go
+
+not a good day for me
+
+## Day 20
+
+### Go
+
+I have use a hashset to store the positions. I had to store the `.` positions so this is not very optimized.
+The interest is that I can extend the border of the image without moviing everything, but it is possible that an array of pixels would be more efficient

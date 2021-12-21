@@ -38,9 +38,10 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                               |            |            | [day 15](./go/go15/day15.go)            | ` 11.64ms` | ` 344.0ms` |
 |                               |            |            | [day 16](./go/go16/day16.go)            | ` 0.121ms` | ` 0.071ms` |
 |                               |            |            | [day 17](./go/17/day17.go)              | ` 0.133ms` | ` 0.424ms` |
-|                               |            |            | [day 18](./go/18/day18.go)              | ` 4.071ms` | ` 24.39ms` |
-|                               |            |            | [day 19](./go/19/day19.go)              |            |            |
-|                               |            |            | [day 20](./go/20/day20.go)              | ` 9.516ms` | ` 493.8ms` |
+|                               |            |            | [day 18](./go/18/main.go)               | ` 4.071ms` | ` 24.39ms` |
+|                               |            |            | [day 19](./go/19/main.go)               |            |            |
+|                               |            |            | [day 20](./go/20/main.go)               | ` 9.516ms` | ` 493.8ms` |
+|                               |            |            | [day 21](./go/21/main.go)               | ` 0.017ms` | ` 166.8ms` |
 
 # Comments
 
@@ -291,3 +292,11 @@ not a good day for me
 
 I have use a hashset to store the positions. I had to store the `.` positions so this is not very optimized.
 The interest is that I can extend the border of the image without moviing everything, but it is possible that an array of pixels would be more efficient
+
+## Day 21
+
+### Go
+
+Using recursion and a cache.
+
+Not so easy to get it correct

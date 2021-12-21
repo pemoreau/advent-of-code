@@ -3,6 +3,8 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -42,79 +44,103 @@ func (d *Dice) deterministicRoll(n uint8) (sum uint16) {
 }
 
 func Part1(input string) int {
-	// input := strings.TrimSuffix(input, "\n")
-	// lines := strings.Split(input, "\n")
-	p1 := Player{space: 10}
-	p2 := Player{space: 3}
+	input = strings.TrimSuffix(input, "\n")
+	lines := strings.Split(input, "\n")
+
+	space0, _ := strconv.Atoi(strings.Split(lines[0], " ")[4])
+	space1, _ := strconv.Atoi(strings.Split(lines[1], " ")[4])
+
+	p1 := Player{space: uint16(space0)}
+	p2 := Player{space: uint16(space1)}
 	d := Dice{value: 1}
 
 	for {
 		m := d.deterministicRoll(3)
 		p1.move(m)
-		// fmt.Printf("p1 dice #%d=%d %s\n", d.nbRoll, m, p1)
 		if p1.score >= 1000 {
 			return int(d.nbRoll) * int(p2.score)
 		}
 		m = d.deterministicRoll(3)
 		p2.move(m)
-		// fmt.Printf("p2 dice #%d=%d %s\n", d.nbRoll, m, p2)
 		if p2.score >= 1000 {
 			return int(d.nbRoll) * int(p1.score)
 		}
 	}
 }
 
-func explore(roll, absoluteRoll, dice uint, score0, score1 uint, space0, space1 uint, win0, win1 uint, player uint8) (uint, uint) {
-	fmt.Printf("player=%d roll=%d[%d] dice=%d score0=%d score1=%d space0=%d space1=%d\n", player, roll, absoluteRoll, dice, score0, score1, space0, space1)
-	if player == 0 {
-		space0 = 1 + ((space0 + dice - 1) % 10)
-		score0 += space0
-	} else if player == 1 {
-		space1 = 1 + ((space1 + dice - 1) % 10)
-		score1 += space1
-	}
-	fmt.Printf("***                       score0=%d score1=%d space0=%d space1=%d\n", score0, score1, space0, space1)
+type state struct {
+	player0        bool
+	roll           uint
+	dice           uint8
+	score0, score1 uint
+	space0, space1 uint8
+}
 
-	if score0 >= 21 {
-		fmt.Printf("player0 win: %d, %d\n", win0+1, win1)
-		return win0 + 1, win1
-	}
-	if score1 >= 21 {
-		fmt.Printf("player1 win: %d, %d\n", win0, win1+1)
-		return win0, win1 + 1
+type win struct{ win0, win1 uint }
+
+var cache = make(map[state]win)
+
+func explore(s state) win {
+
+	if res, found := cache[s]; found {
+		return res
 	}
 
-	roll = (roll + 1) % 3
-	if roll == 0 {
-		player = (player + 1) % 2
+	initS := s
+
+	if s.player0 {
+		s.space0 = 1 + ((s.space0 + s.dice - 1) % 10)
+		if s.roll == 2 {
+			s.score0 += uint(s.space0)
+		}
+	} else {
+		s.space1 = 1 + ((s.space1 + s.dice - 1) % 10)
+		if s.roll == 2 {
+			s.score1 += uint(s.space1)
+		}
 	}
 
-	resw0, resw1 := win0, win1
-	w0, w1 := explore(roll, absoluteRoll+1, 1, score0, score1, space0, space1, win0, win1, player)
-	resw0 += w0
-	resw1 += w1
-	w0, w1 = explore(roll, absoluteRoll+1, 2, score0, score1, space0, space1, win0, win1, player)
-	resw0 += w0
-	resw1 += w1
-	w0, w1 = explore(roll, absoluteRoll+1, 3, score0, score1, space0, space1, win0, win1, player)
-	resw0 += w0
-	resw1 += w1
-	return resw0, resw1
+	if s.score0 >= 21 {
+		cache[initS] = win{1, 0}
+		return win{1, 0}
+	}
+	if s.score1 >= 21 {
+		cache[initS] = win{0, 1}
+		return win{0, 1}
+	}
+
+	if s.roll == 2 {
+		s.player0 = !s.player0
+	}
+	s.roll = (s.roll + 1) % 3
+	var win0, win1 uint
+	for d := uint8(1); d <= 3; d++ {
+		s.dice = d
+		win := explore(s)
+		win0 += win.win0
+		win1 += win.win1
+	}
+
+	// fmt.Printf("store %v --> %v\n", initS, win{win0, win1})
+	cache[initS] = win{win0, win1}
+	return win{win0, win1}
 }
 
 func Part2(input string) int {
-	// input := strings.TrimSuffix(input, "\n")
-	// lines := strings.Split(input, "\n")
+	input = strings.TrimSuffix(input, "\n")
+	lines := strings.Split(input, "\n")
+
+	space0, _ := strconv.Atoi(strings.Split(lines[0], " ")[4])
+	space1, _ := strconv.Atoi(strings.Split(lines[1], " ")[4])
+	player0 := true
+	roll := uint(0)
 	var win0, win1 uint
-	w0, w1 := explore(0, 0, 1, 0, 0, 4, 8, 0, 0, 0)
-	win0 += w0
-	win1 += w1
-	w0, w1 = explore(0, 0, 2, 0, 0, 4, 8, 0, 0, 0)
-	win0 += w0
-	win1 += w1
-	w0, w1 = explore(0, 0, 3, 0, 0, 4, 8, 0, 0, 0)
-	win0 += w0
-	win1 += w1
+	for d := uint8(1); d <= 3; d++ {
+		s := state{player0, roll, d, 0, 0, uint8(space0), uint8(space1)}
+		win := explore(s)
+		win0 += win.win0
+		win1 += win.win1
+	}
 
 	if win0 > win1 {
 		return int(win0)

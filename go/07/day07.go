@@ -1,13 +1,16 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
-	"io/ioutil"
 	"math"
-	"strconv"
-	"strings"
 	"time"
+
+	"github.com/pemoreau/advent-of-code-2021/go/utils"
 )
+
+//go:embed input.txt
+var input_day string
 
 type fn func(int, int) int
 
@@ -37,25 +40,14 @@ func search(values []int, cost fn) int {
 }
 
 func Part1(input string) int {
-	values := make([]int, 0)
-	for _, in := range strings.Split(strings.TrimSuffix(input, "\n"), ",") {
-		v, err := strconv.Atoi(in)
-		if err != nil {
-			panic(err)
-		}
-		values = append(values, v)
-	}
+	values := utils.CommaSeparatedToNumbers(input)
 	return search(values, func(a, b int) int {
 		return abs(a - b)
 	})
 }
 
 func Part2(input string) int {
-	values := make([]int, 0)
-	for _, in := range strings.Split(strings.TrimSuffix(input, "\n"), ",") {
-		v, _ := strconv.Atoi(in)
-		values = append(values, v)
-	}
+	values := utils.CommaSeparatedToNumbers(input)
 	return search(values, func(a, b int) int {
 		n := abs(a - b)
 		return n * (n + 1) / 2
@@ -70,13 +62,12 @@ func abs(x int) int {
 }
 
 func main() {
-	content, _ := ioutil.ReadFile("../../inputs/day07.txt")
-
+	fmt.Println("--2021 day 07 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(string(content)))
+	fmt.Println("part1: ", Part1(string(input_day)))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(string(content)))
+	fmt.Println("part2: ", Part2(string(input_day)))
 	fmt.Println(time.Since(start))
 }

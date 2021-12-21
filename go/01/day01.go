@@ -1,15 +1,18 @@
 package main
 
 import (
-	"aoc2021/utils"
+	_ "embed"
 	"fmt"
 	"time"
+
+	"github.com/pemoreau/advent-of-code-2021/go/utils"
 )
 
-//	"github.com/pemoreau/advent-of-code-2021/utils"
+//go:embed input.txt
+var input_day string
 
-func Part1(filename string) int {
-	values := utils.ReadNumbers(filename)
+func Part1(input string) int {
+	values := utils.LinesToNumbers(input)
 	cpt := 0
 	for i := 1; i < len(values); i++ {
 		if values[i-1] < values[i] {
@@ -19,8 +22,8 @@ func Part1(filename string) int {
 	return cpt
 }
 
-func Part2(filename string) int {
-	values := utils.ReadNumbers(filename)
+func Part2(input string) int {
+	values := utils.LinesToNumbers(input)
 	cpt := 0
 	for i := 3; i < len(values); i++ {
 		if values[i-3] < values[i] {
@@ -31,13 +34,12 @@ func Part2(filename string) int {
 }
 
 func main() {
-	filename := "../../inputs/day01.txt"
-
+	fmt.Println("--2021 day 01 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(filename))
+	fmt.Println("part1: ", Part1(string(input_day)))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(filename))
+	fmt.Println("part2: ", Part2(string(input_day)))
 	fmt.Println(time.Since(start))
 }

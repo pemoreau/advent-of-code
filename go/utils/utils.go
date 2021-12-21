@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func ReadFile(filename string) []string {
@@ -45,4 +46,21 @@ func ReadNumbers(filename string) []int {
 		numbers = append(numbers, ToInt(scanner.Text()))
 	}
 	return numbers
+}
+
+func stringsToNumbers(inputs []string) []int {
+	numbers := make([]int, 0, len(inputs))
+	for _, input := range inputs {
+		numbers = append(numbers, ToInt(input))
+	}
+	return numbers
+}
+
+func LinesToNumbers(input string) []int {
+	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
+	return stringsToNumbers(lines)
+}
+func CommaSeparatedToNumbers(input string) []int {
+	lines := strings.Split(strings.TrimSuffix(input, "\n"), ",")
+	return stringsToNumbers(lines)
 }

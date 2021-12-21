@@ -40,7 +40,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                               |            |            | [day 17](./go/17/day17.go)              | ` 0.133ms` | ` 0.424ms` |
 |                               |            |            | [day 18](./go/18/day18.go)              | ` 4.071ms` | ` 24.39ms` |
 |                               |            |            | [day 19](./go/19/day19.go)              |            |            |
-|                               |            |            | [day 20](./go/20/day20.go)              | ` 13.37ms` | ` 683.0ms` |
+|                               |            |            | [day 20](./go/20/day20.go)              | ` 9.516ms` | ` 493.8ms` |
 
 # Comments
 

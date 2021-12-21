@@ -11,12 +11,12 @@ import (
 //go:embed input.txt
 var input_day string
 
-type Pos struct{ x, y int }
+type Pos struct{ x, y int16 }
 type Image map[Pos]bool
 
 func step(img Image, convo string, defaultValue bool) Image {
 
-	new_img := Image{}
+	new_img := make(Image, len(img))
 	for key := range img {
 		neighbors := []Pos{{key.x - 1, key.y - 1},
 			{key.x, key.y - 1},
@@ -53,11 +53,11 @@ func countPixel(img Image) int {
 	return count
 }
 
-func findMinMax(img Image) (minX, maxX, minY, maxY int) {
-	minX = math.MaxInt
-	maxX = math.MinInt
-	minY = math.MaxInt
-	maxY = math.MinInt
+func findMinMax(img Image) (minX, maxX, minY, maxY int16) {
+	minX = math.MaxInt16
+	maxX = math.MinInt16
+	minY = math.MaxInt16
+	maxY = math.MinInt16
 	for key := range img {
 		if key.x < minX {
 			minX = key.x
@@ -75,7 +75,7 @@ func findMinMax(img Image) (minX, maxX, minY, maxY int) {
 	return
 }
 
-func addExtraLayer(img Image, minX, maxX, minY, maxY int, b bool) (newMinX, newMaxX, newMinY, newMaxY int) {
+func addExtraLayer(img Image, minX, maxX, minY, maxY int16, b bool) (newMinX, newMaxX, newMinY, newMaxY int16) {
 	newMinX = minX - 1
 	newMaxX = maxX + 1
 	for x := newMinX; x <= newMaxX; x++ {
@@ -91,22 +91,23 @@ func addExtraLayer(img Image, minX, maxX, minY, maxY int, b bool) (newMinX, newM
 	return
 }
 
-func solve(input string, n int) int {
+func solve(input string, n uint16) int {
 	input = strings.TrimSuffix(input, "\n")
 	parts := strings.Split(input, "\n\n")
 	convo := parts[0]
 
-	img := map[Pos]bool{}
+	img := make(Image)
 	for j, line := range strings.Split(parts[1], "\n") {
 		for i, c := range strings.TrimSpace(line) {
-			img[Pos{i, j}] = (c == '#')
+			img[Pos{int16(i), int16(j)}] = (c == '#')
 		}
 	}
 
 	minX, maxX, minY, maxY := findMinMax(img)
 	minX, maxX, minY, maxY = addExtraLayer(img, minX, maxX, minY, maxY, false)
 
-	for i := 0; i < n; i++ {
+	var i uint16
+	for i = 0; i < n; i++ {
 		defaultValue := img[Pos{minX, minY}]
 		minX, maxX, minY, maxY = addExtraLayer(img, minX, maxX, minY, maxY, defaultValue)
 		// addExtraLayer(img, minX-1, maxX+1, minY-1, maxY+1, defaultValue)

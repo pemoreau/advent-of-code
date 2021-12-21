@@ -78,8 +78,6 @@ type state struct {
 
 type win struct{ win0, win1 uint }
 
-var cache = make(map[state]win)
-
 func explore(s state) win {
 
 	if res, found := cache[s]; found {
@@ -93,20 +91,19 @@ func explore(s state) win {
 		if s.roll == 2 {
 			s.score0 += uint(s.space0)
 		}
+		if s.score0 >= 21 {
+			cache[initS] = win{1, 0}
+			return win{1, 0}
+		}
 	} else {
 		s.space1 = 1 + ((s.space1 + s.dice - 1) % 10)
 		if s.roll == 2 {
 			s.score1 += uint(s.space1)
 		}
-	}
-
-	if s.score0 >= 21 {
-		cache[initS] = win{1, 0}
-		return win{1, 0}
-	}
-	if s.score1 >= 21 {
-		cache[initS] = win{0, 1}
-		return win{0, 1}
+		if s.score1 >= 21 {
+			cache[initS] = win{0, 1}
+			return win{0, 1}
+		}
 	}
 
 	if s.roll == 2 {
@@ -126,9 +123,13 @@ func explore(s state) win {
 	return win{win0, win1}
 }
 
+var cache map[state]win
+
 func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
+
+	cache = make(map[state]win) // new cache for each benchmark
 
 	space0, _ := strconv.Atoi(strings.Split(lines[0], " ")[4])
 	space1, _ := strconv.Atoi(strings.Split(lines[1], " ")[4])

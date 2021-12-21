@@ -10,13 +10,13 @@ import (
 var input_day string
 
 func Part1(input string) int {
-	// input := strings.TrimSuffix(input, "\n")
+	// input = strings.TrimSuffix(input, "\n")
 	// lines := strings.Split(input, "\n")
 	return 0
 }
 
 func Part2(input string) int {
-	// input := strings.TrimSuffix(input, "\n")
+	// input = strings.TrimSuffix(input, "\n")
 	// lines := strings.Split(input, "\n")
 	return 0
 

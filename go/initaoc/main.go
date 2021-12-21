@@ -37,12 +37,14 @@ func main() {
 
 	y := *year
 	// check if we're in a year folder
-	_, folder := filepath.Split(cwd)
+	// _, folder := filepath.Split(cwd)
 	reg := regexp.MustCompile("([0-9]{4})")
-	m := reg.FindStringSubmatch(folder)
+	// m := reg.FindStringSubmatch(folder)
+	m := reg.FindStringSubmatch(cwd)
 	createYearDir := true
 	if len(m) == 2 {
-		y, _ = strconv.Atoi(folder)
+		// y, _ = strconv.Atoi(folder)
+		y, _ = strconv.Atoi(m[1])
 		createYearDir = false
 	}
 
@@ -89,12 +91,14 @@ func runInit(year, day int, createYearDir bool, session, boilerplate, baseUrl, i
 		contents := f.contents
 		contents = strings.ReplaceAll(contents, "{year}", syear)
 		contents = strings.ReplaceAll(contents, "{day}", pathDay)
+		filename := f.filename
+		filename = strings.ReplaceAll(filename, "{day}", pathDay)
 
-		err = initFile(dirPath, f.filename, contents, true)
+		err = initFile(dirPath, filename, contents, true)
 		if err != nil {
 			return err
 		} else {
-			log.Printf("init'd file %s\\%s", dirPath, f.filename)
+			log.Printf("init'd file %s\\%s", dirPath, filename)
 		}
 	}
 

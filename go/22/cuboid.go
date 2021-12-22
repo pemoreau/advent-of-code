@@ -50,26 +50,26 @@ func Intersection(a, b Cuboid) (Cuboid, bool) {
 	return a, false
 }
 
-func DisjointList(list []Cuboid, b Cuboid) bool {
-	for _, a := range list {
-		if _, ok := Intersection(a, b); ok {
-			return false
-		}
-	}
-	return true
-}
+// func DisjointList(list []Cuboid, b Cuboid) bool {
+// 	for _, a := range list {
+// 		if _, ok := Intersection(a, b); ok {
+// 			return false
+// 		}
+// 	}
+// 	return true
+// }
 
-func AllDisjoint(list []Cuboid) bool {
-	for i := 0; i < len(list); i++ {
-		for j := i + 1; j < len(list); j++ {
-			if _, ok := Intersection(list[i], list[j]); ok {
-				fmt.Printf("not disjoint:\n%d\t%v\n%d\t%v\n", i, list[i], j, list[j])
-				return false
-			}
-		}
-	}
-	return true
-}
+// func AllDisjoint(list []Cuboid) bool {
+// 	for i := 0; i < len(list); i++ {
+// 		for j := i + 1; j < len(list); j++ {
+// 			if _, ok := Intersection(list[i], list[j]); ok {
+// 				fmt.Printf("not disjoint:\n%d\t%v\n%d\t%v\n", i, list[i], j, list[j])
+// 				return false
+// 			}
+// 		}
+// 	}
+// 	return true
+// }
 
 // b over a
 func Overlap(a, b Cuboid) []Cuboid {
@@ -96,9 +96,6 @@ func Overlap(a, b Cuboid) []Cuboid {
 				zmin, zmax := dimension[2][k], dimension[2][k+1]
 				if !IsEmptyCuboid(xmin, xmax, ymin, ymax, zmin, zmax) {
 					c := CreateCuboid(xmin, xmax, ymin, ymax, zmin, zmax)
-					if !DisjointList(res, c) {
-						panic(fmt.Sprint("Not disjoint: ", c, res))
-					}
 					if Include(c, b) || Include(c, a) {
 						res = append(res, c)
 					}
@@ -106,21 +103,9 @@ func Overlap(a, b Cuboid) []Cuboid {
 			}
 		}
 	}
-	if !AllDisjoint(res) {
-		panic(fmt.Sprint("Not all disjoint: ", res))
-	}
-	return res
-}
-
-func makeUniq(list []Cuboid) []Cuboid {
-	set := make(map[Cuboid]bool)
-	for _, c := range list {
-		set[c] = true
-	}
-	res := make([]Cuboid, 0, len(set))
-	for c := range set {
-		res = append(res, c)
-	}
+	// if !AllDisjoint(res) {
+	// 	panic(fmt.Sprint("Not all disjoint: ", res))
+	// }
 	return res
 }
 

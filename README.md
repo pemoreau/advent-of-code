@@ -28,7 +28,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 04](./rust/src/day04.rs) | ` 1.048ms` | ` 0.841ms` |                                       |             |               |
 | [day 05](./rust/src/day05.rs) | ` 45.94ms` | ` 46.03ms` |                                       |             |               |
 | [day 06](./rust/src/day06.rs) | ` 0.010ms` | ` 0.008ms` | [day 06](./go/06/day06.go)            | ` 7.211 µs` | ` 8.712 µs`   |
-| [day 07](./rust/src/day07.rs) | ` 0.274ms` | ` 0.795ms` | [day 07](./go/07/day07.go)            | ` 4516 µs`  | ` 5.001 ms`   |
+| [day 07](./rust/src/day07.rs) | ` 0.274ms` | ` 0.795ms` | [day 07](./go/07/day07.go)            | ` 4.516 ms` | ` 5.001 ms`   |
 | [day 08](./rust/src/day08.rs) | ` 0.198ms` | ` 1.786ms` |                                       |             |               |
 |                               |            |            | [day 09](./go/09_simplified/day09.go) | ` 0.189 ms` | ` 1.183 ms`   |
 | [day 10](./rust/src/day10.rs) | ` 0.137ms` | ` 0.134ms` | [day 10](./go/10/day10.go)            | ` 0.152 ms` | ` 0.151 ms`   |
@@ -287,17 +287,23 @@ The current implementation doesn ot perform side effect. This should be possible
 
 not a good day for me
 
-## Day 20
+## Day 20:: Trench Map
 
 ### Go
 
 I have use a hashset to store the positions. I had to store the `.` positions so this is not very optimized.
 The interest is that I can extend the border of the image without moviing everything, but it is possible that an array of pixels would be more efficient
 
-## Day 21
+## Day 21: Dirac Dice
 
 ### Go
 
 Using recursion and a cache.
 
-Not so easy to get it correct
+Not so easy to get it correct. I made a mistake: starting with `uint8` for space. I took me some time to the overflow problem.
+
+This is a good lesson: use `int` instead of `int8`, `int16`, `uint8`, ...,and do not do premature optimization. Then implement unit tests, and only after that, narrow integer types to speedup.
+
+## Day 22: Reactor Reboot
+
+### Go

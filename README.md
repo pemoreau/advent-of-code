@@ -43,7 +43,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                               |            |            | [day 19](./go/19/day19.go)            |             |               |
 |                               |            |            | [day 20](./go/20/day20.go)            | ` 9.035 ms` | ` 491.576 ms` |
 |                               |            |            | [day 21](./go/21/day21.go)            | ` 2.342 µs` | ` 137.152 ms` |
-|                               |            |            | [day 22](./go/22/day22.go)            | ` 2.285 ms` | ` 99.627 ms`  |
+|                               |            |            | [day 22](./go/22/day22.go)            | ` 2.070 ms` | ` 64.165 ms`  |
 
 # Comments
 
@@ -308,3 +308,5 @@ This is a good lesson: use `int` instead of `int8`, `int16`, `uint8`, ...,and do
 ## Day 22: Reactor Reboot
 
 ### Go
+
+Implemented a Cuboid data-structure with an `overlap(c1,c2 Cuboid)` function (which splits `c1` into smaller disjoint ones when `c2` overlaps)

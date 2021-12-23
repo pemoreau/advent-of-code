@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-type World map[Cuboid]int
+type World map[Cuboid]uint8
 
 func (w World) String() string {
 	var s string
@@ -14,21 +14,18 @@ func (w World) String() string {
 	return s
 }
 
-func (w World) Add(c Cuboid, info int) {
+func (w World) Add(c Cuboid, info uint8) {
 	for key, ki := range w {
 		if ki > 0 {
-			if info == ki && Include(c, key) {
-				// do nothing
-				return
+			if info == ki && key.Contains(c) {
+				return // do nothing
 			}
-			if info == ki && Include(key, c) {
-				// key subsumed
-				w[key] = 0 // remove key
-			} else if _, ok := Intersection(key, c); ok {
-				w[key] = 0 // remove key
-				list := Overlap(key, c)
-				for _, e := range list {
-					if !Include(e, c) {
+			if info == ki && c.Contains(key) {
+				delete(w, key) // key subsumed: remove key
+			} else if !Disjoint(key, c) {
+				delete(w, key) // remove key
+				for _, e := range c.Overlap(key) {
+					if !c.Contains(e) {
 						w[e] = ki
 					}
 				}
@@ -38,11 +35,11 @@ func (w World) Add(c Cuboid, info int) {
 	w[c] = info
 }
 
-func (w World) Count(info int) int {
+func (w World) Count(info uint8) int {
 	count := 0
 	for c, v := range w {
 		if v == info {
-			count += Size(c)
+			count += c.Size()
 		}
 	}
 	return count

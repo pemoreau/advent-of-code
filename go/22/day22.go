@@ -24,9 +24,9 @@ func Part1(input string) int {
 	box50 := CreateCuboid(-50, 51, -50, 51, -50, 51)
 	for _, line := range lines {
 		commands := strings.Split(line, " ")
-		info := 2
+		info := uint8(2)
 		if commands[0] == "off" {
-			info = 1
+			info = uint8(1)
 		}
 		c := ParseCuboid(strings.TrimSuffix(commands[1], "\n"))
 		if i, ok := Intersection(box50, c); ok {
@@ -43,9 +43,9 @@ func Part2(input string) int {
 	world := World{}
 	for _, line := range lines {
 		commands := strings.Split(line, " ")
-		info := 2
+		info := uint8(2)
 		if commands[0] == "off" {
-			info = 1
+			info = uint8(1)
 		}
 		c := ParseCuboid(strings.TrimSuffix(commands[1], "\n"))
 		world.Add(c, info)

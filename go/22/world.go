@@ -14,18 +14,14 @@ func (w World) String() string {
 
 func (w World) Add(c Cuboid, info uint8) {
 	for key, ki := range w {
-		if ki > 0 {
+		if !Disjoint(key, c) {
 			if info == ki && key.Contains(c) {
 				return // do nothing
 			}
-			if info == ki && c.Contains(key) {
-				delete(w, key) // key subsumed: remove key
-			} else if !Disjoint(key, c) {
-				delete(w, key) // remove key
-				for _, e := range c.Overlap(key) {
-					if !c.Contains(e) {
-						w[e] = ki
-					}
+			delete(w, key) // remove key
+			for _, e := range c.Overlap(key) {
+				if !c.Contains(e) {
+					w[e] = ki
 				}
 			}
 		}

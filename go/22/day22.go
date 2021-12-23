@@ -16,41 +16,36 @@ func ParseCuboid(s string) Cuboid {
 	return CreateCuboid(xmin, xmax+1, ymin, ymax+1, zmin, zmax+1)
 }
 
-func Part1(input string) int {
+func solve(input string, part int) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
 	world := World{}
-	box50 := CreateCuboid(-50, 51, -50, 51, -50, 51)
 	for _, line := range lines {
 		commands := strings.Split(line, " ")
 		info := uint8(2)
 		if commands[0] == "off" {
 			info = uint8(1)
 		}
-		c := ParseCuboid(strings.TrimSuffix(commands[1], "\n"))
-		if i, ok := Intersection(box50, c); ok {
-			world.Add(i, info)
+		c := ParseCuboid(commands[1])
+		if part == 1 {
+			box50 := CreateCuboid(-50, 51, -50, 51, -50, 51)
+			if i, ok := Intersection(box50, c); ok {
+				world.Add(i, info)
+			}
+		} else {
+			world.Add(c, info)
 		}
 	}
 	return world.Count(2)
 }
 
-func Part2(input string) int {
-	input = strings.TrimSuffix(input, "\n")
-	lines := strings.Split(input, "\n")
+func Part1(input string) int {
+	return solve(input, 1)
+}
 
-	world := World{}
-	for _, line := range lines {
-		commands := strings.Split(line, " ")
-		info := uint8(2)
-		if commands[0] == "off" {
-			info = uint8(1)
-		}
-		c := ParseCuboid(strings.TrimSuffix(commands[1], "\n"))
-		world.Add(c, info)
-	}
-	return world.Count(2)
+func Part2(input string) int {
+	return solve(input, 2)
 }
 
 func main() {

@@ -7,9 +7,7 @@ type World map[Cuboid]uint8
 func (w World) String() string {
 	var s string
 	for c, v := range w {
-		// if v != 0 {
 		s += fmt.Sprintf("%v: %v\n", c, v)
-		// }
 	}
 	return s
 }

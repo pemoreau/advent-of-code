@@ -1,35 +1,27 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
-	"io/ioutil"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/pemoreau/advent-of-code-2021/go/utils"
 )
 
-type matrix [][]uint8
+//go:embed input.txt
+var input_day string
+
 type Pos struct {
 	i, j int
 }
 
-func BuildMatrix(lines []string) matrix {
-	m := make([][]uint8, len(lines))
-	for i, l := range lines {
-		l = strings.TrimSpace(l)
-		m[i] = make([]uint8, len(l))
-		for j, c := range l {
-			m[i][j] = uint8(c - '0')
-		}
-	}
-	return m
-}
-
-func neighboors(m matrix, i, j int) []Pos {
+func neighboors(m utils.DigitMatrix, i, j int) []Pos {
 	res := []Pos{}
 	pos := []Pos{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
 	for _, p := range pos {
-		if p.i >= 0 && p.i < len(m) && p.j >= 0 && p.j < len(m[p.i]) && m[p.i][p.j] != 9 {
+		if p.j >= 0 && p.j < len(m) && p.i >= 0 && p.i < len(m[p.j]) && m[p.j][p.i] != 9 {
 			// collect neighboors different from 9
 			res = append(res, p)
 		}
@@ -37,16 +29,16 @@ func neighboors(m matrix, i, j int) []Pos {
 	return res
 }
 
-func collectNeighboors(p Pos, m matrix) int {
+func collectNeighboors(p Pos, m utils.DigitMatrix) int {
 	toVisit := []Pos{p}
 	collected := 0
 	for len(toVisit) > 0 {
 		p := toVisit[0]
 		toVisit = toVisit[1:]
-		if m[p.i][p.j] == 9 {
+		if m[p.j][p.i] == 9 {
 			// already visited: skip
 		} else {
-			m[p.i][p.j] = 9
+			m[p.j][p.i] = 9
 			collected += 1
 			toVisit = append(toVisit, neighboors(m, p.i, p.j)...)
 		}
@@ -54,10 +46,10 @@ func collectNeighboors(p Pos, m matrix) int {
 	return collected
 }
 
-func smallerThanNeighboors(m matrix, i, j int) bool {
+func smallerThanNeighboors(m utils.DigitMatrix, i, j int) bool {
 	pos := []Pos{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
 	for _, p := range pos {
-		if p.i >= 0 && p.i < len(m) && p.j >= 0 && p.j < len(m[p.i]) && !(m[i][j] < m[p.i][p.j]) {
+		if p.j >= 0 && p.j < len(m) && p.i >= 0 && p.i < len(m[p.j]) && !(m[j][i] < m[p.j][p.i]) {
 			return false
 		}
 	}
@@ -66,12 +58,12 @@ func smallerThanNeighboors(m matrix, i, j int) bool {
 
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := BuildMatrix(lines)
+	m := utils.BuildDigitMatrix(lines)
 	res := 0
-	for i := range m {
-		for j := range m[i] {
+	for j := range m {
+		for i := range m[j] {
 			if smallerThanNeighboors(m, i, j) {
-				res += int(m[i][j] + 1)
+				res += int(m[j][i] + 1)
 			}
 		}
 	}
@@ -80,12 +72,12 @@ func Part1(input string) int {
 
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := BuildMatrix(lines)
+	m := utils.BuildDigitMatrix(lines)
 
 	sizes := []int{}
-	for i := range m {
-		for j := range m[i] {
-			if m[i][j] != 9 {
+	for j := range m {
+		for i := range m[j] {
+			if m[j][i] != 9 {
 				size := collectNeighboors(Pos{i, j}, m)
 				sizes = append(sizes, size)
 			}
@@ -97,13 +89,12 @@ func Part2(input string) int {
 }
 
 func main() {
-	content, _ := ioutil.ReadFile("../../inputs/day09.txt")
 
 	start := time.Now()
-	fmt.Println("part1: ", Part1(string(content)))
+	fmt.Println("part1: ", Part1(input_day))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(string(content)))
+	fmt.Println("part2: ", Part2(input_day))
 	fmt.Println(time.Since(start))
 }

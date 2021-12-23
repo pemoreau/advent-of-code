@@ -1,11 +1,15 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"io/ioutil"
 	"strings"
 	"time"
 )
+
+//go:embed input.txt
+var input_day string
 
 type matrix [][]Octopus
 type Octopus struct {
@@ -15,20 +19,20 @@ type Octopus struct {
 
 func BuildMatrix(lines []string) matrix {
 	m := make([][]Octopus, len(lines))
-	for i, l := range lines {
+	for j, l := range lines {
 		l = strings.TrimSpace(l)
-		m[i] = make([]Octopus, len(l))
-		for j, c := range l {
-			m[i][j] = Octopus{energy: uint8(c - '0'), flashed: false}
+		m[j] = make([]Octopus, len(l))
+		for i, c := range l {
+			m[j][i] = Octopus{energy: uint8(c - '0'), flashed: false}
 		}
 	}
 	return m
 }
 
 func increase_energy(m matrix) {
-	for i := range m {
-		for j := range m[i] {
-			m[i][j].energy += 1
+	for j := range m {
+		for i := range m[j] {
+			m[j][i].energy += 1
 		}
 	}
 }
@@ -45,11 +49,11 @@ func increase_neighbours_energy(m matrix, x, y int) {
 }
 
 func clear_flashed(m matrix) {
-	for y := range m {
-		for x := range m[y] {
-			if m[y][x].flashed {
-				m[y][x].flashed = false
-				m[y][x].energy = 0
+	for j := range m {
+		for i := range m[j] {
+			if m[j][i].flashed {
+				m[j][i].flashed = false
+				m[j][i].energy = 0
 			}
 		}
 	}
@@ -60,13 +64,13 @@ func flash(m matrix) int {
 	flashed := 0
 	for continue_flashing {
 		continue_flashing = false
-		for y := range m {
-			for x := range m[y] {
-				if m[y][x].energy > 9 && !m[y][x].flashed {
-					m[y][x].flashed = true
+		for j := range m {
+			for i := range m[j] {
+				if m[j][i].energy > 9 && !m[j][i].flashed {
+					m[j][i].flashed = true
 					flashed++
 					continue_flashing = true
-					increase_neighbours_energy(m, x, y)
+					increase_neighbours_energy(m, i, j)
 				}
 			}
 		}

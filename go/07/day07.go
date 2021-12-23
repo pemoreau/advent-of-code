@@ -42,23 +42,16 @@ func search(values []int, cost fn) int {
 func Part1(input string) int {
 	values := utils.CommaSeparatedToNumbers(input)
 	return search(values, func(a, b int) int {
-		return abs(a - b)
+		return utils.Abs(a - b)
 	})
 }
 
 func Part2(input string) int {
 	values := utils.CommaSeparatedToNumbers(input)
 	return search(values, func(a, b int) int {
-		n := abs(a - b)
+		n := utils.Abs(a - b)
 		return n * (n + 1) / 2
 	})
-}
-
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
 }
 
 func main() {

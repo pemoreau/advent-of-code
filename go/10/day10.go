@@ -1,44 +1,17 @@
 package main
 
 import (
-	"errors"
+	_ "embed"
 	"fmt"
-	"io/ioutil"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/pemoreau/advent-of-code-2021/go/utils"
 )
 
-type stack []rune
-
-func BuildStack() stack {
-	return make([]rune, 0)
-}
-
-func (s *stack) Push(c rune) {
-	*s = append(*s, c)
-}
-
-func (s *stack) Pop() (rune, error) {
-	l := len(*s)
-	if l == 0 {
-		return 0, errors.New("stack is empty")
-	}
-	top := (*s)[l-1]
-	*s = (*s)[:l-1]
-	return top, nil
-}
-
-func (s *stack) Peek() (rune, error) {
-	if s.IsEmpty() {
-		return 0, errors.New("stack is empty")
-	}
-	return (*s)[len(*s)-1], nil
-}
-
-func (s *stack) IsEmpty() bool {
-	return len(*s) == 0
-}
+//go:embed input.txt
+var input_day string
 
 var closing = map[rune]rune{
 	'(': ')',
@@ -64,7 +37,7 @@ var autoScore = map[rune]int{
 func parseLine(line string) (corrupted int, auto int) {
 	corrupted = 0
 	auto = 0
-	stack := BuildStack()
+	stack := utils.BuildStack()
 	for _, c := range line {
 		if c == '(' || c == '[' || c == '{' || c == '<' {
 			stack.Push(c)
@@ -73,7 +46,7 @@ func parseLine(line string) (corrupted int, auto int) {
 			if err != nil {
 				return corrupted, auto
 			}
-			if closing[p] != c {
+			if closing[p.(rune)] != c {
 				return corruptedScore[c], auto
 			}
 		}
@@ -81,7 +54,7 @@ func parseLine(line string) (corrupted int, auto int) {
 	if !stack.IsEmpty() {
 		for !stack.IsEmpty() {
 			p, _ := stack.Pop()
-			auto = (5 * auto) + autoScore[p]
+			auto = (5 * auto) + autoScore[p.(rune)]
 		}
 	}
 	return corrupted, auto
@@ -111,13 +84,11 @@ func Part2(input string) int {
 }
 
 func main() {
-	content, _ := ioutil.ReadFile("../../inputs/day10.txt")
-
 	start := time.Now()
-	fmt.Println("part1: ", Part1(string(content)))
+	fmt.Println("part1: ", Part1(input_day))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(string(content)))
+	fmt.Println("part2: ", Part2(input_day))
 	fmt.Println(time.Since(start))
 }

@@ -1,23 +1,15 @@
 package main
 
 import (
-	"io/ioutil"
+	_ "embed"
 	"testing"
 )
 
-const input = `5483143223
-2745854711
-5264556173
-6141336146
-6357385478
-4167524645
-2176841721
-6882881134
-4846848554
-5283751526`
+//go:embed input_test.txt
+var input_test string
 
 func TestPart1(t *testing.T) {
-	result := Part1(input)
+	result := Part1(input_test)
 	expected := 1656
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -25,7 +17,7 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	result := Part2(input)
+	result := Part2(input_test)
 	expected := 195
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -33,8 +25,7 @@ func TestPart2(t *testing.T) {
 }
 
 func TestPart1Input(t *testing.T) {
-	content, _ := ioutil.ReadFile("../../inputs/day11.txt")
-	result := Part1(string(content))
+	result := Part1(input_day)
 	expected := 1681
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -42,10 +33,20 @@ func TestPart1Input(t *testing.T) {
 }
 
 func TestPart2Input(t *testing.T) {
-	content, _ := ioutil.ReadFile("../../inputs/day11.txt")
-	result := Part2(string(content))
+	result := Part2(input_day)
 	expected := 276
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+	}
+}
+
+func BenchmarkPart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Part1(input_day)
+	}
+}
+func BenchmarkPart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Part2(input_day)
 	}
 }

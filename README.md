@@ -22,17 +22,17 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
 | Rust                          | part A     | part B     | Go                                    | part A      | part B        |
 | :---------------------------- | :--------- | :--------- | ------------------------------------- | ----------- | ------------- |
-| [day 01](./rust/src/day01.rs) | ` 0.089ms` | ` 0.067ms` |                                       | `47.668 µs` | `48.029 µs`   |
+| [day 01](./rust/src/day01.rs) | ` 0.089ms` | ` 0.067ms` |                                       | ` 0.047 ms` | ` 0.048 ms`   |
 | [day 02](./rust/src/day02.rs) | ` 0.092ms` | ` 0.063ms` |                                       |             |               |
 | [day 03](./rust/src/day03.rs) | ` 0.157ms` | ` 0.084ms` |                                       |             |               |
 | [day 04](./rust/src/day04.rs) | ` 1.048ms` | ` 0.841ms` |                                       |             |               |
 | [day 05](./rust/src/day05.rs) | ` 45.94ms` | ` 46.03ms` |                                       |             |               |
-| [day 06](./rust/src/day06.rs) | ` 0.010ms` | ` 0.008ms` | [day 06](./go/06/day06.go)            | ` 7.211 µs` | ` 8.712 µs`   |
+| [day 06](./rust/src/day06.rs) | ` 0.010ms` | ` 0.008ms` | [day 06](./go/06/day06.go)            | ` 0.007 ms` | ` 0.008 ms`   |
 | [day 07](./rust/src/day07.rs) | ` 0.274ms` | ` 0.795ms` | [day 07](./go/07/day07.go)            | ` 4.516 ms` | ` 5.001 ms`   |
 | [day 08](./rust/src/day08.rs) | ` 0.198ms` | ` 1.786ms` |                                       |             |               |
-|                               |            |            | [day 09](./go/09_simplified/day09.go) | ` 0.189 ms` | ` 1.183 ms`   |
-| [day 10](./rust/src/day10.rs) | ` 0.137ms` | ` 0.134ms` | [day 10](./go/10/day10.go)            | ` 0.152 ms` | ` 0.151 ms`   |
-| [day 11](./rust/src/day11.rs) | ` 0.186ms` | ` 0.420ms` | [day 11](./go/11/day11.go)            | ` 0.211`    | ` 0.422 ms`   |
+|                               |            |            | [day 09](./go/09_simplified/day09.go) | ` 0.146 ms` | ` 0.859 ms`   |
+| [day 10](./rust/src/day10.rs) | ` 0.137ms` | ` 0.134ms` | [day 10](./go/10/day10.go)            | ` 0.158 ms` | ` 0.160 ms`   |
+| [day 11](./rust/src/day11.rs) | ` 0.186ms` | ` 0.420ms` | [day 11](./go/11/day11.go)            | ` 0.152 ms` | ` 0.432 ms`   |
 |                               |            |            | [day 12](./go/12/day12.go)            | ` 0.161 ms` | ` 3.944 ms`   |
 | [day 13](./rust/src/day13.rs) | ` 0.156ms` | ` 0.118ms` | [day 13](./go/13/day13.go)            | ` 0.441 ms` | ` 0.706 ms`   |
 |                               |            |            | [day 14](./go/14/day14.go)            | ` 0.075 ms` | ` 0.056 ms`   |

@@ -18,14 +18,6 @@ func TestSize(t *testing.T) {
 	}
 }
 
-// func TestInformation(t *testing.T) {
-// 	c := CreateCuboid(10, 12, 10, 12, 10, 12, true)
-// 	result := c.information
-// 	expected := true
-// 	if result != expected {
-// 		t.Errorf("Result is incorrect, got: %v, want: %v.", result, expected)
-// 	}
-// }
 func TestContains(t *testing.T) {
 	c1 := CreateCuboid(10, 13, 10, 13, 10, 13)
 	c2 := CreateCuboid(11, 12, 11, 12, 11, 12)

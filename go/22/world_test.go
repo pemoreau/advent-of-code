@@ -41,14 +41,6 @@ func TestAdd3(t *testing.T) {
 	world.Add(CreateCuboid(10, 13, 10, 13, 10, 13), 1)
 	world.Add(CreateCuboid(11, 12, 11, 12, 11, 12), 1)
 	world.Add(CreateCuboid(11, 14, 11, 14, 11, 14), 1)
-	// world.Add(CreateCuboid(0, 3, 0, 3, 0, 1), 1)
-	// // world.Add(CreateCuboid(11, 12, 11, 12, 0, 1), 1)
-	// world.Add(CreateCuboid(1, 4, 1, 4, 0, 1), 1)
-	// fmt.Println(world)
-	// fmt.Println("---")
-	// world.Add(CreateCuboid(1, 2, 1, 2, 0, 1), 1)
-	// fmt.Println(world)
-	// expected := 14
 	expected := 27 + 19
 	result := world.Count(1)
 	if result != expected {

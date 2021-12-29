@@ -161,11 +161,12 @@ func eval(e Instr, world World) World {
 		fmt.Printf("BEFORE MERGE = %v\n", len(world))
 		world = merge(world, instr.reg)
 		fmt.Printf("AFTER MERGE  = %v\n", len(world))
-		newWorld := make(World, 0, 9*len(world))
+		newWorld := make(World, 0, len(world))
 
+		index := regIndex(instr.reg)
 		for _, state := range world {
 			for i := 1; i <= 9; i++ {
-				state.env[regIndex(instr.reg)] = i
+				state.env[index] = i
 				newState := State{env: state.env, min: 10*state.min + i, max: 10*state.max + i}
 				newWorld = append(newWorld, &newState)
 			}
@@ -175,28 +176,32 @@ func eval(e Instr, world World) World {
 	case Assign:
 		switch exp := instr.rhs.(type) {
 		case Add:
+			index := regIndex(exp.reg)
 			for _, state := range world {
-				state.env[regIndex(exp.reg)] += value(exp.arg, &state.env)
+				state.env[index] += value(exp.arg, &state.env)
 			}
 		case Mul:
+			index := regIndex(exp.reg)
 			for _, state := range world {
-				state.env[regIndex(exp.reg)] *= value(exp.arg, &state.env)
+				state.env[index] *= value(exp.arg, &state.env)
 			}
 		case Div:
+			index := regIndex(exp.reg)
 			for _, state := range world {
 				if value(exp.arg, &state.env) == 0 {
 					panic("divide by zero")
 				}
-				state.env[regIndex(exp.reg)] /= value(exp.arg, &state.env)
+				state.env[index] /= value(exp.arg, &state.env)
 			}
 		case Mod:
+			index := regIndex(exp.reg)
 			for _, state := range world {
 				if state.env[regIndex(exp.reg)] < 0 {
 					panic("negative modulo")
 				} else if value(exp.arg, &state.env) <= 0 {
 					panic("modulo by zero or negative")
 				}
-				state.env[regIndex(exp.reg)] %= value(exp.arg, &state.env)
+				state.env[index] %= value(exp.arg, &state.env)
 			}
 		case Eql:
 			index := regIndex(exp.reg)
@@ -216,7 +221,7 @@ func merge(w World, reg Reg) World {
 	m := map[Env]*struct{ min, max int }{}
 	//fmt.Printf("MERGE %v\n", w)
 	for _, state := range w {
-		state.env[regIndex(reg)] = 0
+		//state.env[regIndex(reg)] = 0
 		if entry, ok := m[state.env]; ok {
 			entry.min = utils.Min(entry.min, state.min)
 			entry.max = utils.Max(entry.max, state.max)

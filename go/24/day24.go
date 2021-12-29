@@ -3,10 +3,11 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code-2021/go/utils"
+	"math"
 	"strconv"
 	"strings"
-
-	. "github.com/pemoreau/advent-of-code-2021/go/utils"
+	"time"
 )
 
 //go:embed input.txt
@@ -16,16 +17,11 @@ type Instr interface {
 	isInstr()
 }
 
-type DecoratedInstr struct {
-	Instr
-	before map[Reg]Interval
-	after  map[Reg]Interval
-}
-
 type Assign struct {
 	reg Reg
 	rhs Expr
 }
+
 type Input struct {
 	reg Reg
 }
@@ -38,7 +34,6 @@ func (i Input) String() string {
 }
 
 func (a Assign) String() string {
-	//return fmt.Sprintf("before: %v\n%s = %v\nafter: %v\n", a.before, a.reg, a.rhs, a.after)
 	return fmt.Sprintf("%s = %v\n", a.reg, a.rhs)
 }
 
@@ -110,9 +105,10 @@ func parse(input string, index *int) (r Instr) {
 
 	reg := Reg(cmd[1][0])
 	if cmd[0] == "inp" {
-		var inputName Reg = Reg(fmt.Sprintf("w%d", *index))
+		var inputName = Reg(fmt.Sprintf("w%d", *index))
 		*index += 1
-		return Assign{reg: reg, rhs: inputName}
+		//return Assign{reg: reg, rhs: inputName}
+		return Input{inputName}
 	}
 
 	var arg Expr
@@ -138,162 +134,112 @@ func parse(input string, index *int) (r Instr) {
 	return Assign{reg: reg, rhs: rhs}
 }
 
-func value(e Expr, env map[Reg]int) int {
+func value(e Expr, env *Env) int {
 	switch exp := e.(type) {
 	case Value:
 		return int(exp)
 	case Reg:
-		return env[exp]
+		return env[regIndex(exp)]
 	}
 	return 0
 }
 
-func eqlInterval(a, b Interval) Interval {
-	if a.Min == a.Max && a.Min == b.Min && a.Max == b.Max {
-		return Interval{1, 1}
-	}
-	if a.Max < b.Min || b.Max < a.Min {
-		return Interval{0, 0}
-	}
-	return Interval{0, 1}
+func regIndex(reg Reg) int {
+	return int(reg[0] - 'w')
 }
 
-func forwardAbstractInterpretation(e Expr, env map[Reg]Interval) Interval {
-	switch exp := e.(type) {
-	case Value:
-		return Interval{int(exp), int(exp)}
-	case Reg:
-		return env[exp]
-	case Add:
-		return env[exp.reg].Add(forwardAbstractInterpretation(exp.arg, env))
-	case Mul:
-		return env[exp.reg].Mul(forwardAbstractInterpretation(exp.arg, env))
-	case Div:
-		return env[exp.reg].Div(forwardAbstractInterpretation(exp.arg, env))
-	case Mod:
-		return env[exp.reg].Mod2(forwardAbstractInterpretation(exp.arg, env))
-	case Eql:
-		return eqlInterval(env[exp.reg], forwardAbstractInterpretation(exp.arg, env))
-	default:
-		panic("unknown exp")
-	}
+type Env [4]int
+type State struct {
+	env      Env
+	min, max int
 }
-func forwardAbstractInterpretationInstr(i Instr, env map[Reg]Interval) DecoratedInstr {
-	newEnv := map[Reg]Interval{}
-	for key, value := range env {
-		newEnv[key] = value
-	}
+type World []*State
 
-	// remove one-level indirection
-	switch ins := i.(type) {
-	case DecoratedInstr:
-		i = ins.Instr
-	}
-
-	switch ins := i.(type) {
-	case Assign:
-		newEnv[ins.reg] = forwardAbstractInterpretation(ins.rhs, env)
-		return DecoratedInstr{Instr: ins, before: env, after: newEnv}
-	default:
-		errorString := fmt.Sprintf("unknown instr: %v", ins)
-		panic(errorString)
-	}
-	return DecoratedInstr{Instr: i}
-}
-func backwardAbstractInterpretation(e Expr, before, after map[Reg]Interval) Interval {
-	//fmt.Printf("BEFORE: %v\n", before)
-	//fmt.Printf("AFTER:  %v\n", after)
-	switch exp := e.(type) {
-	case Value:
-		return Interval{int(exp), int(exp)}
-	case Reg:
-		fmt.Printf("REG:    %s: %v\n", exp, after[exp])
-		return after[exp]
-	case Add:
-		inverse := after[exp.reg].Sub(backwardAbstractInterpretation(exp.arg, before, after))
-		return inverse.Inter(before[exp.reg])
-	case Mul:
-		fmt.Printf("BEFORE: %s: %v\n", exp.reg, before[exp.reg])
-		fmt.Printf("AFTER:  %s: %v\n", exp.reg, after[exp.reg])
-		inverse := after[exp.reg].Div(backwardAbstractInterpretation(exp.arg, before, after))
-		fmt.Printf("INV  :  %v\n", inverse)
-		return inverse
-	case Div:
-		return after[exp.reg].Mul(backwardAbstractInterpretation(exp.arg, before, after))
-	case Mod:
-		return after[exp.reg].Mod2(backwardAbstractInterpretation(exp.arg, before, after))
-	case Eql:
-		return eqlInterval(after[exp.reg], backwardAbstractInterpretation(exp.arg, before, after))
-	default:
-		panic("backward unknown exp")
-	}
-}
-
-func backwardAbstractInterpretationInstr(i DecoratedInstr) DecoratedInstr {
-	newEnv := map[Reg]Interval{}
-	for key, value := range i.before {
-		newEnv[key] = value
-	}
-
-	// remove one-level indirection
-	switch ins := i.Instr.(type) {
-	case Assign:
-		newEnv[ins.reg] = backwardAbstractInterpretation(ins.rhs, i.before, i.after)
-		return DecoratedInstr{Instr: ins, before: newEnv, after: i.after}
-	default:
-		errorString := fmt.Sprintf("unknown instr: %v", ins)
-		panic(errorString)
-	}
-	return DecoratedInstr{Instr: i}
-}
-
-func eval(e Instr, env map[Reg]int, index int) {
+func eval(e Instr, world World) World {
 	switch instr := e.(type) {
 	case Input:
-		var inputName Reg = Reg(fmt.Sprintf("w%d", index))
-		env[instr.reg] = env[inputName]
+		fmt.Printf("BEFORE MERGE = %v\n", len(world))
+		world = merge(world, instr.reg)
+		fmt.Printf("AFTER MERGE  = %v\n", len(world))
+		newWorld := make(World, 0, 9*len(world))
+
+		for _, state := range world {
+			for i := 1; i <= 9; i++ {
+				state.env[regIndex(instr.reg)] = i
+				newState := State{env: state.env, min: 10*state.min + i, max: 10*state.max + i}
+				newWorld = append(newWorld, &newState)
+			}
+		}
+		world = newWorld
+		//fmt.Printf("AFTER INPUT  = %v\n", len(world))
 	case Assign:
-		{
-			switch exp := instr.rhs.(type) {
-			case Add:
-				env[exp.reg] += value(exp.arg, env)
-			case Mul:
-				env[exp.reg] *= value(exp.arg, env)
-			case Div:
-				if value(exp.arg, env) == 0 {
+		switch exp := instr.rhs.(type) {
+		case Add:
+			for _, state := range world {
+				state.env[regIndex(exp.reg)] += value(exp.arg, &state.env)
+			}
+		case Mul:
+			for _, state := range world {
+				state.env[regIndex(exp.reg)] *= value(exp.arg, &state.env)
+			}
+		case Div:
+			for _, state := range world {
+				if value(exp.arg, &state.env) == 0 {
 					panic("divide by zero")
 				}
-				env[exp.reg] /= value(exp.arg, env)
-			case Mod:
-				if env[exp.reg] < 0 || value(exp.arg, env) <= 0 {
-					panic("modulo by zero")
+				state.env[regIndex(exp.reg)] /= value(exp.arg, &state.env)
+			}
+		case Mod:
+			for _, state := range world {
+				if state.env[regIndex(exp.reg)] < 0 {
+					panic("negative modulo")
+				} else if value(exp.arg, &state.env) <= 0 {
+					panic("modulo by zero or negative")
 				}
-				env[exp.reg] %= value(exp.arg, env)
-			case Eql:
-				if value(exp.arg, env) == env[exp.reg] {
-					env[exp.reg] = 1
+				state.env[regIndex(exp.reg)] %= value(exp.arg, &state.env)
+			}
+		case Eql:
+			index := regIndex(exp.reg)
+			for _, state := range world {
+				if value(exp.arg, &state.env) == state.env[index] {
+					state.env[index] = 1
 				} else {
-					env[exp.reg] = 0
+					state.env[index] = 0
 				}
 			}
 		}
 	}
+	return world
 }
 
-func decrement(inp []int, index int) []int {
-	if inp[index] == 1 {
-		inp[index] = 9
-		decrement(inp, index-1)
-	} else {
-		inp[index]--
+func merge(w World, reg Reg) World {
+	m := map[Env]*struct{ min, max int }{}
+	//fmt.Printf("MERGE %v\n", w)
+	for _, state := range w {
+		state.env[regIndex(reg)] = 0
+		if entry, ok := m[state.env]; ok {
+			entry.min = utils.Min(entry.min, state.min)
+			entry.max = utils.Max(entry.max, state.max)
+			//fmt.Printf("UPDATE %v -> %v\n", state, entry)
+		} else {
+			m[state.env] = &struct{ min, max int }{min: state.min, max: state.max}
+			//fmt.Printf("ADD %v -> %v\n", state, m[state.env])
+		}
 	}
-	if index < 0 {
-		return []int{}
+	res := make(World, 0, len(m))
+	for env, minmax := range m {
+		res = append(res, &State{env, minmax.min, minmax.max})
 	}
-	return inp
+	return res
 }
 
-func Part1(input string) int {
+var min = math.MaxInt
+var max = 0
+
+func Solve(input string) {
+	if min < max {
+		return
+	}
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 	instructions := make([]Instr, 0, len(lines))
@@ -302,84 +248,38 @@ func Part1(input string) int {
 		instructions = append(instructions, parse(line, &index))
 	}
 
-	env := map[Reg]Interval{"w": {0, 0}, "x": {0, 0}, "y": {0, 0}, "z": {0, 0}}
-	// for i := 1; i <= 14; i++ {
-	// 	var inputName Reg = Reg(fmt.Sprintf("w%d", i))
-	// 	env[inputName] = Interval{1, 9}
-	// }
-	env["w1"] = Interval{1, 9}
-	env["w2"] = Interval{1, 9}
-	env["w3"] = Interval{1, 9}
-	env["w4"] = Interval{1, 9}
-	env["w5"] = Interval{1, 9}
-	env["w6"] = Interval{1, 9}
-	env["w7"] = Interval{1, 9}
-	env["w8"] = Interval{1, 9}
-	env["w9"] = Interval{1, 9}
-	env["w10"] = Interval{1, 9}
-	env["w11"] = Interval{1, 9}
-	env["w12"] = Interval{1, 9}
-	env["w13"] = Interval{1, 9}
-	env["w14"] = Interval{1, 9}
-
-	fmt.Println("env", env)
-	dInstructions := make([]DecoratedInstr, 0)
-	for _, instr := range instructions {
-		newInstr := forwardAbstractInterpretationInstr(instr, env)
-		env = newInstr.after
-		fmt.Println(newInstr)
-		dInstructions = append(dInstructions, newInstr)
+	world := World{&State{env: Env{0, 0, 0, 0}, min: 0, max: 0}}
+	for i, instr := range instructions {
+		fmt.Printf("#%d: %v\n", i, instr)
+		world = eval(instr, world)
+	}
+	for _, state := range world {
+		if state.env[regIndex("z")] == 0 {
+			min = utils.Min(min, state.min)
+			max = utils.Max(max, state.max)
+			//fmt.Printf("min=%d max=%d\n", min, max)
+		}
 	}
 
-	var last DecoratedInstr = dInstructions[len(dInstructions)-1]
-	last.after["z"] = Interval{0, 0}
-	for i := len(dInstructions) - 1; i >= 0; i-- {
-		fmt.Printf("BACKWARD i=%d\n", i)
-		newInstr := backwardAbstractInterpretationInstr(dInstructions[i])
-		fmt.Println(newInstr)
-	}
+}
+func Part1(input string) int {
+	Solve(input)
+	return max
 
-	//genCode(lines)
-
-	// inp := []int{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9}
-	// env := map[string]int{"w1": 9, "w2": 9}
-	// for {
-	// 	inpCopy := make([]int, len(inp))
-	// 	copy(inpCopy, inp)
-
-	// 	// fmt.Printf("try:  %v\n", inp)
-	// 	for _, i := range instructions {
-	// 		eval(i, env, &inpCopy)
-	// 	}
-	// 	if len(inpCopy) != 0 {
-	// 		panic("input not consumed")
-	// 	}
-	// 	fmt.Printf("env=%v\tinp=%v\n", env, inp)
-	// 	if env[3] == 0 {
-	// 		fmt.Printf("inp=%v\n", inp)
-	// 		break
-	// 	}
-	// 	inp = decrement(inp, len(inp)-1)
-	// }
-
-	return 0
 }
 
 func Part2(input string) int {
-	// input = strings.TrimSuffix(input, "\n")
-	// lines := strings.Split(input, "\n")
-	return 0
-
+	Solve(input)
+	return min
 }
 
 func main() {
-	Part1(string(input_day))
-	// fmt.Println("--2021 day 24 solution--")
-	// start := time.Now()
-	// fmt.Println("part1: ", Part1(string(input_day)))
-	// fmt.Println(time.Since(start))
+	fmt.Println("--2021 day 24 solution--")
+	start := time.Now()
+	fmt.Println("part1: ", Part1(string(input_day)))
+	fmt.Println(time.Since(start))
 
-	// start = time.Now()
-	// fmt.Println("part2: ", Part2(string(input_day)))
-	// fmt.Println(time.Since(start))
+	start = time.Now()
+	fmt.Println("part2: ", Part2(string(input_day)))
+	fmt.Println(time.Since(start))
 }

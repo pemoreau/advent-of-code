@@ -13,6 +13,17 @@ func (a Interval) Negate() Interval {
 func (a Interval) Add(b Interval) Interval {
 	return Interval{a.Min + b.Min, a.Max + b.Max}
 }
+
+func (a Interval) Sub(b Interval) Interval {
+	min := a.Min - b.Min
+	max := a.Max - b.Max
+	if min < max {
+		return Interval{min, max}
+	} else {
+		return Interval{max, min}
+	}
+}
+
 func (a Interval) Mul(b Interval) Interval {
 	v := []int{a.Min * b.Min, a.Min * b.Max, a.Max * b.Min, a.Max * b.Max}
 	sort.Ints(v)
@@ -102,5 +113,4 @@ func (i Interval) Mod2(i2 Interval) Interval {
 		// (11): either compute all possibilities and join, or be imprecise
 		return Interval{0, n - 1} // imprecise
 	}
-
 }

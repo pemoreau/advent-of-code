@@ -15,11 +15,17 @@ var input_day string
 type Instr interface {
 	isInstr()
 }
+
+type DecoratedInstr struct {
+	Instr
+	before map[Reg]Interval
+	after  map[Reg]Interval
+}
+
 type Assign struct {
 	reg Reg
 	rhs Expr
 }
-
 type Input struct {
 	reg Reg
 }
@@ -32,6 +38,7 @@ func (i Input) String() string {
 }
 
 func (a Assign) String() string {
+	//return fmt.Sprintf("before: %v\n%s = %v\nafter: %v\n", a.before, a.reg, a.rhs, a.after)
 	return fmt.Sprintf("%s = %v\n", a.reg, a.rhs)
 }
 
@@ -105,7 +112,7 @@ func parse(input string, index *int) (r Instr) {
 	if cmd[0] == "inp" {
 		var inputName Reg = Reg(fmt.Sprintf("w%d", *index))
 		*index += 1
-		return Assign{reg, inputName}
+		return Assign{reg: reg, rhs: inputName}
 	}
 
 	var arg Expr
@@ -128,7 +135,7 @@ func parse(input string, index *int) (r Instr) {
 	case "eql":
 		rhs = Eql{reg, arg}
 	}
-	return Assign{reg, rhs}
+	return Assign{reg: reg, rhs: rhs}
 }
 
 func value(e Expr, env map[Reg]int) int {
@@ -151,52 +158,93 @@ func eqlInterval(a, b Interval) Interval {
 	return Interval{0, 1}
 }
 
-func abstractInterpretation(e Expr, env map[Reg]Interval) Interval {
+func forwardAbstractInterpretation(e Expr, env map[Reg]Interval) Interval {
 	switch exp := e.(type) {
 	case Value:
 		return Interval{int(exp), int(exp)}
 	case Reg:
 		return env[exp]
 	case Add:
-		return env[exp.reg].Add(abstractInterpretation(exp.arg, env))
+		return env[exp.reg].Add(forwardAbstractInterpretation(exp.arg, env))
 	case Mul:
-		return env[exp.reg].Mul(abstractInterpretation(exp.arg, env))
+		return env[exp.reg].Mul(forwardAbstractInterpretation(exp.arg, env))
 	case Div:
-		return env[exp.reg].Div(abstractInterpretation(exp.arg, env))
+		return env[exp.reg].Div(forwardAbstractInterpretation(exp.arg, env))
 	case Mod:
-		return env[exp.reg].Mod2(abstractInterpretation(exp.arg, env))
+		return env[exp.reg].Mod2(forwardAbstractInterpretation(exp.arg, env))
 	case Eql:
-		return eqlInterval(env[exp.reg], abstractInterpretation(exp.arg, env))
+		return eqlInterval(env[exp.reg], forwardAbstractInterpretation(exp.arg, env))
 	default:
 		panic("unknown exp")
 	}
 }
-
-func abstractInterpretationInstr(i Instr, env map[Reg]Interval) map[Reg]Interval {
+func forwardAbstractInterpretationInstr(i Instr, env map[Reg]Interval) DecoratedInstr {
 	newEnv := map[Reg]Interval{}
 	for key, value := range env {
 		newEnv[key] = value
 	}
+
+	// remove one-level indirection
+	switch ins := i.(type) {
+	case DecoratedInstr:
+		i = ins.Instr
+	}
+
 	switch ins := i.(type) {
 	case Assign:
-		newEnv[ins.reg] = abstractInterpretation(ins.rhs, env)
-		// switch exp := ins.rhs.(type) {
-		// case Eql:
-		// 	inter := asbtractInterpretation(ins.rhs, env)
-		// 	if inter.Max < inter.Min {
-		// 		// empty Interval ==> not equal
-		// 		newEnv[ins.reg] = Interval{0, 0}
-		// 	} else {
-		// 		newEnv[ins.reg] = Interval{1, 1}
-		// 		newEnv[exp.reg] = inter
-
-		// 	}
-		// default:
-		// }
+		newEnv[ins.reg] = forwardAbstractInterpretation(ins.rhs, env)
+		return DecoratedInstr{Instr: ins, before: env, after: newEnv}
 	default:
-		panic("unknown instr")
+		errorString := fmt.Sprintf("unknown instr: %v", ins)
+		panic(errorString)
 	}
-	return newEnv
+	return DecoratedInstr{Instr: i}
+}
+func backwardAbstractInterpretation(e Expr, before, after map[Reg]Interval) Interval {
+	//fmt.Printf("BEFORE: %v\n", before)
+	//fmt.Printf("AFTER:  %v\n", after)
+	switch exp := e.(type) {
+	case Value:
+		return Interval{int(exp), int(exp)}
+	case Reg:
+		fmt.Printf("REG:    %s: %v\n", exp, after[exp])
+		return after[exp]
+	case Add:
+		inverse := after[exp.reg].Sub(backwardAbstractInterpretation(exp.arg, before, after))
+		return inverse.Inter(before[exp.reg])
+	case Mul:
+		fmt.Printf("BEFORE: %s: %v\n", exp.reg, before[exp.reg])
+		fmt.Printf("AFTER:  %s: %v\n", exp.reg, after[exp.reg])
+		inverse := after[exp.reg].Div(backwardAbstractInterpretation(exp.arg, before, after))
+		fmt.Printf("INV  :  %v\n", inverse)
+		return inverse
+	case Div:
+		return after[exp.reg].Mul(backwardAbstractInterpretation(exp.arg, before, after))
+	case Mod:
+		return after[exp.reg].Mod2(backwardAbstractInterpretation(exp.arg, before, after))
+	case Eql:
+		return eqlInterval(after[exp.reg], backwardAbstractInterpretation(exp.arg, before, after))
+	default:
+		panic("backward unknown exp")
+	}
+}
+
+func backwardAbstractInterpretationInstr(i DecoratedInstr) DecoratedInstr {
+	newEnv := map[Reg]Interval{}
+	for key, value := range i.before {
+		newEnv[key] = value
+	}
+
+	// remove one-level indirection
+	switch ins := i.Instr.(type) {
+	case Assign:
+		newEnv[ins.reg] = backwardAbstractInterpretation(ins.rhs, i.before, i.after)
+		return DecoratedInstr{Instr: ins, before: newEnv, after: i.after}
+	default:
+		errorString := fmt.Sprintf("unknown instr: %v", ins)
+		panic(errorString)
+	}
+	return DecoratedInstr{Instr: i}
 }
 
 func eval(e Instr, env map[Reg]int, index int) {
@@ -233,72 +281,17 @@ func eval(e Instr, env map[Reg]int, index int) {
 }
 
 func decrement(inp []int, index int) []int {
-	if index < 0 {
-		return []int{}
-	}
 	if inp[index] == 1 {
 		inp[index] = 9
 		decrement(inp, index-1)
 	} else {
 		inp[index]--
 	}
+	if index < 0 {
+		return []int{}
+	}
 	return inp
 }
-
-func compile(input string, index int) (r string, i int) {
-	cmd := strings.Split(input, " ")
-	i = index
-	switch cmd[0] {
-	case "inp":
-		r = fmt.Sprintf("%v = inp[%d]", cmd[1], index)
-		i = index + 1
-	case "add":
-		r = fmt.Sprintf("%v = %v + %v", cmd[1], cmd[1], cmd[2])
-	case "mul":
-		if cmd[2] == "0" {
-			r = fmt.Sprintf("%v = %v", cmd[1], cmd[2])
-		} else {
-			r = fmt.Sprintf("%v = %v * %v", cmd[1], cmd[1], cmd[2])
-		}
-	case "div":
-		if cmd[2] != "1" {
-			r = fmt.Sprintf("%v = %v / %v", cmd[1], cmd[1], cmd[2])
-		}
-	case "mod":
-		r = fmt.Sprintf("%v = %v %% %v", cmd[1], cmd[1], cmd[2])
-	case "eql":
-		r = fmt.Sprintf("if %v == %v {\n %v=1\n} else {\n %v=0\n}", cmd[1], cmd[2], cmd[1], cmd[1])
-	}
-	return
-}
-
-func genCode(lines []string) {
-	fmt.Println(`package main
-
-	import (
-		"fmt"
-	)`)
-	fmt.Println(`func Run(inp []int) (w, x, y, z int) {
-		w = 0
-		x = 0
-		y = 0
-		z = 0
-		`)
-	i := 0
-	for _, line := range lines {
-		var s string
-		s, i = compile(line, i)
-		fmt.Println(s)
-	}
-	fmt.Println("return \n}")
-
-}
-
-// func optimize(instr []Expr) []Expr {
-// 	res := make([]Expr)
-
-// 	return res
-// }
 
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
@@ -314,11 +307,11 @@ func Part1(input string) int {
 	// 	var inputName Reg = Reg(fmt.Sprintf("w%d", i))
 	// 	env[inputName] = Interval{1, 9}
 	// }
-	env["w1"] = Interval{9, 9}
-	env["w2"] = Interval{9, 9}
+	env["w1"] = Interval{1, 9}
+	env["w2"] = Interval{1, 9}
 	env["w3"] = Interval{1, 9}
 	env["w4"] = Interval{1, 9}
-	env["w5"] = Interval{7, 9}
+	env["w5"] = Interval{1, 9}
 	env["w6"] = Interval{1, 9}
 	env["w7"] = Interval{1, 9}
 	env["w8"] = Interval{1, 9}
@@ -330,13 +323,23 @@ func Part1(input string) int {
 	env["w14"] = Interval{1, 9}
 
 	fmt.Println("env", env)
+	dInstructions := make([]DecoratedInstr, 0)
 	for _, instr := range instructions {
-		fmt.Print(instr)
-		env = abstractInterpretationInstr(instr, env)
-		fmt.Println(env)
+		newInstr := forwardAbstractInterpretationInstr(instr, env)
+		env = newInstr.after
+		fmt.Println(newInstr)
+		dInstructions = append(dInstructions, newInstr)
 	}
-	// instructions = optimize(instructions)
-	// genCode(lines)
+
+	var last DecoratedInstr = dInstructions[len(dInstructions)-1]
+	last.after["z"] = Interval{0, 0}
+	for i := len(dInstructions) - 1; i >= 0; i-- {
+		fmt.Printf("BACKWARD i=%d\n", i)
+		newInstr := backwardAbstractInterpretationInstr(dInstructions[i])
+		fmt.Println(newInstr)
+	}
+
+	//genCode(lines)
 
 	// inp := []int{9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9}
 	// env := map[string]int{"w1": 9, "w2": 9}

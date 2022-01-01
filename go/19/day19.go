@@ -3,15 +3,13 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 )
 
 //go:embed input.txt
 var input_day string
-
-//go:embed input_test.txt
-var input_test string
 
 type Pos struct{ x, y, z int }
 
@@ -48,32 +46,12 @@ func allRotations(p Pos) []Pos {
 	return res
 }
 
-func translation(p Pos, x, y, z int) Pos {
-	return Pos{p.x + x, p.y + y, p.z + z}
-}
-
-func intersection(a, b []Pos) []Pos {
-	count := make(map[Pos]uint8)
-	for _, p := range a {
-		count[p]++
-	}
-	for _, q := range b {
-		count[q]++
-	}
-
-	res := make([]Pos, 0)
-	for p, c := range count {
-		if c > 1 {
-			res = append(res, p)
-		}
-	}
-	return res
-}
-
 type Scanner struct {
 	name     string
 	view     []Pos
+	aligned  bool
 	rotation uint8
+	position Pos
 	distance []int
 }
 
@@ -81,15 +59,14 @@ type Scanner struct {
 func (s Scanner) String() string {
 	b := strings.Builder{}
 	b.WriteString(s.name)
+	b.WriteString(fmt.Sprintf(" aligned %t", s.aligned))
+	b.WriteString(fmt.Sprintf(" rotation %v", s.rotation))
+	b.WriteString(fmt.Sprintf(" translation %v", s.position))
 	b.WriteString("\n")
 	for _, p := range s.view {
 		b.WriteString(p.String())
 		b.WriteString("\n")
 	}
-	b.WriteString("distances: ")
-	b.WriteString(fmt.Sprintf("%v", s.distance))
-	b.WriteString("\n")
-
 	return b.String()
 }
 
@@ -100,6 +77,7 @@ func ParseScanner(lines []string) Scanner {
 			view = append(view, ParsePos(line))
 		}
 	}
+
 	return Scanner{name: lines[0], view: view, rotation: 0, distance: computeDistance(view)}
 }
 
@@ -136,88 +114,43 @@ func intersectionIntList(a, b []int) []int {
 	return res
 }
 
-func TranslationScanner(s Scanner, x, y, z int) Scanner {
-	view := make([]Pos, 0)
-	for _, p := range s.view {
-		view = append(view, translation(p, x, y, z))
-	}
-	return Scanner{name: s.name, view: view, rotation: s.rotation, distance: s.distance}
-}
-
-func Abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
-func maxAbs(s Scanner) int {
-	max := 0
-	for _, p := range s.view {
-		if Abs(p.x) > max {
-			max = Abs(p.x)
-		}
-		if Abs(p.y) > max {
-			max = Abs(p.y)
-		}
-		if Abs(p.z) > max {
-			max = Abs(p.z)
-		}
-	}
-	return max
-}
-
-func allX(s Scanner) []int {
-	res := make([]int, 0)
-	for _, p := range s.view {
-		res = append(res, p.x)
-	}
-	return res
-}
-func allY(s Scanner) []int {
-	res := make([]int, 0)
-	for _, p := range s.view {
-		res = append(res, p.y)
-	}
-	return res
-}
-func allZ(s Scanner) []int {
-	res := make([]int, 0)
-	for _, p := range s.view {
-		res = append(res, p.z)
-	}
-	return res
-}
-
-func arrangementScanner(s Scanner) []Scanner {
+func arrangementView(s []Pos) [][]Pos {
 	points := [][]Pos{}
-	for _, p := range s.view {
+	for _, p := range s {
 		points = append(points, allRotations(p))
 	}
 
-	res := make([]Scanner, 0)
+	res := make([][]Pos, 0)
 	for i := 0; i < len(points[0]); i++ { // 24 rotations
 		view := make([]Pos, 0)
 		for j := range points {
 			view = append(view, points[j][i])
 		}
-		res = append(res, Scanner{name: s.name, view: view, rotation: uint8(i), distance: s.distance})
+		res = append(res, view)
 	}
 	return res
 }
 
-func searchTranslation(s1, s2 Scanner) []Pos {
-	for _, x := range allX(s2) {
-		for _, y := range allY(s2) {
-			for _, z := range allZ(s2) {
-				i := searchCommon(s1, s2, x, y, z)
-				if len(i) > 0 {
-					return i
-				}
-			}
+func sortView(view []Pos) {
+	sort.Slice(view, func(i, j int) bool {
+		p, q := view[i], view[j]
+		switch {
+		case p.x < q.x:
+			return true
+		case p.x > q.x:
+			return false
+		case p.y < q.y:
+			return true
+		case p.y > q.y:
+			return false
+		case p.z < q.z:
+			return true
+		case p.z > q.z:
+			return false
+		default:
+			return false
 		}
-	}
-	return make([]Pos, 0)
+	})
 }
 
 func commonBeamer(s1, s2 Scanner) int {
@@ -225,114 +158,161 @@ func commonBeamer(s1, s2 Scanner) int {
 	return len(commonDistance)
 }
 
-func searchCommon(s1, s2 Scanner, x, y, z int) []Pos {
-	s1x := s1.view[0].x
-	s1y := s1.view[0].y
-	s1z := s1.view[0].z
-	sign := []int{1, -1}
-	// fmt.Println("try", x, y, z)
-	as2 := arrangementScanner(s2)
-	// fmt.Println(s1)
-	// fmt.Println(as2)
-	for _, os2 := range as2 {
-		for _, sp := range sign {
-			for _, sx := range sign {
-				for _, sy := range sign {
-					for _, sz := range sign {
-						tos2 := TranslationScanner(os2, sp*(s1x+sx*x), sp*(s1y+sy*y), sp*(s1z+sz*z))
-						i := intersection(s1.view, tos2.view)
-						// fmt.Printf("len=%d %v\n", len(i), i)
-						if len(i) >= 12 {
-							fmt.Println("translation", sp*(s1x+sx*x), sp*(s1y+sy*y), sp*(s1z+sz*z))
-							return i
-						}
-					}
-
+func extractCommonBeamer(s1, s2 Scanner) (b1 []Pos, b2 []Pos) {
+	m1 := map[Pos]struct{}{}
+	m2 := map[Pos]struct{}{}
+	commonDistance := intersectionIntList(s1.distance, s2.distance)
+	for _, d := range commonDistance {
+		for i, p := range s1.view {
+			for j := i + 1; j < len(s1.view); j++ {
+				q := s1.view[j]
+				n := norme(p.x-q.x, p.y-q.y, p.z-q.z)
+				if d == n {
+					m1[p] = struct{}{}
+					m1[q] = struct{}{}
+				}
+			}
+		}
+		for i, p := range s2.view {
+			for j := i + 1; j < len(s2.view); j++ {
+				q := s2.view[j]
+				n := norme(p.x-q.x, p.y-q.y, p.z-q.z)
+				if d == n {
+					m2[p] = struct{}{}
+					m2[q] = struct{}{}
 				}
 			}
 		}
 	}
-	return make([]Pos, 0)
+	for k := range m1 {
+		b1 = append(b1, k)
+	}
+	for k := range m2 {
+		b2 = append(b2, k)
+	}
+	return
 }
 
-func Part1(input string) int {
+func checkSame(v1, v2 []Pos) bool {
+	for i := 1; i < len(v1)-1; i++ {
+		d1 := Pos{
+			v1[i].x - v1[i-1].x,
+			v1[i].y - v1[i-1].y,
+			v1[i].z - v1[i-1].z,
+		}
+		d2 := Pos{
+			v2[i].x - v2[i-1].x,
+			v2[i].y - v2[i-1].y,
+			v2[i].z - v2[i-1].z,
+		}
+		if d1 != d2 {
+			return false
+		}
+	}
+	return true
+}
 
-	input = `--- scanner 0a ---
--1,-1,1
--2,-2,2
--3,-3,3
--2,-3,1
-5,6,-4
-8,0,7
+func searchTranslation(s1, s2 Scanner) (Pos, uint8, bool) {
+	v1, v2 := extractCommonBeamer(s1, s2)
+	sortView(v1)
+	allv2 := arrangementView(v2)
+	for r, v2 := range allv2 {
+		sortView(v2)
+		if checkSame(v1, v2) {
+			// we have found rotation r and translation t from s1 to s2
+			t := Pos{
+				v1[0].x - v2[0].x,
+				v1[0].y - v2[0].y,
+				v1[0].z - v2[0].z,
+			}
+			return t, uint8(r), true
+		}
+	}
+	return Pos{}, 0, false
+}
 
---- scanner 0b ---
-1,-1,1
-2,-2,2
-3,-3,3
-2,-1,3
--5,4,-6
--8,-7,0
-
---- scanner 0c ---
--1,-1,-1
--2,-2,-2
--3,-3,-3
--1,-3,-2
-4,6,5
--7,0,8
-
---- scanner 0d ---
-1,1,-1
-2,2,-2
-3,3,-3
-1,3,-2
--4,-6,5
-7,0,8
-
---- scanner 0e ---
-1,1,1
-2,2,2
-3,3,3
-3,1,2
--6,-4,-5
-0,7,-8`
-
-	input = input_test
+func solve(input string) (int, []Pos) {
 	input = strings.TrimSuffix(input, "\n")
 	parts := strings.Split(input, "\n\n")
 	scanners := make([]Scanner, 0)
 	for _, part := range parts {
 		lines := strings.Split(part, "\n")
 		scanners = append(scanners, ParseScanner(lines))
-		// fmt.Println(scanners[len(scanners)-1])
 	}
 
-	// fmt.Println(allRotations(Pos{3, 2, 1}))
-	// fmt.Println(allRotations(Pos{-1, -1, 1}))
-	// for _, p := range allRotations(Pos{8, 0, 7}) {
-	// 	fmt.Println(p)
-	// }
-	// scanner := ParseScanner(lines)
-	// fmt.Println(Scanner{view: arrangement(ParsePos("3,1,2"))})
-	// fmt.Println(arrangementScanner(scanners[0]))
+	scanners[0].aligned = true
+	beacons := map[Pos]bool{}
+	for _, p := range scanners[0].view {
+		beacons[p] = true
+	}
+	aligned := []Scanner{scanners[0]}
+	for len(aligned) > 0 {
+		s1 := &aligned[0]
+		aligned = aligned[1:]
+		for j := 1; j < len(scanners); j++ {
+			s2 := &scanners[j]
 
-	// fmt.Printf("common %d,%d --> %t\n", 0, 1, commonBeamer(scanners[0], scanners[1]))
-	// fmt.Printf("common %d,%d --> %v\n", 0, 1, searchCommon(scanners[0], scanners[1], 68, -1246, -43))
-	// fmt.Printf("common %d,%d --> %v\n", 0, 1, searchTranslation(scanners[0], scanners[1]))
-	for i, _ := range scanners {
-		for j := i + 1; j < len(scanners); j++ {
-			fmt.Printf("common %d,%d --> %d\n", i, j, commonBeamer(scanners[i], scanners[j]))
-			// fmt.Printf("common %d,%d --> %v\n", i, j, searchTranslation(s, scanners[j]))
+			if !s2.aligned && commonBeamer(*s1, *s2) >= (12*11)/2 {
+				// fmt.Printf("common %d --> %d\n", j, commonBeamer(*s1, *s2))
+				if t, r, ok := searchTranslation(*s1, *s2); ok {
+					s2.aligned = true
+					s2.position = t
+					s2.rotation = r
+					s2.view = arrangementView(s2.view)[r]
+					alignedv2 := make([]Pos, 0)
+					for _, p2 := range s2.view {
+						alignedv2 = append(alignedv2, Pos{p2.x + t.x, p2.y + t.y, p2.z + t.z})
+					}
+					s2.view = alignedv2
+					aligned = append(aligned, *s2)
+					// fmt.Println(s2)
+					for _, p := range s2.view {
+						beacons[p] = true
+					}
+				}
+			}
 		}
 	}
+	res := make([]Pos, 0, len(scanners))
+	for _, s := range scanners {
+		res = append(res, s.position)
+	}
+	return len(beacons), res
+}
 
-	return 0
+func manhattanDistance(from, to Pos) int {
+	absX := from.x - to.x
+	if absX < 0 {
+		absX = -absX
+	}
+	absY := from.y - to.y
+	if absY < 0 {
+		absY = -absY
+	}
+	absZ := from.z - to.z
+	if absZ < 0 {
+		absZ = -absZ
+	}
+	return absX + absY + absZ
+}
+
+func Part1(input string) int {
+	nb, _ := solve(input)
+	return nb
 }
 
 func Part2(input string) int {
-	//s := strings.TrimSuffix(input, "\n")
-	return 0
-
+	_, pos := solve(input)
+	max := 0
+	for i := 0; i < len(pos); i++ {
+		for j := i + 1; j < len(pos); j++ {
+			d := manhattanDistance(pos[i], pos[j])
+			if d > max {
+				max = d
+			}
+		}
+	}
+	return max
 }
 
 func main() {

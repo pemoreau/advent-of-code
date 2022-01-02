@@ -22,7 +22,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
 | Rust                          | part A     | part B     | Go                                    | part A      | part B        |
 | :---------------------------- | :--------- | :--------- | ------------------------------------- | ----------- | ------------- |
-| [day 01](./rust/src/day01.rs) | ` 0.089ms` | ` 0.067ms` |                                       | ` 0.047 ms` | ` 0.048 ms`   |
+| [day 01](./rust/src/day01.rs) | ` 0.089ms` | ` 0.067ms` | [day 01](./go/01/day01.go)            | ` 0.047 ms` | ` 0.048 ms`   |
 | [day 02](./rust/src/day02.rs) | ` 0.092ms` | ` 0.063ms` |                                       |             |               |
 | [day 03](./rust/src/day03.rs) | ` 0.157ms` | ` 0.084ms` |                                       |             |               |
 | [day 04](./rust/src/day04.rs) | ` 1.048ms` | ` 0.841ms` |                                       |             |               |
@@ -50,27 +50,95 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
 # Comments
 
-## Day 01
+## Day 01: Sonar Sweep
+
+```
+199
+200
+208
+210
+200
+207
+240
+269
+260
+263
+```
 
 ### Rust
 
-nothing special except the use of `windows` function
+Nothing special except the use of `windows` function
 
-## Day 02
+### Go
+
+Used the following construct to embed the input file as a string in the source code:
+
+```
+//go:embed input.txt
+var input_day string
+```
+
+## Day 02: Dive!
+
+```
+forward 5
+down 5
+forward 8
+up 3
+down 8
+forward 2
+```
 
 ### Rust
 
-use `split_one` instead of regex to speed-up parsing
+Used `split_one` instead of regex to speed-up parsing
 
-use `for-loop` style and then `fold` for the second part
+Used `for-loop` style and then `fold` for the second part
 
-## Day 03
+## Day 03: Binary Diagnostic
+
+```
+00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010
+```
 
 ### Rust
 
-nothing special
+Nothing special
 
-## Day 04
+## Day 04: Giant Squid
+
+```
+7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
+
+22 13 17 11  0
+ 8  2 23  4 24
+21  9 14 16  7
+ 6 10  3 18  5
+ 1 12 20 15 19
+
+ 3 15  0  2 22
+ 9 18 13 17  5
+19  8  7 25 23
+20 11 10 24  4
+14 21 16 12  6
+
+14 21 17 24  4
+10 16 15  9 19
+18  8 23 26 20
+22 11 13  6  5
+ 2  0 12  3  7
+```
 
 ### Rust
 
@@ -313,3 +381,69 @@ This is a good lesson: use `int` instead of `int8`, `int16`, `uint8`, ...,and do
 ### Go
 
 Implemented a Cuboid data-structure with an `overlap(c1,c2 Cuboid)` function (which splits `c1` into smaller disjoint ones when `c2` overlaps)
+
+## Day 23: Amphipod
+
+```
+#############
+#...........#
+###B#C#B#D###
+  #A#D#C#A#
+  #########
+```
+
+Not yet implemented. Solved it using a spreadsheet.
+
+## Day 24: Arithmetic Logic Unit
+
+```
+inp w
+add z w
+mod z 2
+div w 2
+add y w
+mod y 2
+div w 2
+add x w
+mod x 2
+div w 2
+mod w 2
+```
+
+The goal is to find inputs (`w0`...`w13`) such that `z=0`.
+
+### Go
+
+First tried brute force (using a compiled approach) but it is way too slow.
+
+In a second attempt, I tried to use abstract interpretation to associate an
+interval (min,max values) to each variable.
+Unfortunately, this does not restrict the search space enough.
+Then I wanted to use back-propagation (i.e. assign the interval `[0,0]` to `z`) and interpret the program starting from the last instruction to compute conditions that the input variable should satisfy.
+
+Since I was not convince to get something at the end, I put some energy in the brute force approach.
+First I used channels and go routines (using a producer-consumer pattern) to explore all the search space.
+In a couple of minutes I got the lower bound but it took much more time (several days) to get the upper one.
+
+So, I tried another approach: I used a hashmap to store all explored states (i.e. all `w, x, y, z` values). And to each state we associate the `min` and the `max` input values which lead to this state.
+After each `inp` instruction, the search space is increase by a factor 9. Fortunately we can merge all the states whose values `w, x, y, z` are the same.
+
+This approach solved the problems in ~100s, using 70.10^6 states.
+
+## Day 25: Sea Cucumber
+
+```
+v...>>.vv>
+.vv>>.vv..
+>>.>v>...v
+>>v>>.>.v.
+v>v.vv.v..
+>.>>..v...
+.vv..>.>v.
+v.v..>>v.v
+....v..v.>
+```
+
+### Go
+
+Nothing special: just uses a 2d-array of bytes and a step function to simulate the movement.

@@ -75,7 +75,7 @@ Nothing special except the use of `windows` function
 
 Used the following construct to embed the input file as a string in the source code:
 
-```
+```go
 //go:embed input.txt
 var input_day string
 ```
@@ -297,7 +297,7 @@ Once again I found the Go version easier to write
 
 I have written a code of the form:
 
-```
+```go
 func step(screen map[Pos]struct{}, inst Instr) {
 	for p := range screen {
         ...
@@ -317,7 +317,7 @@ I have used a 2d-array for the rules (`[26][26]byte`) and a 2d-array for countin
 
 Also used the following construct to statically include the input file :
 
-```
+```go
 //go:embed input.txt
 var input string
 ```
@@ -339,7 +339,7 @@ My function `extract` takes a position (`index`) as an argument and returns the 
 
 I would have liked to write my code as follows:
 
-```
+```go
     next, index := bit(bytes, index)
 	value, index = extract(bytes, index, 4)
 	for next {
@@ -353,7 +353,7 @@ but this is not possible because in the `for-loop`, using `v, index :=` declares
 
 The solution is to declare `v` before the assignment:
 
-```
+```go
     next, index = bit(bytes, index)
 	value, index = extract(bytes, index, 4)
 	for next {
@@ -366,7 +366,7 @@ The solution is to declare `v` before the assignment:
 
 Another example is:
 
-```
+```go
     for index < end {
 		var res Packet
 		res, index = decode(bytes, index)

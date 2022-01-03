@@ -12,9 +12,7 @@ import (
 //go:embed input.txt
 var input_day string
 
-type fn func(int, int) int
-
-func search(values []int, cost fn) int {
+func search(values []int, part1 bool) int {
 	minValue, maxValue := math.MaxInt, 0
 	for _, value := range values {
 		if value < minValue {
@@ -29,8 +27,16 @@ func search(values []int, cost fn) int {
 
 	for h := minValue; h <= maxValue; h++ {
 		sum := 0
-		for _, value := range values {
-			sum += cost(h, value)
+		if part1 {
+			for _, value := range values {
+				sum += utils.Abs(h - value)
+			}
+
+		} else {
+			for _, value := range values {
+				n := utils.Abs(h - value)
+				sum += n * (n + 1) / 2
+			}
 		}
 		if sum < minSum {
 			minSum = sum
@@ -38,20 +44,14 @@ func search(values []int, cost fn) int {
 	}
 	return minSum
 }
-
 func Part1(input string) int {
 	values := utils.CommaSeparatedToNumbers(input)
-	return search(values, func(a, b int) int {
-		return utils.Abs(a - b)
-	})
+	return search(values, true)
 }
 
 func Part2(input string) int {
 	values := utils.CommaSeparatedToNumbers(input)
-	return search(values, func(a, b int) int {
-		n := utils.Abs(a - b)
-		return n * (n + 1) / 2
-	})
+	return search(values, false)
 }
 
 func main() {

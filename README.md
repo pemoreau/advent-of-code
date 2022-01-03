@@ -52,6 +52,8 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
 ## Day 01: Sonar Sweep
 
+Example of input:
+
 ```
 199
 200
@@ -65,11 +67,11 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 263
 ```
 
-### Rust
+#### Rust
 
 Nothing special except the use of `windows` function
 
-### Go
+#### Go
 
 Used the following construct to embed the input file as a string in the source code:
 

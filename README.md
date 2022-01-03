@@ -67,11 +67,11 @@ Example of input:
 263
 ```
 
-#### Rust
+### Rust
 
 Nothing special except the use of `windows` function
 
-#### Go
+### Go
 
 Used the following construct to embed the input file as a string in the source code:
 
@@ -81,6 +81,8 @@ var input_day string
 ```
 
 ## Day 02: Dive!
+
+Example of input:
 
 ```
 forward 5
@@ -103,6 +105,8 @@ Nothing special
 
 ## Day 03: Binary Diagnostic
 
+Example of input:
+
 ```
 00100
 11110
@@ -123,6 +127,8 @@ Nothing special
 Nothing special
 
 ## Day 04: Giant Squid
+
+Example of input:
 
 ```
 7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
@@ -156,6 +162,8 @@ The program contains too many `for-loop` in my opinion
 
 ## Day 05: Hydrothermal Venture
 
+Example of input:
+
 ```
 0,9 -> 5,9
 8,0 -> 0,8
@@ -179,6 +187,8 @@ Used references to mutable structures
 
 ## Day 06: Lanternfish
 
+Example of input:
+
 ```
 3,4,3,1,2
 ```
@@ -192,6 +202,8 @@ Very simple solution thanks to `rotate_left` function
 Used `mult = append(mult[1:], mult[0])` to rotate left the slice
 
 ## Day 07: The Treachery of Whales
+
+Example of input:
 
 ```
 16,1,2,0,4,2,7,1,2,14
@@ -233,7 +245,7 @@ This is why `matrix` and `set` can be passed without `*` as function arguments, 
 
 See [Dave Cheney's article](https://dave.cheney.net/2017/04/30/if-a-map-isnt-a-reference-variable-what-is-it) for more explanations
 
-`[]int{}` and `make([]int, 0)` are equivalent but the later can be used to defined the capacity of the underlaying array. For instance: `make([]int, 0, len(collectedBassin))`.
+`[]int{}` and `make([]int, 0)` are equivalent but the later can be used to defined the capacity of the underlying array. For instance: `make([]int, 0, len(collectedBassin))`.
 
 ## Day 10
 
@@ -316,7 +328,7 @@ var input string
 
 Lost a lot of time because I made a mistake when building the mega-matrix but I have discovered a very nice website: https://www.redblobgames.com/
 
-And in partiular articles from Amit (https://theory.stanford.edu/~amitp/GameProgramming/)
+And in particular articles from Amit (https://theory.stanford.edu/~amitp/GameProgramming/)
 
 ## Day 16
 
@@ -362,7 +374,7 @@ Another example is:
 	}
 ```
 
-where I cannot use the short declaration syntax for `res, index :=` becasue the `index` variable should not be shallowed.
+where I cannot use the short declaration syntax for `res, index :=` because the `index` variable should not be shallowed.
 
 The second part of the problem is very interesting because we have to find a way to construct an expression-tree and to define evaluation functions.
 
@@ -370,7 +382,7 @@ In general we can use inheritance. In Golang I have defined structs and an inter
 
 As explained here: https://eli.thegreenplace.net/2018/go-and-algebraic-data-types/, a key point is to define a function (`isTree` for example) which is common to all struct that belong to the interface.
 
-In a second step, the type discrimination (instead of dynamic dispathing) is done by the `switch` statement and the use of `t.(type)` construct
+In a second step, the type discrimination (instead of dynamic dispatching) is done by the `switch` statement and the use of `t.(type)` construct
 
 After finishing the puzzle I discovered the [bitio](https://github.com/icza/bitio) library. I will try it when I have time.
 
@@ -386,9 +398,9 @@ Brute force approach. Not very proud of it.
 
 A good day for me. I have used a list of (value, depth) tuples to represent the tree. With this representation, the normalization wrt. explode can be done in one pass. `split` rule is also efficient.
 
-One difficulty is to compute the magnitude. Fopr that I use a stack of `(value,depth)`. when the top of the stack contains two values with the same depth, theyn can be replaced by a new tuple `(3*left+2*right, depth-1)`. This is quite efficient.
+One difficulty is to compute the magnitude. For that I use a stack of `(value,depth)`. when the top of the stack contains two values with the same depth, they can be replaced by a new tuple `(3*left+2*right, depth-1)`. This is quite efficient.
 
-The current implementation doesn ot perform side effect. This should be possible to improve the efficiency by doing transformations in place.
+The current implementation does not perform side effect. This should be possible to improve the efficiency by doing transformations in place.
 
 ## Day 19
 
@@ -401,7 +413,7 @@ not a good day for me
 ### Go
 
 I have use a hashset to store the positions. I had to store the `.` positions so this is not very optimized.
-The interest is that I can extend the border of the image without moviing everything, but it is possible that an array of pixels would be more efficient
+The interest is that I can extend the border of the image without moving everything, but it is possible that an array of pixels would be more efficient
 
 ## Day 21: Dirac Dice
 

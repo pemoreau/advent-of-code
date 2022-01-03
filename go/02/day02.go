@@ -3,18 +3,57 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 )
 
 //go:embed input.txt
 var input_day string
 
+func parse(line string) (command string, value int) {
+	s := strings.SplitN(line, " ", 2)
+	command = s[0]
+	value, _ = strconv.Atoi(s[1])
+	return
+}
+
 func Part1(input string) int {
-	return 0
+	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
+	horizontal := 0
+	depth := 0
+	for l := range lines {
+		c, v := parse(lines[l])
+		switch c {
+		case "forward":
+			horizontal += v
+		case "up":
+			depth -= v
+		case "down":
+			depth += v
+		}
+	}
+	return horizontal * depth
 }
 
 func Part2(input string) int {
-	return 0
+	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
+	horizontal := 0
+	depth := 0
+	aim := 0
+	for l := range lines {
+		c, v := parse(lines[l])
+		switch c {
+		case "forward":
+			horizontal += v
+			depth += (v * aim)
+		case "up":
+			aim -= v
+		case "down":
+			aim += v
+		}
+	}
+	return horizontal * depth
 }
 
 func main() {

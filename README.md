@@ -23,7 +23,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | Rust                          | part A     | part B     | Go                                    | part A      | part B        |
 | :---------------------------- | :--------- | :--------- | ------------------------------------- | ----------- | ------------- |
 | [day 01](./rust/src/day01.rs) | ` 0.089ms` | ` 0.067ms` | [day 01](./go/01/day01.go)            | ` 0.047 ms` | ` 0.048 ms`   |
-| [day 02](./rust/src/day02.rs) | ` 0.092ms` | ` 0.063ms` |                                       |             |               |
+| [day 02](./rust/src/day02.rs) | ` 0.092ms` | ` 0.063ms` | [day 02](./go/02/day02.go)            | ` 0.102 ms` | ` 0.103 ms`   |
 | [day 03](./rust/src/day03.rs) | ` 0.157ms` | ` 0.084ms` |                                       |             |               |
 | [day 04](./rust/src/day04.rs) | ` 1.048ms` | ` 0.841ms` |                                       |             |               |
 | [day 05](./rust/src/day05.rs) | ` 45.94ms` | ` 46.03ms` |                                       |             |               |
@@ -94,6 +94,10 @@ forward 2
 Used `split_one` instead of regex to speed-up parsing
 
 Used `for-loop` style and then `fold` for the second part
+
+### Go
+
+Nothing special
 
 ## Day 03: Binary Diagnostic
 

@@ -28,7 +28,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 04](./rust/src/day04.rs) | ` 1.048ms` | ` 0.841ms` |                                       |             |               |
 | [day 05](./rust/src/day05.rs) | ` 45.94ms` | ` 46.03ms` |                                       |             |               |
 | [day 06](./rust/src/day06.rs) | ` 0.010ms` | ` 0.008ms` | [day 06](./go/06/day06.go)            | ` 0.007 ms` | ` 0.008 ms`   |
-| [day 07](./rust/src/day07.rs) | ` 0.274ms` | ` 0.795ms` | [day 07](./go/07/day07.go)            | ` 4.516 ms` | ` 5.001 ms`   |
+| [day 07](./rust/src/day07.rs) | ` 0.274ms` | ` 0.795ms` | [day 07](./go/07/day07.go)            | ` 1.711 ms` | ` 2.841 ms`   |
 | [day 08](./rust/src/day08.rs) | ` 0.198ms` | ` 1.786ms` |                                       |             |               |
 |                               |            |            | [day 09](./go/09_simplified/day09.go) | ` 0.146 ms` | ` 0.859 ms`   |
 | [day 10](./rust/src/day10.rs) | ` 0.137ms` | ` 0.134ms` | [day 10](./go/10/day10.go)            | ` 0.158 ms` | ` 0.160 ms`   |
@@ -146,33 +146,64 @@ Nothing special
 
 ### Rust
 
-use `split("\n\n")` to separate parts (instead of counting the number of entries)
+Used `split("\n\n")` to separate parts (instead of counting the number of entries)
 
-use `array2d::Array2D` to represent the board but this may be not the best choice
+Used `array2d::Array2D` to represent the board but this may be not the best choice
 
-the program contains too many `for-loop` in my opinion
+The program contains too many `for-loop` in my opinion
 
-## Day 05
+## Day 05: Hydrothermal Venture
 
-### Rust
-
-a bit slow due the the use of regex for parsing
-
-discovered the `signum` function
-
-use references to mutable structures
-
-## Day 06
-
-### Rust
-
-very simple solution thanks to `rotate_left` function
-
-## Day 07
+```
+0,9 -> 5,9
+8,0 -> 0,8
+9,4 -> 3,4
+2,2 -> 2,1
+7,0 -> 7,4
+6,4 -> 2,0
+0,9 -> 2,9
+3,4 -> 1,4
+0,0 -> 8,8
+5,5 -> 8,2
+```
 
 ### Rust
 
-use a cost function as parameter
+A bit slow due the the use of regex for parsing
+
+Discovered the `signum` function
+
+Used references to mutable structures
+
+## Day 06: Lanternfish
+
+```
+3,4,3,1,2
+```
+
+### Rust
+
+Very simple solution thanks to `rotate_left` function
+
+### Go
+
+Used `mult = append(mult[1:], mult[0])` to rotate left the slice
+
+## Day 07: The Treachery of Whales
+
+```
+16,1,2,0,4,2,7,1,2,14
+```
+
+### Rust
+
+Used a cost function as parameter
+
+### Go
+
+Using a cost function as parameter is 2 to 3 times slower than coding the cost expression directly in the for-loop
+
+Tried to use `int32` instead of `int` but it was slower
 
 ## Day 08
 

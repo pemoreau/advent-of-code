@@ -30,7 +30,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 06](./rust/src/day06.rs) | ` 0.010ms` | ` 0.008ms` | [day 06](./go/06/day06.go)            | ` 0.007 ms` | ` 0.008 ms`   |
 | [day 07](./rust/src/day07.rs) | ` 0.274ms` | ` 0.795ms` | [day 07](./go/07/day07.go)            | ` 1.711 ms` | ` 2.841 ms`   |
 | [day 08](./rust/src/day08.rs) | ` 0.198ms` | ` 1.786ms` |                                       |             |               |
-|                               |            |            | [day 09](./go/09_simplified/day09.go) | ` 0.146 ms` | ` 0.859 ms`   |
+|                               |            |            | [day 09](./go/09_simplified/day09.go) | ` 0.146 ms` | ` 0.670 ms`   |
 | [day 10](./rust/src/day10.rs) | ` 0.137ms` | ` 0.134ms` | [day 10](./go/10/day10.go)            | ` 0.158 ms` | ` 0.160 ms`   |
 | [day 11](./rust/src/day11.rs) | ` 0.186ms` | ` 0.420ms` | [day 11](./go/11/day11.go)            | ` 0.152 ms` | ` 0.432 ms`   |
 |                               |            |            | [day 12](./go/12/day12.go)            | ` 0.161 ms` | ` 3.944 ms`   |
@@ -219,13 +219,30 @@ Using a cost function as parameter is 2 to 3 times slower than coding the cost e
 
 Tried to use `int32` instead of `int` but it was slower
 
-## Day 08
+## Day 08: Seven Segment Search
+
+Example of input:
+
+```
+acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab |
+cdfeb fcadb cdfeb cdbaf
+```
 
 ### Rust
 
 use a HashMap with sorted letters as keys
 
-## Day 09
+## Day 09: Smoke Basin
+
+Example of input:
+
+```
+2199943210
+3987894921
+9856789892
+8767896789
+9899965678
+```
 
 ### Go
 
@@ -245,15 +262,36 @@ This is why `matrix` and `set` can be passed without `*` as function arguments, 
 
 See [Dave Cheney's article](https://dave.cheney.net/2017/04/30/if-a-map-isnt-a-reference-variable-what-is-it) for more explanations
 
-`[]int{}` and `make([]int, 0)` are equivalent but the later can be used to defined the capacity of the underlying array. For instance: `make([]int, 0, len(collectedBassin))`.
+`[]int{}` and `make([]int, 0)` are equivalent but the later can be used to defined the capacity of the underlying array. For instance: `make([]Pos, 0, 4)`.
 
-## Day 10
+## Day 10: Syntax Scoring
+
+Example of input:
+
+```
+[({(<(())[]>[[{[]{<()<>>
+[(()[<>])]({[<{<<[]>>(
+{([(<{}[<>[]}>{[]{[(<()>
+(((({<>}<{<{<>}{[]{[]{}
+[[<[([]))<([[{}[[()]]]
+[{[{({}]{}}([{[{{{}}([]
+{<[[]]>}<{[{[{[]{()[[[]
+[<(<(<(<{}))><([]([]()
+<{([([[(<>()){}]>(<<{{
+<{([{{}}[<[[[<>{}]]]>[]]
+```
 
 ### Go
 
 Use a stack for parsing the input
 
 ## Day 11
+
+Example of input:
+
+```
+
+```
 
 ### Go
 
@@ -269,6 +307,12 @@ I am not very satisfied by this solution.
 
 ## Day 12
 
+Example of input:
+
+```
+
+```
+
 ### Go
 
 I have lost a lot of time because I did not immediately understood the second part.
@@ -278,6 +322,12 @@ I first came with a solution that builds the list of paths, but it was a bit slo
 I then simplified the code to get a more efficient solution (~3.8ms for part 2 on my 2013 mac).
 
 ## Day 13
+
+Example of input:
+
+```
+
+```
 
 ### Rust
 
@@ -311,6 +361,12 @@ This shows that you can mutate a map while iterating over it.
 
 ## Day 14
 
+Example of input:
+
+```
+
+```
+
 ### Go
 
 I have used a 2d-array for the rules (`[26][26]byte`) and a 2d-array for counting the pairs (`[26][26]int{}`). Maybe a `map` would have been more efficient. I did not have time to compare the two solutions.
@@ -324,6 +380,12 @@ var input string
 
 ## Day 15
 
+Example of input:
+
+```
+
+```
+
 ### Go
 
 Lost a lot of time because I made a mistake when building the mega-matrix but I have discovered a very nice website: https://www.redblobgames.com/
@@ -331,6 +393,12 @@ Lost a lot of time because I made a mistake when building the mega-matrix but I 
 And in particular articles from Amit (https://theory.stanford.edu/~amitp/GameProgramming/)
 
 ## Day 16
+
+Example of input:
+
+```
+
+```
 
 ### Go
 
@@ -388,11 +456,23 @@ After finishing the puzzle I discovered the [bitio](https://github.com/icza/biti
 
 ## Day 17
 
+Example of input:
+
+```
+
+```
+
 ### Go
 
 Brute force approach. Not very proud of it.
 
 ## Day 18
+
+Example of input:
+
+```
+
+```
 
 ### Go
 
@@ -404,11 +484,23 @@ The current implementation does not perform side effect. This should be possible
 
 ## Day 19
 
+Example of input:
+
+```
+
+```
+
 ### Go
 
 not a good day for me
 
 ## Day 20:: Trench Map
+
+Example of input:
+
+```
+
+```
 
 ### Go
 
@@ -416,6 +508,12 @@ I have use a hashset to store the positions. I had to store the `.` positions so
 The interest is that I can extend the border of the image without moving everything, but it is possible that an array of pixels would be more efficient
 
 ## Day 21: Dirac Dice
+
+Example of input:
+
+```
+
+```
 
 ### Go
 
@@ -427,11 +525,19 @@ This is a good lesson: use `int` instead of `int8`, `int16`, `uint8`, ...,and do
 
 ## Day 22: Reactor Reboot
 
+Example of input:
+
+```
+
+```
+
 ### Go
 
 Implemented a Cuboid data-structure with an `overlap(c1,c2 Cuboid)` function (which splits `c1` into smaller disjoint ones when `c2` overlaps)
 
 ## Day 23: Amphipod
+
+Example of input:
 
 ```
 #############
@@ -444,6 +550,8 @@ Implemented a Cuboid data-structure with an `overlap(c1,c2 Cuboid)` function (wh
 Not yet implemented. Solved it using a spreadsheet.
 
 ## Day 24: Arithmetic Logic Unit
+
+Example of input:
 
 ```
 inp w
@@ -480,6 +588,8 @@ After each `inp` instruction, the search space is increase by a factor 9. Fortun
 This approach solved the problems in ~100s, using 70.10^6 states.
 
 ## Day 25: Sea Cucumber
+
+Example of input:
 
 ```
 v...>>.vv>

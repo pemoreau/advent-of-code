@@ -1,12 +1,15 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
-	"io/ioutil"
 	"sort"
 	"strings"
 	"time"
 )
+
+//go:embed input.txt
+var input_day string
 
 type matrix [][]uint8
 type Pos struct {
@@ -63,7 +66,7 @@ func smallerThanNeighboors(m matrix, i, j int) bool {
 }
 
 func explore(m matrix) []set {
-	collectedBassin := []set{}
+	collectedBasin := []set{}
 	for i := range m {
 		for j := range m[i] {
 			if m[i][j] == 9 {
@@ -71,11 +74,11 @@ func explore(m matrix) []set {
 			} else {
 				newBasin := BuildSet()
 				collectNeighboors(Pos{i, j}, m, newBasin)
-				collectedBassin = append(collectedBassin, newBasin)
+				collectedBasin = append(collectedBasin, newBasin)
 			}
 		}
 	}
-	return collectedBassin
+	return collectedBasin
 }
 
 func collectNeighboors(p Pos, m matrix, collected set) {
@@ -110,9 +113,9 @@ func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	m := BuildMatrix(lines)
 
-	collectedBassin := explore(m) // m is modified here
-	sizes := make([]int, 0, len(collectedBassin))
-	for _, s := range collectedBassin {
+	collectedBasin := explore(m) // m is modified here
+	sizes := make([]int, 0, len(collectedBasin))
+	for _, s := range collectedBasin {
 		sizes = append(sizes, s.Len())
 	}
 	sort.Ints(sizes)
@@ -120,13 +123,11 @@ func Part2(input string) int {
 }
 
 func main() {
-	content, _ := ioutil.ReadFile("../../inputs/day09.txt")
-
 	start := time.Now()
-	fmt.Println("part1: ", Part1(string(content)))
+	fmt.Println("part1: ", Part1(input_day))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(string(content)))
+	fmt.Println("part2: ", Part2(input_day))
 	fmt.Println(time.Since(start))
 }

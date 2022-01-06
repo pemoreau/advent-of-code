@@ -18,7 +18,7 @@ type Pos struct {
 }
 
 func neighboors(m utils.DigitMatrix, i, j int) []Pos {
-	res := []Pos{}
+	res := make([]Pos, 0, 4)
 	pos := []Pos{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
 	for _, p := range pos {
 		if p.j >= 0 && p.j < len(m) && p.i >= 0 && p.i < len(m[p.j]) && m[p.j][p.i] != 9 {
@@ -74,7 +74,7 @@ func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	m := utils.BuildDigitMatrix(lines)
 
-	sizes := []int{}
+	var sizes []int
 	for j := range m {
 		for i := range m[j] {
 			if m[j][i] != 9 {

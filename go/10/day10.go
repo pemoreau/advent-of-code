@@ -72,7 +72,7 @@ func Part1(input string) int {
 
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	scores := []int{}
+	var scores []int
 	for line := range lines {
 		_, auto := parseLine(lines[line])
 		if auto > 0 {

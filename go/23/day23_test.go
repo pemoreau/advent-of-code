@@ -26,7 +26,7 @@ var input_test string
 
 func TestPart1Input(t *testing.T) {
 	result := Part1(string(input_day))
-	expected := 155160
+	expected := 15516
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}

@@ -13,14 +13,6 @@ import (
 //go:embed input.txt
 var input_day string
 
-// kind of field
-const (
-	Hallway byte = iota
-	Room
-	Door
-	Wall
-)
-
 const hallwayY int = 1
 
 var hallwayPos []Pos = []Pos{{1, 1}, {2, 1}, {4, 1}, {6, 1}, {8, 1}, {10, 1}, {11, 1}}
@@ -41,7 +33,6 @@ type MoveCost struct {
 const empty byte = 0
 
 type Field struct {
-	kind     byte
 	occupant byte
 	atHome   bool
 }
@@ -52,7 +43,7 @@ type World struct {
 }
 
 func (f Field) String() string {
-	return fmt.Sprintf("%v %c", f.kind, f.occupant)
+	return fmt.Sprintf("%c %t", f.occupant, f.atHome)
 }
 
 func (w World) String() string {
@@ -62,17 +53,13 @@ func (w World) String() string {
 			pos := Pos{x: x, y: y}
 			f, ok := w.grid[pos]
 			if ok {
-				switch f.kind {
-				case Wall:
-					sb.WriteByte('#')
-				case Door:
-					sb.WriteByte('_')
-				case Hallway, Room:
-					if f.occupant != empty {
-						sb.WriteByte(f.occupant)
-					} else {
-						sb.WriteByte('.')
-					}
+				switch f.occupant {
+				case empty:
+					sb.WriteByte('.')
+				case 'A', 'B', 'C', 'D':
+					sb.WriteByte(f.occupant)
+				default:
+					sb.WriteByte(' ')
 				}
 			} else {
 				sb.WriteByte(' ')
@@ -100,15 +87,15 @@ func createWorld(lines []string) World {
 			pos := Pos{x: x, y: y}
 			switch char {
 			case '#':
-				world.grid[pos] = Field{kind: Wall}
+				// world.grid[pos] = Field{kind: Wall}
 			case '.':
 				if _, ok := door[x]; ok {
-					world.grid[pos] = Field{kind: Door}
+					// world.grid[pos] = Field{kind: Door}
 				} else {
-					world.grid[pos] = Field{kind: Hallway}
+					world.grid[pos] = Field{occupant: empty}
 				}
 			case 'A', 'B', 'C', 'D':
-				world.grid[pos] = Field{kind: Room, occupant: byte(char)}
+				world.grid[pos] = Field{occupant: byte(char)}
 			}
 		}
 	}
@@ -122,7 +109,7 @@ func createGoal(w World) World {
 		maxY: w.maxY,
 	}
 	for p, f := range w.grid {
-		if f.kind == Room && p.y >= 2 {
+		if p.y >= 2 && p.y <= w.maxY-2 {
 			switch p.x {
 			case 3:
 				f.occupant = 'A'
@@ -152,6 +139,9 @@ func (w World) move(src, dest Pos) World {
 		grid: make(map[Pos]Field, len(w.grid)),
 		maxX: w.maxX,
 		maxY: w.maxY,
+	}
+	if w.occupied(dest) {
+		panic("dest occupied")
 	}
 	for p, f := range w.grid {
 		if p == src {
@@ -352,7 +342,7 @@ func manhattanDistance(from, to Pos) int {
 	return absX + absY
 }
 
-func heuristicDistance(w World) int {
+func heuristicCost(w World) int {
 	var res int
 	cpt := map[byte]int{}
 
@@ -431,7 +421,7 @@ func path(start, to World) (path []World, distance int) {
 			neighborSignature := signature(neighbor.world)
 			if _, ok := costSoFar[neighborSignature]; !ok || newCost < costSoFar[neighborSignature] {
 				costSoFar[neighborSignature] = newCost
-				priority := newCost + heuristicDistance(neighbor.world)
+				priority := newCost + heuristicCost(neighbor.world)
 				heap.Push(frontier, &node{World: neighbor.world, priority: priority})
 				cameFrom[neighborSignature] = current
 			}

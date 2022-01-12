@@ -209,7 +209,7 @@ func (w World) blockedHallway() bool {
 }
 
 func (w World) freeHomeY(roomX int) (int, bool) {
-	for y := w.maxY - 2; y >= 2; y -= 1 {
+	for y := w.maxY - 2; y >= 2; y-- {
 		if !w.occupied(Pos{roomX, y}) {
 			return y, true
 		}
@@ -248,12 +248,13 @@ func (w World) moveRoomToHome(x int) (World, int) {
 	for roomY := 2; roomY <= w.maxY-2; roomY++ {
 		p := Pos{x, roomY}
 		if w.occupied(p) {
-			if w.atHome(p) {
+			occupant := w.occupant(p)
+			homeX := roomX[occupant]
+
+			if w.atHome(p) || p.x == homeX {
 				return w, cost
 			}
 
-			occupant := w.occupant(p)
-			homeX := roomX[occupant]
 			homeY, ok := w.freeHomeY(homeX)
 			if ok && w.accessibleHallway(x, homeX) {
 				distance := utils.Abs(homeX-p.x) + (homeY - hallwayY) + (p.y - hallwayY)
@@ -269,17 +270,19 @@ func (w World) moveRoomToHome(x int) (World, int) {
 
 func (w World) moveRoomToHallway(roomX int) []MoveCost {
 	var res []MoveCost
+
 	for roomY := 2; roomY <= w.maxY-2; roomY++ {
 		p := Pos{roomX, roomY}
 		if w.occupied(p) {
-			if !w.atHome(p) {
-				occupant := w.occupant(p)
-				for _, h := range hallwayPos {
-					if w.accessibleHallway(p.x, h.x) {
-						cost := manhattanDistance(p, h) * costMove[occupant]
-						res = append(res, MoveCost{src: p, dest: h, cost: cost})
-						// fmt.Printf("%c %v can reach hallway %v with cost: %d\n", occupant, p, Pos{x, hallwayY}, cost)
-					}
+			if w.atHome(p) {
+				return res
+			}
+			occupant := w.occupant(p)
+			for _, h := range hallwayPos {
+				if w.accessibleHallway(roomX, h.x) {
+					cost := manhattanDistance(p, h) * costMove[occupant]
+					res = append(res, MoveCost{src: p, dest: h, cost: cost})
+					// fmt.Printf("%c %v can reach hallway %v with cost: %d\n", occupant, p, Pos{x, hallwayY}, cost)
 				}
 			}
 			return res
@@ -347,7 +350,7 @@ func heuristicCost(w World) int {
 	cpt := map[byte]int{}
 
 	for x := 3; x <= 9; x += 2 {
-		for y := w.maxX - 2; y >= 2; y-- {
+		for y := w.maxY - 2; y >= 2; y-- {
 			p := Pos{x, y}
 			if w.occupied(p) && !w.atHome(p) {
 				occupant := w.occupant(p)
@@ -370,17 +373,38 @@ func heuristicCost(w World) int {
 	return res
 }
 
-func signature(w World) string {
-	var sb strings.Builder
+// func signature(w World) string {
+// 	var sb strings.Builder
+// 	sb.Grow(len(hallwayPos) + (w.maxY-2)*4)
+// 	for _, p := range hallwayPos {
+// 		sb.WriteByte(w.occupant(p))
+// 	}
+// 	for y := 2; y <= w.maxY-2; y++ {
+// 		for x := 3; x <= 9; x += 2 {
+// 			sb.WriteByte(w.occupant(Pos{x, y}))
+// 		}
+// 	}
+// 	return sb.String()
+// }
+func signature(w World) uint64 {
+	var res uint64
 	for _, p := range hallwayPos {
-		sb.WriteByte(w.occupant(p))
+		o := w.occupant(p)
+		res = res * 5
+		if o > 0 {
+			res += uint64(1 + o - 'A')
+		}
 	}
 	for y := 2; y <= w.maxY-2; y++ {
 		for x := 3; x <= 9; x += 2 {
-			sb.WriteByte(w.occupant(Pos{x, y}))
+			o := w.occupant(Pos{x, y})
+			res = res * 5
+			if o > 0 {
+				res += uint64(1 + o - 'A')
+			}
 		}
 	}
-	return sb.String()
+	return res
 }
 
 func path(start, to World) (path []World, distance int) {
@@ -391,8 +415,8 @@ func path(start, to World) (path []World, distance int) {
 	heap.Init(frontier)
 	heap.Push(frontier, &node{World: start, priority: 0})
 
-	cameFrom := map[string]World{startSignature: start}
-	costSoFar := map[string]int{startSignature: 0}
+	cameFrom := map[uint64]World{startSignature: start}
+	costSoFar := map[uint64]int{startSignature: 0}
 
 	for {
 		if frontier.Len() == 0 {

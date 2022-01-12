@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/pemoreau/advent-of-code-2021/go/utils"
 )
@@ -15,9 +16,7 @@ var input_day string
 
 const hallwayY int = 1
 
-var hallwayPos []Pos = []Pos{{1, 1}, {2, 1}, {4, 1}, {6, 1}, {8, 1}, {10, 1}, {11, 1}}
-var roomX = map[byte]int{'A': 3, 'B': 5, 'C': 7, 'D': 9}
-var costMove = map[byte]int{'A': 1, 'B': 10, 'C': 100, 'D': 1000}
+var hallwayPos = []Pos{{1, 1}, {2, 1}, {4, 1}, {6, 1}, {8, 1}, {10, 1}, {11, 1}}
 
 type Pos struct {
 	x, y int
@@ -29,149 +28,60 @@ type MoveCost struct {
 	cost int
 }
 
-// occupant of field can be 0, 'A', 'B', 'C', 'D'
-const empty byte = 0
-
-type Field struct {
-	occupant byte
-	atHome   bool
-}
+const empty byte = '.'
 
 type World struct {
-	maxX, maxY int
-	grid       map[Pos]Field
+	maxY int
+	grid string
 }
 
-func (f Field) String() string {
-	return fmt.Sprintf("%c %t", f.occupant, f.atHome)
-}
-
-func (w World) String() string {
-	var sb strings.Builder
-	for y := 0; y < w.maxY; y++ {
-		for x := 0; x < w.maxX; x++ {
-			pos := Pos{x: x, y: y}
-			f, ok := w.grid[pos]
-			if ok {
-				switch f.occupant {
-				case empty:
-					sb.WriteByte('.')
-				case 'A', 'B', 'C', 'D':
-					sb.WriteByte(f.occupant)
-				default:
-					sb.WriteByte(' ')
-				}
-			} else {
-				sb.WriteByte(' ')
-			}
-		}
-		sb.WriteByte('\n')
-	}
-	return sb.String()
-}
-
-// #############
-// #...........#
-// ###D#A#B#C###
-//   #B#A#D#C#
-//   #########
 func createWorld(lines []string) World {
 	world := World{
-		grid: make(map[Pos]Field),
-		maxX: len(lines[0]),
+		grid: strings.Join(lines, "\n"),
 		maxY: len(lines),
-	}
-	door := map[int]struct{}{3: {}, 5: {}, 7: {}, 9: {}}
-	for y, line := range lines {
-		for x, char := range line {
-			pos := Pos{x: x, y: y}
-			switch char {
-			case '#':
-				// world.grid[pos] = Field{kind: Wall}
-			case '.':
-				if _, ok := door[x]; ok {
-					// world.grid[pos] = Field{kind: Door}
-				} else {
-					world.grid[pos] = Field{occupant: empty}
-				}
-			case 'A', 'B', 'C', 'D':
-				world.grid[pos] = Field{occupant: byte(char)}
-			}
-		}
 	}
 	return world
 }
 
-func createGoal(w World) World {
-	res := World{
-		grid: make(map[Pos]Field, len(w.grid)),
-		maxX: w.maxX,
+func index(p Pos) int {
+	return p.y*14 + p.x
+}
+
+func replace(s string, p Pos, c byte) string {
+	i := index(p)
+	return s[:i] + string(c) + s[i+1:]
+}
+
+// An occupant can be '.', 'A', 'B', 'C', 'D', or 'a', 'b', 'c', 'd'
+func (w World) occupant(p Pos) byte {
+	return w.grid[index(p)]
+}
+
+func (w World) occupied(p Pos) bool {
+	return w.grid[index(p)] != empty
+}
+
+func (w World) move(src, dest Pos) World {
+	if w.occupied(dest) {
+		panic("dest occupied")
+	}
+	s := w.grid
+	s = replace(s, src, empty)
+	s = replace(s, dest, w.occupant(src))
+	return World{
+		grid: s,
 		maxY: w.maxY,
 	}
-	for p, f := range w.grid {
-		if p.y >= 2 && p.y <= w.maxY-2 {
-			switch p.x {
-			case 3:
-				f.occupant = 'A'
-			case 5:
-				f.occupant = 'B'
-			case 7:
-				f.occupant = 'C'
-			case 9:
-				f.occupant = 'D'
-			}
-		}
-		res.grid[p] = f
-	}
-	return res
 }
 
 func (w World) moveHome(src, dest Pos) World {
 	res := w.move(src, dest)
-	f := res.grid[dest]
-	f.atHome = true
-	res.grid[dest] = f
-	return res
-}
-
-func (w World) move(src, dest Pos) World {
-	res := World{
-		grid: make(map[Pos]Field, len(w.grid)),
-		maxX: w.maxX,
-		maxY: w.maxY,
-	}
-	if w.occupied(dest) {
-		panic("dest occupied")
-	}
-	for p, f := range w.grid {
-		if p == src {
-			f.occupant = empty
-		} else if p == dest {
-			f.occupant = w.occupant(src)
-		}
-		res.grid[p] = f
-	}
+	res.grid = replace(res.grid, dest, byte(unicode.ToLower(rune(res.occupant(dest)))))
 	return res
 }
 
 func (w World) atHome(p Pos) bool {
-	return w.grid[p].atHome
-}
-
-func (w World) occupied(p Pos) bool {
-	field, ok := w.grid[p]
-	if !ok {
-		return false
-	}
-	return field.occupant != empty
-}
-
-func (w World) occupant(p Pos) byte {
-	field, ok := w.grid[p]
-	if !ok {
-		panic("invalid pos")
-	}
-	return field.occupant
+	return unicode.IsLower(rune(w.occupant(p)))
 }
 
 func (w World) accessibleHallway(srcX, destX int) bool {
@@ -200,7 +110,7 @@ func (w World) blockedHallway() bool {
 		occupant1 := w.occupant(Pos{x: x1, y: hallwayY})
 		for x2 := 4; x2 <= 8; x2 += 2 {
 			occupant2 := w.occupant(Pos{x: x2, y: hallwayY})
-			if x1 != x2 && occupant1 != empty && occupant2 != empty && roomX[occupant1] > x2 && roomX[occupant2] < x1 {
+			if x1 != x2 && occupant1 != empty && occupant2 != empty && roomX(occupant1) > x2 && roomX(occupant2) < x1 {
 				return true
 			}
 		}
@@ -220,6 +130,35 @@ func (w World) freeHomeY(roomX int) (int, bool) {
 	return 0, false
 }
 
+func roomX(b byte) int {
+	switch b {
+	case 'A', 'a':
+		return 3
+	case 'B', 'b':
+		return 5
+	case 'C', 'c':
+		return 7
+	case 'D', 'd':
+		return 9
+	default:
+		return 0
+	}
+}
+func costMove(b byte) int {
+	switch b {
+	case 'A', 'a':
+		return 1
+	case 'B', 'b':
+		return 10
+	case 'C', 'c':
+		return 100
+	case 'D', 'd':
+		return 1000
+	default:
+		return 0
+	}
+}
+
 func (w World) moveHallwayToHome() (World, int) {
 	cost := 0
 	stop := false
@@ -228,11 +167,11 @@ func (w World) moveHallwayToHome() (World, int) {
 		for _, p := range hallwayPos {
 			if w.occupied(p) {
 				occupant := w.occupant(p)
-				homeX := roomX[occupant]
+				homeX := roomX(occupant)
 				if w.accessibleHallway(p.x, homeX) {
 					if homeY, ok := w.freeHomeY(homeX); ok {
 						home := Pos{homeX, homeY}
-						cost += manhattanDistance(p, home) * costMove[occupant]
+						cost += manhattanDistance(p, home) * costMove(occupant)
 						w = w.moveHome(p, home)
 						stop = false
 					}
@@ -249,7 +188,7 @@ func (w World) moveRoomToHome(x int) (World, int) {
 		p := Pos{x, roomY}
 		if w.occupied(p) {
 			occupant := w.occupant(p)
-			homeX := roomX[occupant]
+			homeX := roomX(occupant)
 
 			if w.atHome(p) || p.x == homeX {
 				return w, cost
@@ -258,7 +197,7 @@ func (w World) moveRoomToHome(x int) (World, int) {
 			homeY, ok := w.freeHomeY(homeX)
 			if ok && w.accessibleHallway(x, homeX) {
 				distance := utils.Abs(homeX-p.x) + (homeY - hallwayY) + (p.y - hallwayY)
-				cost = cost + distance*costMove[occupant]
+				cost = cost + distance*costMove(occupant)
 				w = w.moveHome(p, Pos{homeX, homeY})
 			} else {
 				return w, cost
@@ -280,7 +219,7 @@ func (w World) moveRoomToHallway(roomX int) []MoveCost {
 			occupant := w.occupant(p)
 			for _, h := range hallwayPos {
 				if w.accessibleHallway(roomX, h.x) {
-					cost := manhattanDistance(p, h) * costMove[occupant]
+					cost := manhattanDistance(p, h) * costMove(occupant)
 					res = append(res, MoveCost{src: p, dest: h, cost: cost})
 					// fmt.Printf("%c %v can reach hallway %v with cost: %d\n", occupant, p, Pos{x, hallwayY}, cost)
 				}
@@ -355,8 +294,8 @@ func heuristicCost(w World) int {
 			if w.occupied(p) && !w.atHome(p) {
 				occupant := w.occupant(p)
 				cpt[occupant] = cpt[occupant] + 1
-				distance := cpt[occupant] + manhattanDistance(p, Pos{roomX[occupant], hallwayY})
-				res += distance * costMove[occupant]
+				distance := cpt[occupant] + manhattanDistance(p, Pos{roomX(occupant), hallwayY})
+				res += distance * costMove(occupant)
 			}
 		}
 	}
@@ -364,8 +303,8 @@ func heuristicCost(w World) int {
 		if w.occupied(p) {
 			occupant := w.occupant(p)
 			cpt[occupant] = cpt[occupant] + 1
-			distance := cpt[occupant] + manhattanDistance(p, Pos{roomX[occupant], hallwayY})
-			res += distance * costMove[occupant]
+			distance := cpt[occupant] + manhattanDistance(p, Pos{roomX(occupant), hallwayY})
+			res += distance * costMove(occupant)
 		}
 	}
 
@@ -373,25 +312,14 @@ func heuristicCost(w World) int {
 	return res
 }
 
-// func signature(w World) string {
-// 	var sb strings.Builder
-// 	sb.Grow(len(hallwayPos) + (w.maxY-2)*4)
-// 	for _, p := range hallwayPos {
-// 		sb.WriteByte(w.occupant(p))
-// 	}
-// 	for y := 2; y <= w.maxY-2; y++ {
-// 		for x := 3; x <= 9; x += 2 {
-// 			sb.WriteByte(w.occupant(Pos{x, y}))
-// 		}
-// 	}
-// 	return sb.String()
-// }
 func signature(w World) uint64 {
 	var res uint64
 	for _, p := range hallwayPos {
 		o := w.occupant(p)
 		res = res * 5
-		if o > 0 {
+		if o >= 'a' {
+			res += uint64(1 + o - 'a')
+		} else if o >= 'A' {
 			res += uint64(1 + o - 'A')
 		}
 	}
@@ -399,7 +327,9 @@ func signature(w World) uint64 {
 		for x := 3; x <= 9; x += 2 {
 			o := w.occupant(Pos{x, y})
 			res = res * 5
-			if o > 0 {
+			if o >= 'a' {
+				res += uint64(1 + o - 'a')
+			} else if o >= 'A' {
 				res += uint64(1 + o - 'A')
 			}
 		}
@@ -488,12 +418,19 @@ func (pq *PriorityQueue) Pop() interface{} {
 	return item
 }
 
+// #############
+// #...........#
+// ###D#A#B#C###
+//   #B#A#D#C#
+//   #########
 func Part1(input string) int {
 	var d int
 	input = strings.TrimSuffix(input, "\n")
-	lines := strings.Split(input, "\n")
-	w := createWorld(lines)
-	_, d = path(w, createGoal(w))
+	l := strings.Split(input, "\n")
+	w := createWorld(l)
+	t := "  #a#b#c#d#  "
+	g := createWorld([]string{l[0], l[1], t, t, l[4]})
+	_, d = path(w, g)
 	return d
 }
 
@@ -504,7 +441,9 @@ func Part2(input string) int {
 	l2 := "  #D#B#A#C#  "
 	lines := []string{l[0], l[1], l[2], l1, l2, l[3], l[4]}
 	w := createWorld(lines)
-	_, d := path(w, createGoal(w))
+	t := "  #a#b#c#d#  "
+	g := createWorld([]string{l[0], l[1], t, t, t, t, l[4]})
+	_, d := path(w, g)
 	return d
 	// return 0
 }

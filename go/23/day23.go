@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 	"unicode"
-
-	"github.com/pemoreau/advent-of-code-2021/go/utils"
 )
 
 //go:embed input.txt
@@ -108,10 +106,12 @@ func (w World) accessibleHallway(srcX, destX int) bool {
 func (w World) blockedHallway() bool {
 	for x1 := 4; x1 <= 8; x1 += 2 {
 		occupant1 := w.occupant(Pos{x: x1, y: hallwayY})
-		for x2 := 4; x2 <= 8; x2 += 2 {
+		for x2 := x1 + 2; x2 <= 8; x2 += 2 {
 			occupant2 := w.occupant(Pos{x: x2, y: hallwayY})
-			if x1 != x2 && occupant1 != empty && occupant2 != empty && roomX(occupant1) > x2 && roomX(occupant2) < x1 {
-				return true
+			if occupant1 != occupant2 && occupant1 != empty && occupant2 != empty {
+				if roomX(occupant1) > x2 && roomX(occupant2) < x1 {
+					return true
+				}
 			}
 		}
 	}
@@ -196,8 +196,8 @@ func (w World) moveRoomToHome(x int) (World, int) {
 
 			homeY, ok := w.freeHomeY(homeX)
 			if ok && w.accessibleHallway(x, homeX) {
-				distance := utils.Abs(homeX-p.x) + (homeY - hallwayY) + (p.y - hallwayY)
-				cost = cost + distance*costMove(occupant)
+				distance := manhattanDistance(p, Pos{homeX, hallwayY}) + manhattanDistance(Pos{homeX, hallwayY}, Pos{homeX, homeY})
+				cost += distance * costMove(occupant)
 				w = w.moveHome(p, Pos{homeX, homeY})
 			} else {
 				return w, cost

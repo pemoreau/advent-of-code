@@ -1,8 +1,12 @@
 package main
 
 import (
+	_ "embed"
 	"testing"
 )
+
+//go:embed input2.txt
+var input2 string
 
 func TestPart1Input(t *testing.T) {
 	result := Part1(string(input_day))
@@ -28,5 +32,21 @@ func BenchmarkPart1(b *testing.B) {
 func BenchmarkPart2(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		Part2(input_day)
+	}
+}
+
+func TestPart1Input2(t *testing.T) {
+	result := Part1(string(input2))
+	expected := 16157
+	if result != expected {
+		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+	}
+}
+
+func TestPart2Input2(t *testing.T) {
+	result := Part2(string(input2))
+	expected := 43481
+	if result != expected {
+		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}
 }

@@ -59,13 +59,17 @@ func (w World) occupied(p Pos) bool {
 	return w.grid[index(p)] != empty
 }
 
-func (w World) move(src, dest Pos) World {
+func (w World) move(src, dest Pos, home bool) World {
 	if w.occupied(dest) {
 		panic("dest occupied")
 	}
 	s := w.grid
 	s = replace(s, src, empty)
-	s = replace(s, dest, w.occupant(src))
+	if !home {
+		s = replace(s, dest, w.occupant(src))
+	} else {
+		s = replace(s, dest, byte(unicode.ToLower(rune(w.occupant(src)))))
+	}
 	return World{
 		grid: s,
 		maxY: w.maxY,
@@ -73,9 +77,7 @@ func (w World) move(src, dest Pos) World {
 }
 
 func (w World) moveHome(src, dest Pos) World {
-	res := w.move(src, dest)
-	res.grid = replace(res.grid, dest, byte(unicode.ToLower(rune(res.occupant(dest)))))
-	return res
+	return w.move(src, dest, true)
 }
 
 func (w World) atHome(p Pos) bool {
@@ -240,6 +242,7 @@ func (w World) step() []State {
 	var cost int
 	var c int
 
+	// This is an optimization, not necessary
 	if w.blockedHallway() {
 		return res
 	}
@@ -247,7 +250,7 @@ func (w World) step() []State {
 	w, c = w.moveHallwayToHome()
 	cost += c
 
-	// this is an optimization, this should not be necessary
+	// This is an optimization, not necessary
 	for roomX := 3; roomX <= 9; roomX += 2 {
 		w, c = w.moveRoomToHome(roomX)
 		cost += c
@@ -255,7 +258,7 @@ func (w World) step() []State {
 
 	for roomX := 3; roomX <= 9; roomX += 2 {
 		for _, m := range w.moveRoomToHallway(roomX) {
-			res = append(res, State{world: w.move(m.src, m.dest), cost: cost + m.cost})
+			res = append(res, State{world: w.move(m.src, m.dest, false), cost: cost + m.cost})
 		}
 	}
 
@@ -286,15 +289,15 @@ func manhattanDistance(from, to Pos) int {
 
 func heuristicCost(w World) int {
 	var res int
-	cpt := map[byte]int{}
+	cpt := [10]int{}
 
 	for x := 3; x <= 9; x += 2 {
 		for y := w.maxY - 2; y >= 2; y-- {
 			p := Pos{x, y}
 			if w.occupied(p) && !w.atHome(p) {
 				occupant := w.occupant(p)
-				cpt[occupant] = cpt[occupant] + 1
-				distance := cpt[occupant] + manhattanDistance(p, Pos{roomX(occupant), hallwayY})
+				cpt[roomX(occupant)] += 1
+				distance := cpt[roomX(occupant)] + manhattanDistance(p, Pos{roomX(occupant), hallwayY})
 				res += distance * costMove(occupant)
 			}
 		}
@@ -302,8 +305,8 @@ func heuristicCost(w World) int {
 	for _, p := range hallwayPos {
 		if w.occupied(p) {
 			occupant := w.occupant(p)
-			cpt[occupant] = cpt[occupant] + 1
-			distance := cpt[occupant] + manhattanDistance(p, Pos{roomX(occupant), hallwayY})
+			cpt[roomX(occupant)] += 1
+			distance := cpt[roomX(occupant)] + manhattanDistance(p, Pos{roomX(occupant), hallwayY})
 			res += distance * costMove(occupant)
 		}
 	}
@@ -317,7 +320,9 @@ func signature(w World) uint64 {
 	for _, p := range hallwayPos {
 		o := w.occupant(p)
 		res = res * 5
-		if o >= 'a' {
+		if o == empty {
+			res += 0
+		} else if o >= 'a' {
 			res += uint64(1 + o - 'a')
 		} else if o >= 'A' {
 			res += uint64(1 + o - 'A')
@@ -327,7 +332,9 @@ func signature(w World) uint64 {
 		for x := 3; x <= 9; x += 2 {
 			o := w.occupant(Pos{x, y})
 			res = res * 5
-			if o >= 'a' {
+			if o == empty {
+				res += 0
+			} else if o >= 'a' {
 				res += uint64(1 + o - 'a')
 			} else if o >= 'A' {
 				res += uint64(1 + o - 'A')

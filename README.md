@@ -547,7 +547,21 @@ Example of input:
   #########
 ```
 
-Not yet implemented. Solved it using a spreadsheet.
+### Go
+
+I spent a lot of time on this solution.
+
+First I tried to use a map[Position]byte to represent the game but it was a bit too slow, in particular when compared to 1e9y approach.
+
+1e9y has a very simple representation (a string) with a function to convert a position {x,y} into an int index. This representation is very efficient for this problem. His code is very smart.
+
+In my approach I use an A* algorithm with a heuristic based on manhattan distance.
+
+I have also noted that storing (instead of computing each time) the fact that an occupant is "at home" can help. I use a lowercase in my string based implementation.
+
+With these optimisations, part 1 can be solved in 9ms, and part 2 in 110ms on a 2013 Mac.
+
+I am sure that this can still be improved because I do not use any programming trick.
 
 ## Day 24: Arithmetic Logic Unit
 

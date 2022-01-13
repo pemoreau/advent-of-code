@@ -34,6 +34,7 @@ type World struct {
 }
 
 func createWorld(lines []string) World {
+	// WARNING: we assume no occupant is at home
 	world := World{
 		grid: strings.Join(lines, "\n"),
 		maxY: len(lines),
@@ -84,6 +85,7 @@ func (w World) atHome(p Pos) bool {
 	return unicode.IsLower(rune(w.occupant(p)))
 }
 
+// Returns true when [src+1..dest-1] is no occupied
 func (w World) accessibleHallway(srcX, destX int) bool {
 	if srcX == destX {
 		return true
@@ -105,13 +107,36 @@ func (w World) accessibleHallway(srcX, destX int) bool {
 	return true
 }
 
-func (w World) blockedHallway() bool {
+// List of free hallway positions accessible from column roomX
+func (w World) accessiblePos(roomX int) []Pos {
+	var res []Pos
+	for _, h := range hallwayPos {
+		if h.x < roomX {
+			if w.occupied(h) {
+				res = nil
+			} else {
+				res = append(res, h)
+			}
+		}
+		if h.x > roomX {
+			if w.occupied(h) {
+				return res
+			}
+			res = append(res, h)
+		}
+	}
+	return res
+}
+
+func (w World) blockedHallway1() bool {
+	// If we find two elements in the hallway that have to pass through
 	for x1 := 4; x1 <= 8; x1 += 2 {
 		occupant1 := w.occupant(Pos{x: x1, y: hallwayY})
 		for x2 := x1 + 2; x2 <= 8; x2 += 2 {
 			occupant2 := w.occupant(Pos{x: x2, y: hallwayY})
 			if occupant1 != occupant2 && occupant1 != empty && occupant2 != empty {
 				if roomX(occupant1) > x2 && roomX(occupant2) < x1 {
+					// fmt.Println("blocked1")
 					return true
 				}
 			}
@@ -120,6 +145,49 @@ func (w World) blockedHallway() bool {
 	return false
 }
 
+func (w World) blockedHallway2() bool {
+	if w.occupant(Pos{8, 1}) == 'D' {
+		homeX := 9
+		freeSpace := 0
+		if !w.occupied(Pos{10, 1}) {
+			freeSpace += 1
+			if !w.occupied(Pos{11, 1}) {
+				freeSpace += 1
+			}
+		}
+		nbForeign := 0
+		for homeY := w.maxY - 2; homeY >= 2 && w.occupied(Pos{homeX, homeY}); homeY-- {
+			if !w.atHome(Pos{homeX, homeY}) {
+				nbForeign += 1
+			}
+		}
+		if nbForeign > freeSpace {
+			return true
+		}
+	}
+	if w.occupant(Pos{4, 1}) == 'A' {
+		homeX := 3
+		freeSpace := 0
+		if !w.occupied(Pos{2, 1}) {
+			freeSpace += 1
+			if !w.occupied(Pos{1, 1}) {
+				freeSpace += 1
+			}
+		}
+		nbForeign := 0
+		for homeY := w.maxY - 2; homeY >= 2 && w.occupied(Pos{homeX, homeY}); homeY-- {
+			if !w.atHome(Pos{homeX, homeY}) {
+				nbForeign += 1
+			}
+		}
+		if nbForeign > freeSpace {
+			return true
+		}
+	}
+	return false
+}
+
+// Returns first available home position
 func (w World) freeHomeY(roomX int) (int, bool) {
 	for y := w.maxY - 2; y >= 2; y-- {
 		if !w.occupied(Pos{roomX, y}) {
@@ -219,13 +287,16 @@ func (w World) moveRoomToHallway(roomX int) []MoveCost {
 				return res
 			}
 			occupant := w.occupant(p)
-			for _, h := range hallwayPos {
-				if w.accessibleHallway(roomX, h.x) {
-					cost := manhattanDistance(p, h) * costMove(occupant)
-					res = append(res, MoveCost{src: p, dest: h, cost: cost})
-					// fmt.Printf("%c %v can reach hallway %v with cost: %d\n", occupant, p, Pos{x, hallwayY}, cost)
-				}
+			for _, h := range w.accessiblePos(roomX) {
+				cost := manhattanDistance(p, h) * costMove(occupant)
+				res = append(res, MoveCost{src: p, dest: h, cost: cost})
 			}
+			// for _, h := range hallwayPos {
+			// 	if w.accessibleHallway(roomX, h.x) {
+			// 		cost := manhattanDistance(p, h) * costMove(occupant)
+			// 		res = append(res, MoveCost{src: p, dest: h, cost: cost})
+			// 	}
+			// }
 			return res
 		}
 	}
@@ -243,7 +314,7 @@ func (w World) step() []State {
 	var c int
 
 	// This is an optimization, not necessary
-	if w.blockedHallway() {
+	if w.blockedHallway1() || w.blockedHallway2() {
 		return res
 	}
 
@@ -310,8 +381,6 @@ func heuristicCost(w World) int {
 			res += distance * costMove(occupant)
 		}
 	}
-
-	// fmt.Printf("heuristic distance: %d\n%v\n", res, w)
 	return res
 }
 
@@ -363,7 +432,6 @@ func path(start, to World) (path []World, distance int) {
 		var current World = heap.Pop(frontier).(*node).World
 		var currentSignature = signature(current)
 
-		// fmt.Printf("signature: %s\ncurrent:\n%v\n", currentSignature, current)
 		if currentSignature == toSignature {
 			// Found a path to the goal.
 			var path []World

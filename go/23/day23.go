@@ -30,16 +30,22 @@ const empty byte = '.'
 
 type World struct {
 	maxY int
-	grid string
+	grid []byte
+	// grid string
 }
 
 func createWorld(lines []string) World {
 	// WARNING: we assume no occupant is at home
 	world := World{
-		grid: strings.Join(lines, "\n"),
+		// grid: strings.Join(lines, "\n"),
+		grid: []byte(strings.Join(lines, "\n")),
 		maxY: len(lines),
 	}
 	return world
+}
+
+func (w World) String() string {
+	return string(w.grid)
 }
 
 func index(p Pos) int {
@@ -64,13 +70,23 @@ func (w World) move(src, dest Pos, home bool) World {
 	if w.occupied(dest) {
 		panic("dest occupied")
 	}
-	s := w.grid
-	s = replace(s, src, empty)
+
+	var s = make([]byte, len(w.grid))
+	copy(s, w.grid)
 	if !home {
-		s = replace(s, dest, w.occupant(src))
+		s[index(dest)] = w.occupant(src)
 	} else {
-		s = replace(s, dest, byte(unicode.ToLower(rune(w.occupant(src)))))
+		s[index(dest)] = byte(unicode.ToLower(rune(w.occupant(src))))
 	}
+	s[index(src)] = empty
+
+	// s := w.grid
+	// s = replace(s, src, empty)
+	// if !home {
+	// 	s = replace(s, dest, w.occupant(src))
+	// } else {
+	// 	s = replace(s, dest, byte(unicode.ToLower(rune(w.occupant(src)))))
+	// }
 	return World{
 		grid: s,
 		maxY: w.maxY,

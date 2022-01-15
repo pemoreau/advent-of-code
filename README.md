@@ -35,7 +35,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 11](./rust/src/day11.rs) | ` 0.186ms` | ` 0.420ms` | [day 11](./go/11/day11.go)            | ` 0.152 ms` | ` 0.432 ms`   |
 |                               |            |            | [day 12](./go/12/day12.go)            | ` 0.161 ms` | ` 3.944 ms`   |
 | [day 13](./rust/src/day13.rs) | ` 0.156ms` | ` 0.118ms` | [day 13](./go/13/day13.go)            | ` 0.441 ms` | ` 0.706 ms`   |
-|                               |            |            | [day 14](./go/14/day14.go)            | ` 0.075 ms` | ` 0.056 ms`   |
+|                               |            |            | [day 14](./go/14/day14.go)            | ` 0.023 ms` | ` 0.052 ms`   |
 |                               |            |            | [day 15](./go/15/day15.go)            | ` 11.64 ms` | ` 344.0 ms`   |
 |                               |            |            | [day 16](./go/16/day16.go)            | ` 0.121 ms` | ` 0.071 ms`   |
 |                               |            |            | [day 17](./go/17/day17.go)            | ` 0.133 ms` | ` 0.424 ms`   |
@@ -285,17 +285,26 @@ Example of input:
 
 Use a stack for parsing the input
 
-## Day 11
+## Day 11: Dumbo Octopus
 
 Example of input:
 
 ```
-
+5483143223
+2745854711
+5264556173
+6141336146
+6357385478
+4167524645
+2176841721
+6882881134
+4846848554
+5283751526
 ```
 
 ### Go
 
-Use 2d array to represent the board. The code involves many nested `for-loop` but it is quite natural in Golang
+Used 2d array to represent the board. The code involves many nested `for-loop` but it is quite natural in Golang
 
 ### Rust
 
@@ -305,12 +314,18 @@ Tried to represent the board using a 1d-array, but this did not improved the cod
 
 I am not very satisfied by this solution.
 
-## Day 12
+## Day 12: Passage Pathing
 
 Example of input:
 
 ```
-
+start-A
+start-b
+A-c
+A-b
+b-d
+A-end
+b-end
 ```
 
 ### Go
@@ -321,12 +336,32 @@ I first came with a solution that builds the list of paths, but it was a bit slo
 
 I then simplified the code to get a more efficient solution (~3.8ms for part 2 on my 2013 mac).
 
-## Day 13
+## Day 13: Transparent Origami
 
 Example of input:
 
 ```
+6,10
+0,14
+9,10
+0,3
+10,4
+4,11
+6,0
+6,12
+4,1
+0,13
+10,12
+3,4
+3,0
+8,4
+1,10
+2,14
+8,10
+9,0
 
+fold along y=7
+fold along x=5
 ```
 
 ### Rust
@@ -359,12 +394,29 @@ func step(screen map[Pos]struct{}, inst Instr) {
 
 This shows that you can mutate a map while iterating over it.
 
-## Day 14
+## Day 14: Extended Polymerization
 
 Example of input:
 
 ```
+NNCB
 
+CH -> B
+HH -> N
+CB -> H
+NH -> C
+HB -> C
+HC -> B
+HN -> C
+NN -> C
+BH -> H
+NC -> B
+NB -> B
+BN -> B
+BB -> N
+BC -> B
+CC -> N
+CN -> C
 ```
 
 ### Go

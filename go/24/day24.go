@@ -3,11 +3,12 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code-2021/go/utils"
 	"math"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pemoreau/advent-of-code-2021/go/utils"
 )
 
 //go:embed input.txt
@@ -155,7 +156,7 @@ type State struct {
 }
 type World []*State
 
-func eval(e Instr, world World) World {
+func eval(e Instr, remaining []Instr, world World) World {
 	switch instr := e.(type) {
 	case Input:
 		fmt.Printf("BEFORE MERGE = %v\n", len(world))
@@ -167,8 +168,10 @@ func eval(e Instr, world World) World {
 		for _, state := range world {
 			for i := 1; i <= 9; i++ {
 				state.env[index] = i
-				newState := State{env: state.env, min: 10*state.min + i, max: 10*state.max + i}
-				newWorld = append(newWorld, &newState)
+				if reachable(remaining, createEnvInterval(state.env)) {
+					newState := State{env: state.env, min: 10*state.min + i, max: 10*state.max + i}
+					newWorld = append(newWorld, &newState)
+				}
 			}
 		}
 		world = newWorld
@@ -256,7 +259,7 @@ func Solve(input string) {
 	world := World{&State{env: Env{0, 0, 0, 0}, min: 0, max: 0}}
 	for i, instr := range instructions {
 		fmt.Printf("#%d: %v\n", i, instr)
-		world = eval(instr, world)
+		world = eval(instr, instructions[i+1:], world)
 	}
 	for _, state := range world {
 		if state.env[regIndex("z")] == 0 {

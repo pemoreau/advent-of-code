@@ -1,34 +1,15 @@
 package main
 
 import (
-	"io/ioutil"
+	_ "embed"
 	"testing"
 )
 
-const input = `6,10
-0,14
-9,10
-0,3
-10,4
-4,11
-6,0
-6,12
-4,1
-0,13
-10,12
-3,4
-3,0
-8,4
-1,10
-2,14
-8,10
-9,0
-
-fold along y=7
-fold along x=5`
+//go:embed input_test.txt
+var input_test string
 
 func TestPart1(t *testing.T) {
-	result := Part1(input)
+	result := Part1(input_test)
 	expected := 17
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -36,10 +17,19 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart1Input(t *testing.T) {
-	content, _ := ioutil.ReadFile("../../inputs/day13.txt")
-	result := Part1(string(content))
+	result := Part1(input_day)
 	expected := 795
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+	}
+}
+func BenchmarkPart1(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Part1(input_day)
+	}
+}
+func BenchmarkPart2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Part2(input_day)
 	}
 }

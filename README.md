@@ -45,7 +45,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                               |            |            | [day 21](./go/21/day21.go)            | ` 2.342 µs` | ` 137.152 ms` |
 |                               |            |            | [day 22](./go/22/day22.go)            | ` 2.237 ms` | ` 56.162 ms`  |
 |                               |            |            | [day 23](./go/23/day23.go)            | ` 7.806 ms` | ` 76.21 ms`   |
-|                               |            |            | [day 24](./go/24/day24.go)            | ` 101.5 s`  | ` 0.003 ms`   |
+|                               |            |            | [day 24](./go/24/day24.go)            | ` 7.7 s`    | ` 0.003 ms`   |
 |                               |            |            | [day 25](./go/25/day25.go)            | ` 98.0 ms`  | ` 0.003 ms`   |
 
 # Comments
@@ -555,7 +555,7 @@ First I tried to use a map[Position]byte to represent the game but it was a bit 
 
 1e9y has a very simple representation (a string) with a function to convert a position {x,y} into an int index. This representation is very efficient for this problem. His code is very smart.
 
-In my approach I use an A* algorithm with a heuristic based on manhattan distance.
+In my approach I use an A\* algorithm with a heuristic based on manhattan distance.
 
 I have also noted that storing (instead of computing each time) the fact that an occupant is "at home" can help. I use a lowercase in my string based implementation.
 
@@ -585,7 +585,7 @@ The goal is to find inputs (`w0`...`w13`) such that `z=0`.
 
 ### Go
 
-First tried brute force (using a compiled approach) but it is way too slow.
+First tried brute force (using a compiled approach) but it was way too slow.
 
 In a second attempt, I tried to use abstract interpretation to associate an
 interval (min,max values) to each variable.
@@ -600,6 +600,8 @@ So, I tried another approach: I used a hashmap to store all explored states (i.e
 After each `inp` instruction, the search space is increase by a factor 9. Fortunately we can merge all the states whose values `w, x, y, z` are the same.
 
 This approach solved the problems in ~100s, using 70.10^6 states.
+
+Later, I reused the code using abstract interpretation to cut search branches when z cannot reach the value 0. This reduced the computation to less than 8 seconds.
 
 ## Day 25: Sea Cucumber
 

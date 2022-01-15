@@ -62,5 +62,5 @@ func reachable(program []Instr, env EnvInterval) bool {
 	for _, i := range program {
 		env = abstractInterpretationInstr(i, env)
 	}
-	return env[3].Min <= 0 && env[3].Max >= 0
+	return env[regIndex("z")].Min <= 0 && env[regIndex("z")].Max >= 0
 }

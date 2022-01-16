@@ -36,10 +36,10 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                               |            |            | [day 12](./go/12/day12.go)            | ` 0.161 ms` | ` 3.944 ms`   |
 | [day 13](./rust/src/day13.rs) | ` 0.156ms` | ` 0.118ms` | [day 13](./go/13/day13.go)            | ` 0.441 ms` | ` 0.706 ms`   |
 |                               |            |            | [day 14](./go/14/day14.go)            | ` 0.023 ms` | ` 0.052 ms`   |
-|                               |            |            | [day 15](./go/15/day15.go)            | ` 11.64 ms` | ` 344.0 ms`   |
-|                               |            |            | [day 16](./go/16/day16.go)            | ` 0.121 ms` | ` 0.071 ms`   |
+|                               |            |            | [day 15](./go/15/day15.go)            | ` 9.858 ms` | ` 342.6 ms`   |
+|                               |            |            | [day 16](./go/16/day16.go)            | ` 0.052 ms` | ` 0.049 ms`   |
 |                               |            |            | [day 17](./go/17/day17.go)            | ` 0.133 ms` | ` 0.424 ms`   |
-|                               |            |            | [day 18](./go/18/day18.go)            | ` 4.071 ms` | ` 24.39 ms`   |
+|                               |            |            | [day 18](./go/18/day18.go)            | ` 1.685 ms` | ` 25.187 ms`  |
 |                               |            |            | [day 19](./go/19/day19.go)            | ` 20.20 ms` | ` 20.88 ms`   |
 |                               |            |            | [day 20](./go/20/day20.go)            | ` 9.035 ms` | ` 491.576 ms` |
 |                               |            |            | [day 21](./go/21/day21.go)            | ` 2.342 µs` | ` 137.152 ms` |
@@ -423,19 +423,21 @@ CN -> C
 
 I have used a 2d-array for the rules (`[26][26]byte`) and a 2d-array for counting the pairs (`[26][26]int{}`). Maybe a `map` would have been more efficient. I did not have time to compare the two solutions.
 
-Also used the following construct to statically include the input file :
-
-```go
-//go:embed input.txt
-var input string
-```
-
-## Day 15
+## Day 15: Chiton
 
 Example of input:
 
 ```
-
+1163751742
+1381373672
+2136511328
+3694931569
+7463417111
+1319128137
+1359912421
+3125421639
+1293138521
+2311944581
 ```
 
 ### Go
@@ -444,12 +446,12 @@ Lost a lot of time because I made a mistake when building the mega-matrix but I 
 
 And in particular articles from Amit (https://theory.stanford.edu/~amitp/GameProgramming/)
 
-## Day 16
+## Day 16: Packet Decoder
 
 Example of input:
 
 ```
-
+9C0141080250320F1802104A08
 ```
 
 ### Go
@@ -500,35 +502,41 @@ The second part of the problem is very interesting because we have to find a way
 
 In general we can use inheritance. In Golang I have defined structs and an interface (`Packet`).
 
-As explained here: https://eli.thegreenplace.net/2018/go-and-algebraic-data-types/, a key point is to define a function (`isTree` for example) which is common to all struct that belong to the interface.
+As explained [here](https://eli.thegreenplace.net/2018/go-and-algebraic-data-types/), a key point is to define a function (`isTree` for example) which is common to all struct that belong to the interface.
 
 In a second step, the type discrimination (instead of dynamic dispatching) is done by the `switch` statement and the use of `t.(type)` construct
 
 After finishing the puzzle I discovered the [bitio](https://github.com/icza/bitio) library. I will try it when I have time.
 
-## Day 17
+## Day 17: Trick Shot
 
 Example of input:
 
 ```
-
+target area: x=20..30, y=-10..-5
 ```
 
 ### Go
 
 Brute force approach. Not very proud of it.
 
-## Day 18
+## Day 18: Snailfish
 
 Example of input:
 
 ```
-
+[1,2]
+[[1,2],3]
+[9,[8,7]]
+[[1,9],[8,5]]
+[[[[1,2],[3,4]],[[5,6],[7,8]]],9]
+[[[9,[3,8]],[[0,9],6]],[[[3,7],[4,9]],3]]
+[[[[1,3],[5,3]],[[1,3],[8,7]]],[[[4,9],[6,9]],[[8,2],[7,3]]]]
 ```
 
 ### Go
 
-A good day for me. I have used a list of (value, depth) tuples to represent the tree. With this representation, the normalization wrt. explode can be done in one pass. `split` rule is also efficient.
+A good day for me. I have used a list of `(value, depth)` tuples to represent the tree. With this representation, the normalization wrt. explode can be done in one pass. `split` rule is also efficient.
 
 One difficulty is to compute the magnitude. For that I use a stack of `(value,depth)`. when the top of the stack contains two values with the same depth, they can be replaced by a new tuple `(3*left+2*right, depth-1)`. This is quite efficient.
 

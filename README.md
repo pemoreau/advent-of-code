@@ -42,10 +42,10 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                               |            |            | [day 18](./go/18/day18.go)            | ` 1.685 ms` | ` 25.187 ms`  |
 |                               |            |            | [day 19](./go/19/day19.go)            | ` 20.20 ms` | ` 20.88 ms`   |
 |                               |            |            | [day 20](./go/20/day20.go)            | ` 9.035 ms` | ` 491.576 ms` |
-|                               |            |            | [day 21](./go/21/day21.go)            | ` 2.342 µs` | ` 137.152 ms` |
+|                               |            |            | [day 21](./go/21/day21.go)            | ` 0.002 ms` | ` 137.152 ms` |
 |                               |            |            | [day 22](./go/22/day22.go)            | ` 2.237 ms` | ` 56.162 ms`  |
 |                               |            |            | [day 23](./go/23/day23.go)            | ` 7.806 ms` | ` 76.21 ms`   |
-|                               |            |            | [day 24](./go/24/day24.go)            | ` 7.7 s`    | ` 0.003 ms`   |
+|                               |            |            | [day 24](./go/24/day24.go)            | ` 7700 ms`  | ` 0.003 ms`   |
 |                               |            |            | [day 25](./go/25/day25.go)            | ` 98.0 ms`  | ` 0.003 ms`   |
 
 # Comments
@@ -542,24 +542,44 @@ One difficulty is to compute the magnitude. For that I use a stack of `(value,de
 
 The current implementation does not perform side effect. This should be possible to improve the efficiency by doing transformations in place.
 
-## Day 19
+## Day 19: Beacon Scanner
 
 Example of input:
 
 ```
+--- scanner 0 ---
+0,2
+4,1
+3,3
 
+--- scanner 1 ---
+-1,-1
+-5,0
+-2,1
 ```
 
 ### Go
 
 not a good day for me
 
-## Day 20:: Trench Map
+## Day 20: Trench Map
 
 Example of input:
 
 ```
+..#.#..#####.#.#.#.###.##.....###.##.#..###.####..#####..#....#..#..##..##
+#..######.###...####..#..#####..##..#.#####...##.#.#..#.##..#.#......#.###
+.######.###.####...#.##.##..#..#..#####.....#.#....###..#.##......#.....#.
+.#..#..##..#...##.######.####.####.#.#...#.......#..#.#.#...####.##.#.....
+.#..#...##.#.##..#...##.#.##..###.#......#.#.......#.#.#.####.###.##...#..
+...####.#..#..#.##.#....##..#.####....##...##..#...#......#.#.......#.....
+..##..####..#...#.#.#...##..#.#..###..#####........#..####......#..#
 
+#..#.
+#....
+##..#
+..#..
+..###
 ```
 
 ### Go
@@ -572,14 +592,15 @@ The interest is that I can extend the border of the image without moving everyth
 Example of input:
 
 ```
-
+Player 1 starting position: 4
+Player 2 starting position: 8
 ```
 
 ### Go
 
 Using recursion and a cache.
 
-Not so easy to get it correct. I made a mistake: starting with `uint8` for space. I took me some time to the overflow problem.
+Not so easy to get it correct. I made a mistake: starting with `uint8` for space. It took me some time to see the overflow problem.
 
 This is a good lesson: use `int` instead of `int8`, `int16`, `uint8`, ...,and do not do premature optimization. Then implement unit tests, and only after that, narrow integer types to speedup.
 
@@ -588,7 +609,10 @@ This is a good lesson: use `int` instead of `int8`, `int16`, `uint8`, ...,and do
 Example of input:
 
 ```
-
+on x=10..12,y=10..12,z=10..12
+on x=11..13,y=11..13,z=11..13
+off x=9..11,y=9..11,z=9..11
+on x=10..10,y=10..10,z=10..1
 ```
 
 ### Go
@@ -611,17 +635,15 @@ Example of input:
 
 I spent a lot of time on this solution.
 
-First I tried to use a map[Position]byte to represent the game but it was a bit too slow, in particular when compared to 1e9y approach.
+First I tried to use a `map[Position]byte` to represent the game but it was a bit too slow, in particular when compared to [1e9y](https://github.com/1e9y/adventofcode/blob/main/2021/day23/day23.go) approach.
 
-1e9y has a very simple representation (a string) with a function to convert a position {x,y} into an int index. This representation is very efficient for this problem. His code is very smart.
+1e9y has a very simple representation (a string) with a function to convert a position `{x,y}` into an `int` index. This representation is very efficient for this problem. His code is very smart.
 
 In my approach I use an A\* algorithm with a heuristic based on manhattan distance.
 
 I have also noted that storing (instead of computing each time) the fact that an occupant is "at home" can help. I use a lowercase in my string based implementation.
 
-With these optimisations, part 1 can be solved in 9ms, and part 2 in 110ms on a 2013 Mac.
-
-I am sure that this can still be improved because I do not use any programming trick.
+With these optimisations, part 1 can be solved in 7ms, and part 2 in 70ms on a 2013 Mac.
 
 ## Day 24: Arithmetic Logic Unit
 

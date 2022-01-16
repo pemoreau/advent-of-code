@@ -58,9 +58,18 @@ func abstractInterpretationInstr(i Instr, env EnvInterval) EnvInterval {
 	return newEnv
 }
 
+type key struct {
+	len int
+	env EnvInterval
+}
+
 func reachable(program []Instr, env EnvInterval) bool {
+	z := regIndex("z")
+
+	// fmt.Println(key{len(program), env})
 	for _, i := range program {
 		env = abstractInterpretationInstr(i, env)
 	}
-	return env[regIndex("z")].Min <= 0 && env[regIndex("z")].Max >= 0
+	// fmt.Println(key{len(program), env})
+	return env[z].Min <= 0 && 0 <= env[z].Max
 }

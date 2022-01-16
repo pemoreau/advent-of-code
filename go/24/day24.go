@@ -6,6 +6,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/pemoreau/advent-of-code-2021/go/utils"
@@ -156,26 +157,54 @@ type State struct {
 }
 type World []*State
 
+func (w World) String() string {
+	var s string
+	for _, state := range w {
+		s += fmt.Sprintf("%v %d %d, ", state.env, state.min, state.max)
+	}
+	s += "\n"
+	return s
+}
+
 func eval(e Instr, remaining []Instr, world World) World {
 	switch instr := e.(type) {
 	case Input:
 		fmt.Printf("BEFORE MERGE = %v\n", len(world))
-		world = merge(world, instr.reg)
+		world = merge(world)
 		fmt.Printf("AFTER MERGE  = %v\n", len(world))
-		newWorld := make(World, 0, len(world))
 
 		index := regIndex(instr.reg)
-		for _, state := range world {
-			for i := 1; i <= 9; i++ {
-				state.env[index] = i
-				if reachable(remaining, createEnvInterval(state.env)) {
-					newState := State{env: state.env, min: 10*state.min + i, max: 10*state.max + i}
-					newWorld = append(newWorld, &newState)
+
+		var wg sync.WaitGroup
+		wg.Add(9)
+		var tmp [10]World
+		for i := 1; i <= 9; i++ {
+			go func(i int) {
+				defer wg.Done()
+				for _, state := range world {
+					env := state.env
+					env[index] = i
+
+					envInterval := createEnvInterval(env)
+					envInterval[index] = utils.Interval{i, i}
+					// If reachable(remaining, createEnvInterval(state.env)) {
+					if reachable(remaining, envInterval) {
+						newState := State{env: env, min: 10*state.min + i, max: 10*state.max + i}
+						tmp[i] = append(tmp[i], &newState)
+						// fmt.Printf("tmp[%d]=%v\n", i, tmp[i])
+					}
 				}
-			}
+			}(i)
+		}
+		wg.Wait()
+
+		// Merge tmp[i] into world
+		var newWorld World
+		for i := 1; i <= 9; i++ {
+			newWorld = append(newWorld, tmp[i]...)
 		}
 		world = newWorld
-		//fmt.Printf("AFTER INPUT  = %v\n", len(world))
+		// fmt.Printf("AFTER INPUT  = %v\n", len(world))
 	case Assign:
 		switch exp := instr.rhs.(type) {
 		case Add:
@@ -220,11 +249,10 @@ func eval(e Instr, remaining []Instr, world World) World {
 	return world
 }
 
-func merge(w World, reg Reg) World {
+func merge(w World) World {
 	m := map[Env]*struct{ min, max int }{}
 	//fmt.Printf("MERGE %v\n", w)
 	for _, state := range w {
-		//state.env[regIndex(reg)] = 0
 		if entry, ok := m[state.env]; ok {
 			entry.min = utils.Min(entry.min, state.min)
 			entry.max = utils.Max(entry.max, state.max)
@@ -265,7 +293,6 @@ func Solve(input string) {
 		if state.env[regIndex("z")] == 0 {
 			min = utils.Min(min, state.min)
 			max = utils.Max(max, state.max)
-			//fmt.Printf("min=%d max=%d\n", min, max)
 		}
 	}
 

@@ -5,6 +5,9 @@ import "sort"
 type Interval struct{ Min, Max int }
 
 // https{//stackoverflow.com/questions/31057473/calculating-the-modulo-of-two-Intervals
+func (a Interval) Len() int {
+	return a.Max - a.Min + 1
+}
 
 func (a Interval) Negate() Interval {
 	return Interval{-a.Max, -a.Min}

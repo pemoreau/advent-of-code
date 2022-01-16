@@ -45,7 +45,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                               |            |            | [day 21](./go/21/day21.go)            | ` 0.002 ms` | ` 137.152 ms` |
 |                               |            |            | [day 22](./go/22/day22.go)            | ` 2.237 ms` | ` 56.162 ms`  |
 |                               |            |            | [day 23](./go/23/day23.go)            | ` 7.806 ms` | ` 76.21 ms`   |
-|                               |            |            | [day 24](./go/24/day24.go)            | ` 7700 ms`  | ` 0.003 ms`   |
+|                               |            |            | [day 24](./go/24/day24.go)            | ` 2436 ms`  | ` 0.003 ms`   |
 |                               |            |            | [day 25](./go/25/day25.go)            | ` 98.0 ms`  | ` 0.003 ms`   |
 
 # Comments
@@ -688,6 +688,8 @@ After each `inp` instruction, the search space is increase by a factor 9. Fortun
 This approach solved the problems in ~100s, using 70.10^6 states.
 
 Later, I reused the code using abstract interpretation to cut search branches when z cannot reach the value 0. This reduced the computation to less than 8 seconds.
+
+I noted that the exploration can be done in parallel. I just spawn some goroutines and the time decreased to 2.5 seconds.
 
 ## [Day 25: Sea Cucumber](https://adventofcode.com/2021/day/25)
 

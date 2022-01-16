@@ -71,7 +71,7 @@ Example of input:
 
 Nothing special except the use of `windows` function
 
-### Go
+### [Go](./go/01/day01.go)
 
 Used the following construct to embed the input file as a string in the source code:
 

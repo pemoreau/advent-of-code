@@ -46,6 +46,20 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                             |            |            | [day 24](./go/2021/24/day24.go)            | ` 2436 ms`  | ` 0.003 ms`   |
 |                             |            |            | [day 25](./go/2021/25/day25.go)            | ` 98.0 ms`  | ` 0.003 ms`   |
 
+# Year 2020
+
+| Rust                        | Go                              |
+| :-------------------------- | ------------------------------- |
+| [day 01](./rust/2020/day01) | [day 01](./go/2020/01/day01.go) |
+| [day 02](./rust/2020/day02) |                                 |
+| [day 03](./rust/2020/day03) |                                 |
+| [day 04](./rust/2020/day04) |                                 |
+| [day 05](./rust/2020/day05) |                                 |
+| [day 06](./rust/2020/day06) |                                 |
+|                             | [day 07](./go/2020/07/day07.go) |
+|                             | [day 08](./go/2020/08/day08.go) |
+|                             | [day 09](./go/2020/09/day09.go) |
+
 # Comments
 
 ## [README for year 2021](README-2021.md)

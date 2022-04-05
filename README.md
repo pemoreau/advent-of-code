@@ -1,6 +1,8 @@
 # Advent Of Code 2021
 
-Learning Rust and Go
+This repository is archived.
+
+The new repository is [here](https://github.com/pemoreau/advent-of-code)
 
 # Commands
 

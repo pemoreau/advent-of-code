@@ -1,6 +1,0 @@
-[workspace]
-
-members = [
-    "2021/*",
-    "utils",
-]

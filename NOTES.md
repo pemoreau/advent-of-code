@@ -1,4 +1,7 @@
+Some interesting repositories
+
 ### Go
+
 https://github.com/bozdoz/advent-of-code-2021
 https://github.com/Skarlso/aoc2021
 https://github.com/danvk/aoc2021
@@ -12,9 +15,10 @@ https://github.com/derat/advent-of-code/tree/main/2021
 https://github.com/janetschel/advent-of-go-2020
 
 ### Rust
+
 https://github.com/jontmy/aoc-rust/tree/master/src
 https://github.com/AxlLind/adventofcode2021
 
 ### Python (smart)
-https://github.com/r0f1/adventofcode2021
 
+https://github.com/r0f1/adventofcode2021

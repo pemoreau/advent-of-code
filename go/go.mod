@@ -1,3 +1,7 @@
-module github.com/pemoreau/advent-of-code-2021/go
+module github.com/pemoreau/advent-of-code/go
 
-go 1.17
+go 1.18
+
+require (
+	golang.org/x/exp v0.0.0-20220328175248-053ad81199eb
+)

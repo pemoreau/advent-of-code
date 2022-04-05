@@ -1,3 +1,3 @@
-module github.com/pemoreau/advent-of-code-2021/go/initaoc
+module github.com/pemoreau/advent-of-code/go/initaoc
 
-go 1.17
+go 1.18

@@ -2,33 +2,35 @@ package utils
 
 import "errors"
 
-type Stack []interface{}
+type Stack[T any] []T
 
-func BuildStack() Stack {
-	return make([]interface{}, 0)
+func BuildStack[T any]() Stack[T] {
+	return make([]T, 0)
 }
 
-func (s *Stack) Push(c interface{}) {
+func (s *Stack[T]) Push(c T) {
 	*s = append(*s, c)
 }
 
-func (s *Stack) Pop() (interface{}, error) {
+func (s *Stack[T]) Pop() (T, error) {
 	l := len(*s)
 	if l == 0 {
-		return 0, errors.New("stack is empty")
+		var zero T
+		return zero, errors.New("stack is empty")
 	}
 	top := (*s)[l-1]
 	*s = (*s)[:l-1]
 	return top, nil
 }
 
-func (s *Stack) Peek() (interface{}, error) {
+func (s *Stack[T]) Peek() (T, error) {
 	if s.IsEmpty() {
-		return 0, errors.New("stack is empty")
+		var zero T
+		return zero, errors.New("stack is empty")
 	}
 	return (*s)[len(*s)-1], nil
 }
 
-func (s *Stack) IsEmpty() bool {
+func (s *Stack[T]) IsEmpty() bool {
 	return len(*s) == 0
 }

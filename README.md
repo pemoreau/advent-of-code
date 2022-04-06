@@ -7,14 +7,15 @@
 - `cd rust/<n>` and `cargo run`
 - `cargo run --release` to run the puzzle in release mode
 - `cargo test` to run unit tests
+- `cargo bench` to run benchmarks
 
 ## Go
 
 - `cd go/<n>` and `go run .`
 - `go test` to run unit tests
-- `go test -bench .` to run unit tests
+- `go test -bench .` to run benchmarks
 
-# Timings 2021
+# Year 2021
 
 Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
@@ -59,6 +60,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                             | [day 07](./go/2020/07/day07.go) |
 |                             | [day 08](./go/2020/08/day08.go) |
 |                             | [day 09](./go/2020/09/day09.go) |
+|                             | [day 10](./go/2020/10/day10.go) |
 
 # Comments
 

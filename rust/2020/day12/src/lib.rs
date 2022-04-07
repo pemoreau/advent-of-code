@@ -1,15 +1,27 @@
-struct State<'a> {
+struct State {
     dir: usize,
     x: i32,
     y: i32,
-    waypoint: &'a mut Waypoint,
+    waypoint: Waypoint,
 }
 struct Waypoint {
     x: i32,
     y: i32,
 }
 
-impl<'a> State<'a> {
+impl State {
+    fn new() -> State {
+        State {
+            dir: 0,
+            x: 0,
+            y: 0,
+            waypoint: Waypoint { x: 10, y: 1 },
+        }
+    }
+    fn manhattan_distance(&self) -> i64 {
+        (self.x.abs() + self.y.abs()) as i64
+    }
+
     fn step1(&mut self, command: char, value: usize) {
         match command {
             'E' => self.x += value as i32,
@@ -66,12 +78,7 @@ impl Waypoint {
 }
 
 pub fn part1(input: String) -> i64 {
-    let mut state = State {
-        dir: 0,
-        x: 0,
-        y: 0,
-        waypoint: &mut Waypoint { x: 10, y: 1 },
-    };
+    let mut state = State::new();
 
     input.lines().for_each(|line| {
         let mut iter = line.chars();
@@ -79,16 +86,12 @@ pub fn part1(input: String) -> i64 {
         let value = iter.collect::<String>().parse::<usize>().unwrap();
         state.step1(command, value);
     });
-    (state.x.abs() + state.y.abs()) as i64
+
+    state.manhattan_distance()
 }
 
 pub fn part2(input: String) -> i64 {
-    let mut state = State {
-        dir: 0,
-        x: 0,
-        y: 0,
-        waypoint: &mut Waypoint { x: 10, y: 1 },
-    };
+    let mut state = State::new();
 
     input.lines().for_each(|line| {
         let mut iter = line.chars();
@@ -96,5 +99,6 @@ pub fn part2(input: String) -> i64 {
         let value = iter.collect::<String>().parse::<usize>().unwrap();
         state.step2(command, value);
     });
-    (state.x.abs() + state.y.abs()) as i64
+
+    state.manhattan_distance()
 }

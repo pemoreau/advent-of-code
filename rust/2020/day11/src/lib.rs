@@ -14,6 +14,27 @@ struct Game {
 }
 
 impl Game {
+    fn new(input: String) -> Game {
+        let cells = input
+            .replace("\n", "")
+            .chars()
+            .map(|c| match c {
+                '#' => Cell::Occupied,
+                'L' => Cell::Empty,
+                _ => Cell::Floor,
+            })
+            .collect::<Vec<Cell>>();
+
+        let height = input.lines().count();
+        let width = cells.len() / height;
+
+        Game {
+            width,
+            height,
+            cells,
+        }
+    }
+
     fn get_index(&self, row: usize, column: usize) -> usize {
         row * self.width + column
     }
@@ -118,29 +139,8 @@ impl Game {
     }
 }
 
-fn create_game(input: String) -> Game {
-    let cells = input
-        .replace("\n", "")
-        .chars()
-        .map(|c| match c {
-            '#' => Cell::Occupied,
-            'L' => Cell::Empty,
-            _ => Cell::Floor,
-        })
-        .collect::<Vec<Cell>>();
-
-    let height = input.lines().count();
-    let width = cells.len() / height;
-
-    Game {
-        width,
-        height,
-        cells,
-    }
-}
-
 pub fn part1(input: String) -> i64 {
-    let mut game = create_game(input);
+    let mut game = Game::new(input);
     let mut cont = true;
     while cont {
         cont = game.step(false);
@@ -149,7 +149,7 @@ pub fn part1(input: String) -> i64 {
 }
 
 pub fn part2(input: String) -> i64 {
-    let mut game = create_game(input);
+    let mut game = Game::new(input);
     let mut cont = true;
     while cont {
         cont = game.step(true);

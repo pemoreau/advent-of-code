@@ -65,6 +65,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                             | [day 10](./go/2020/10/day10.go) |
 | [day 11](./rust/2020/day11) |                                 |
 | [day 12](./rust/2020/day12) |                                 |
+| [day 13](./rust/2020/day13) |                                 |
 
 # Comments
 

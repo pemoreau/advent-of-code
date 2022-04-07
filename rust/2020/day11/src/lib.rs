@@ -1,3 +1,5 @@
+use std::cmp::min;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Cell {
     Floor,
@@ -89,94 +91,27 @@ impl Game {
 
     fn occupied_neighbor_count(&self, row: usize, column: usize) -> u32 {
         let mut count = 0;
-
-        for i in 1..self.width {
-            let c = column as i32 + i as i32;
-            let r = row as i32;
-            if self.is_occupied(r, c) {
-                count += 1;
-                break;
-            }
-            if self.is_empty(r, c) {
-                break;
-            }
-        }
-        for i in 1..self.width {
-            let c = column as i32 - i as i32;
-            let r = row as i32;
-            if self.is_occupied(r, c) {
-                count += 1;
-                break;
-            }
-            if self.is_empty(r, c) {
-                break;
-            }
-        }
-        for i in 1..self.width {
-            let c = column as i32;
-            let r = row as i32 + i as i32;
-            if self.is_occupied(r, c) {
-                count += 1;
-                break;
-            }
-            if self.is_empty(r, c) {
-                break;
-            }
-        }
-        for i in 1..self.width {
-            let c = column as i32;
-            let r = row as i32 - i as i32;
-            if self.is_occupied(r, c) {
-                count += 1;
-                break;
-            }
-            if self.is_empty(r, c) {
-                break;
-            }
-        }
-
-        for i in 1..self.width {
-            let c = column as i32 + i as i32;
-            let r = row as i32 - i as i32;
-            if self.is_occupied(r, c) {
-                count += 1;
-                break;
-            }
-            if self.is_empty(r, c) {
-                break;
-            }
-        }
-        for i in 1..self.width {
-            let c = column as i32 + i as i32;
-            let r = row as i32 + i as i32;
-            if self.is_occupied(r, c) {
-                count += 1;
-                break;
-            }
-            if self.is_empty(r, c) {
-                break;
-            }
-        }
-        for i in 1..self.width {
-            let c = column as i32 - i as i32;
-            let r = row as i32 - i as i32;
-            if self.is_occupied(r, c) {
-                count += 1;
-                break;
-            }
-            if self.is_empty(r, c) {
-                break;
-            }
-        }
-        for i in 1..self.width {
-            let c = column as i32 - i as i32;
-            let r = row as i32 + i as i32;
-            if self.is_occupied(r, c) {
-                count += 1;
-                break;
-            }
-            if self.is_empty(r, c) {
-                break;
+        let modifiers = [
+            (1, 0),
+            (-1, 0),
+            (0, 1),
+            (0, -1),
+            (1, 1),
+            (-1, -1),
+            (1, -1),
+            (-1, 1),
+        ];
+        for (mx, my) in modifiers.iter() {
+            for i in 1..min(self.width, self.height) {
+                let c = column as i32 + mx * i as i32;
+                let r = row as i32 + my * i as i32;
+                if self.is_occupied(r, c) {
+                    count += 1;
+                    break;
+                }
+                if self.is_empty(r, c) {
+                    break;
+                }
             }
         }
         count

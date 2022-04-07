@@ -1,7 +1,7 @@
-use day12::{part1, part2};
+use day13::{part1, part2};
 
 fn main() {
-    println!("--2021 day 12 solution--");
+    println!("--2021 day 13 solution--");
     println!(
         "Part 1: {}",
         part1(include_str!("../input.txt").to_string())

@@ -47,13 +47,13 @@ impl State {
                 self.x += value as i32 * self.waypoint.x;
                 self.y += value as i32 * self.waypoint.y
             }
-            _ => self.waypoint.step(command, value, self.x, self.y),
+            _ => self.waypoint.step(command, value),
         }
     }
 }
 
 impl Waypoint {
-    fn step(&mut self, command: char, value: usize, x: i32, y: i32) {
+    fn step(&mut self, command: char, value: usize) {
         match command {
             'E' => self.x += value as i32,
             'N' => self.y += value as i32,

@@ -1,5 +1,7 @@
 # Advent Of Code
 
+Mostly written in Rust and Go
+
 # Commands
 
 ## Rust
@@ -61,6 +63,8 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                             | [day 08](./go/2020/08/day08.go) |
 |                             | [day 09](./go/2020/09/day09.go) |
 |                             | [day 10](./go/2020/10/day10.go) |
+| [day 11](./rust/2020/day11) |                                 |
+| [day 12](./rust/2020/day12) |                                 |
 
 # Comments
 

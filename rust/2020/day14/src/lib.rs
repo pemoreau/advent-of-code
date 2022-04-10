@@ -45,7 +45,6 @@ pub fn part2(input: String) -> i64 {
     };
 
     for line in input.lines() {
-        println!("{}", line);
         match parse_line(line) {
             Action::Mask(mask) => state.set_mask(&mask),
             Action::Mem(addr, val) => state.set_mem(addr, val),

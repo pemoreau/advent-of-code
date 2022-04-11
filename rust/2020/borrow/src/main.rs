@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 fn main() {
-    let mut map: HashMap<usize, usize> = HashMap::new();
+    let mut map: HashMap<usize, String> = HashMap::new();
     let n = 10;
 
-    let index = map.get(&n);
-    map.insert(n, 0);
-    let res = index.unwrap();
+    let value = map.get(&n);
+    map.insert(n, "hello".to_string());
+    if value.is_some() {
+        println!("{}", value.unwrap());
+    }
 }

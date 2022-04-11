@@ -12,7 +12,7 @@ mod tests {
         assert_eq!(1836, part1("3,1,2".to_string()));
     }
 
-    #[test]
+    // #[test]
     // fn test_part2() {
     //     assert_eq!(175594, part2("0,3,6".to_string()));
     //     assert_eq!(2578, part2("1,3,2".to_string()));
@@ -22,6 +22,7 @@ mod tests {
     //     assert_eq!(18, part2("3,2,1".to_string()));
     //     assert_eq!(362, part2("3,1,2".to_string()));
     // }
+
     #[test]
     fn test_input_part1() {
         assert_eq!(376, part1(include_str!("../input.txt").to_string()));

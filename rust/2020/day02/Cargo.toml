@@ -8,10 +8,3 @@ edition = "2021"
 utils = { path = "../../utils" }
 regex = "1.5.5"
 peg = "0.6.3"
-
-[dev-dependencies]
-criterion = "0.3.5"
-
-[[bench]]
-name = "benchmark"
-harness = false

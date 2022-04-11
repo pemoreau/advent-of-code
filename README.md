@@ -51,23 +51,25 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
 # Year 2020
 
-| Rust                        | Go                              |
-| :-------------------------- | ------------------------------- |
-| [day 01](./rust/2020/day01) | [day 01](./go/2020/01/day01.go) |
-| [day 02](./rust/2020/day02) |                                 |
-| [day 03](./rust/2020/day03) |                                 |
-| [day 04](./rust/2020/day04) |                                 |
-| [day 05](./rust/2020/day05) |                                 |
-| [day 06](./rust/2020/day06) |                                 |
-|                             | [day 07](./go/2020/07/day07.go) |
-|                             | [day 08](./go/2020/08/day08.go) |
-|                             | [day 09](./go/2020/09/day09.go) |
-|                             | [day 10](./go/2020/10/day10.go) |
-| [day 11](./rust/2020/day11) |                                 |
-| [day 12](./rust/2020/day12) |                                 |
-| [day 13](./rust/2020/day13) |                                 |
-| [day 14](./rust/2020/day14) |                                 |
-| [day 15](./rust/2020/day15) |                                 |
+Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
+
+| Rust                                                       | Go                              |
+| :--------------------------------------------------------- | ------------------------------- |
+| [day 01](./rust/2020/day01) (` 0.034 ms` / ` 9.541 ms`)    | [day 01](./go/2020/01/day01.go) |
+| [day 02](./rust/2020/day02) (` 0.331 ms` / ` 0.266 ms`)    |                                 |
+| [day 03](./rust/2020/day03) (` 0.199 ms` / ` 1.04 ms`)     |                                 |
+| [day 04](./rust/2020/day04) (` 0.712 ms` / ` 0.75 ms`)     |                                 |
+| [day 05](./rust/2020/day05) (` 0.036 ms` / ` 0.036 ms`)    |                                 |
+| [day 06](./rust/2020/day06) (` 0.114 ms` / ` 0.1 ms`)      |                                 |
+|                                                            | [day 07](./go/2020/07/day07.go) |
+|                                                            | [day 08](./go/2020/08/day08.go) |
+|                                                            | [day 09](./go/2020/09/day09.go) |
+|                                                            | [day 10](./go/2020/10/day10.go) |
+| [day 11](./rust/2020/day11) (` 22.474ms` / ` 52/576 ms`)   |                                 |
+| [day 12](./rust/2020/day12) (` 0.102 ms` / ` 0.093 ms`)    |                                 |
+| [day 13](./rust/2020/day13) (` 0.016 ms` / ` 0.007 ms`)    |                                 |
+| [day 14](./rust/2020/day14) (` 0.34 ms` / ` 51.973 ms`)    |                                 |
+| [day 15](./rust/2020/day15) (` 0.209 ms` / ` 2726.847 ms`) |                                 |
 
 # Comments
 

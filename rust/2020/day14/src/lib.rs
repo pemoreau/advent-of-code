@@ -109,12 +109,14 @@ pub enum Action {
 fn parse_line(s: &str) -> Action {
     peg::parser! {
       grammar parser() for str {
+        rule _() = [' ' | '\t' | '\r' | '\n']*
+
         rule number() -> u64
           = n:$(['0'..='9']+) { n.parse().unwrap() }
 
         pub(crate) rule line() -> (Action)
-          = "mask = "  mask:$(['X'|'1'|'0']+) { Action::Mask(mask.to_string()) }
-          / "mem[" adr:number() "] = " value:number() { Action::Mem(adr,value) }
+          = "mask" _  "=" _ mask:$(['X'|'1'|'0']+) { Action::Mask(mask.to_string()) }
+          / "mem[" adr:number() "]" _ "=" _ value:number() { Action::Mem(adr,value) }
       }
     }
 

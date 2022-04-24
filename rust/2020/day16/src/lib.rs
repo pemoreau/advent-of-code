@@ -48,8 +48,8 @@ pub fn part2(input: String) -> i64 {
     let mut map: HashMap<String, Vec<bool>> = HashMap::new();
     for c in e.constraints.iter() {
         let Constraint::Field(name, _, _) = c;
-        let mut v = Vec::<bool>::new();
-        (0..e.ticket.len()).for_each(|_| v.push(true));
+        let mut v = vec![];
+        v.resize(e.ticket.len(), true);
         map.insert(name.clone(), v);
     }
 

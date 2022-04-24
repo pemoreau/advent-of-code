@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug)]
 enum Constraint {
@@ -53,28 +53,52 @@ pub fn part2(input: String) -> i64 {
         map.insert(name.clone(), v);
     }
 
-    println!("map={:?}", map);
     // eliminate index which are not satisfying constraints
     for c in e.constraints.iter() {
         let Constraint::Field(name, i1, i2) = c;
         for valid in valid_nearby.iter() {
             for (i, n) in valid.iter().enumerate() {
                 if !i1.contains(*n) && !i2.contains(*n) {
-                    println!("c={:?} n={}, i={} i1={:?} i2={:?}", c, n, i, i1, i2);
                     let v = map.get_mut(name).unwrap();
                     v[i] = false;
-                    println!("v={:?}", v);
                 }
             }
         }
     }
 
     // find constraint with only one true and remove index from others
-    for flags in map.values() {
-        println!("flags={:?} index={:?}", flags, single_index(flags));
+    let mut propagated: HashSet<String> = HashSet::new();
+    let mut cpt = map.len();
+    let mut res: i64 = 1;
+    while cpt > 0 {
+        let key = find_solved_constraint(&map, &propagated);
+        let flags = map.get(&key).unwrap();
+        let index = single_index(flags).unwrap();
+        propagated.insert(key.clone());
+        cpt -= 1;
+        // println!("found index={:?}", index);
+        if key.starts_with("departure") {
+            res *= e.ticket[index] as i64;
+        }
+        for (name, flags) in map.iter_mut() {
+            if *name != key {
+                flags[index] = false;
+            }
+        }
     }
-    println!("map={:?}", map);
-    0
+
+    res
+}
+
+fn find_solved_constraint(
+    map: &HashMap<String, Vec<bool>>,
+    propagated: &HashSet<String>,
+) -> String {
+    let (key, _) = map
+        .iter()
+        .find(|(key, flags)| single_index(flags).is_some() && !propagated.contains(key.clone()))
+        .unwrap();
+    key.to_string()
 }
 
 fn single_index(v: &Vec<bool>) -> Option<usize> {

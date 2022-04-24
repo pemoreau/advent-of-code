@@ -20,11 +20,11 @@ mod tests {
         assert_eq!(23054, part1(include_str!("../input.txt").to_string()));
     }
 
-    // #[test]
-    // fn test_input_part2() {
-    //     assert_eq!(
-    //         2900994392308,
-    //         part2(include_str!("../input.txt").to_string())
-    //     );
-    // }
+    #[test]
+    fn test_input_part2() {
+        assert_eq!(
+            51240700105297,
+            part2(include_str!("../input.txt").to_string())
+        );
+    }
 }

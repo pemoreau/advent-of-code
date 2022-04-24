@@ -69,8 +69,8 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 12](./rust/2020/day12) | ` 0.102 ms` | ` 0.093 ms` |                                 |             |             |
 | [day 13](./rust/2020/day13) | ` 0.016 ms` | ` 0.007 ms` |                                 |             |             |
 | [day 14](./rust/2020/day14) | ` 0.340 ms` | ` 51.97 ms` |                                 |             |             |
-| [day 15](./rust/2020/day15) | ` 0.209 ms` | ` 2726. ms` |                                 |             |             |
-| [day 16](./rust/2020/day16) | ` 6.246 ms` | ` 12.39 ms` |                                 |             |             |
+| [day 15](./rust/2020/day15) | ` 0.096 ms` | ` 1798. ms` |                                 |             |             |
+| [day 16](./rust/2020/day16) | ` 0.464 ms` | ` 0.706 ms` |                                 |             |             |
 
 # Comments
 

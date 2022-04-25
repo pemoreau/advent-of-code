@@ -71,34 +71,28 @@ pub fn part2(input: String) -> i64 {
     let mut cpt = map.len();
     let mut res: i64 = 1;
     while cpt > 0 {
-        let key = find_solved_constraint(&map, &propagated);
+        // look for solved constraint
+        let key = map
+            .iter()
+            .find(|(key, flags)| single_index(flags).is_some() && !propagated.contains(key.clone()))
+            .unwrap()
+            .0
+            .to_string(); // needed to release a ref on map
         let flags = map.get(&key).unwrap();
         let index = single_index(flags).unwrap();
         propagated.insert(key.clone());
         cpt -= 1;
-        // println!("found index={:?}", index);
         if key.starts_with("departure") {
             res *= e.ticket[index] as i64;
         }
         for (name, flags) in map.iter_mut() {
-            if *name != key {
+            if *name != *key {
                 flags[index] = false;
             }
         }
     }
 
     res
-}
-
-fn find_solved_constraint(
-    map: &HashMap<String, Vec<bool>>,
-    propagated: &HashSet<String>,
-) -> String {
-    let (key, _) = map
-        .iter()
-        .find(|(key, flags)| single_index(flags).is_some() && !propagated.contains(key.clone()))
-        .unwrap();
-    key.to_string()
 }
 
 fn single_index(v: &Vec<bool>) -> Option<usize> {

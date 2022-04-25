@@ -8,23 +8,20 @@ mod tests {
         assert_eq!(expected, result);
     }
 
-    // #[test]
-    // fn test_part2() {
-    //     let expected = 223;
-    //     let result = part2(include_str!("../input_test.txt").to_string());
-    //     assert_eq!(expected, result);
-    // }
+    #[test]
+    fn test_part2() {
+        let expected = 848;
+        let result = part2(include_str!("../input_test.txt").to_string());
+        assert_eq!(expected, result);
+    }
 
     #[test]
     fn test_input_part1() {
         assert_eq!(223, part1(include_str!("../input.txt").to_string()));
     }
 
-    // #[test]
-    // fn test_input_part2() {
-    //     assert_eq!(
-    //         51240700105297,
-    //         part2(include_str!("../input.txt").to_string())
-    //     );
-    // }
+    #[test]
+    fn test_input_part2() {
+        assert_eq!(1884, part2(include_str!("../input.txt").to_string()));
+    }
 }

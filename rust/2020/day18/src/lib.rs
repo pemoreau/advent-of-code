@@ -1,7 +1,7 @@
 pub fn part1(input: String) -> i64 {
     input
         .lines()
-        .fold(0, |acc, line| acc + parse_line(line).eval()) as i64
+        .fold(0, |acc, line| acc + parse_line1(line).eval()) as i64
 }
 
 pub fn part2(input: String) -> i64 {
@@ -10,7 +10,7 @@ pub fn part2(input: String) -> i64 {
         .fold(0, |acc, line| acc + parse_line2(line).eval()) as i64
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Exp {
     Val(u64),
     Add(Box<Exp>, Box<Exp>),
@@ -27,7 +27,7 @@ impl Exp {
     }
 }
 
-fn parse_line(s: &str) -> Exp {
+fn parse_line1(s: &str) -> Exp {
     peg::parser! {
       grammar parser() for str {
         rule _() = [' ' | '\t' | '\r']*
@@ -42,7 +42,7 @@ fn parse_line(s: &str) -> Exp {
           / { left }
 
         rule expr() -> Exp
-          = a:atom() _ f:followOpt(a) { f}
+          = a:atom() _ f:followOpt(a) { f }
           / a:atom() { a }
 
         pub(crate) rule line() -> (Exp)

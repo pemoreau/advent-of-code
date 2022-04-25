@@ -23,7 +23,7 @@ pub fn solve(input: String, d4: bool) -> i64 {
     state.len() as i64
 }
 
-fn neiboors(
+fn neighbors(
     state: &HashSet<(i32, i32, i32, i32)>,
     (x, y, z, w): (i32, i32, i32, i32),
     d4: bool,
@@ -66,7 +66,7 @@ fn step(state: &HashSet<(i32, i32, i32, i32)>, d4: bool) -> HashSet<(i32, i32, i
     //             for k in -1..2 {
     //                 for l in domain4.clone() {
     //                     let cell = (x + i, y + j, z + k, w + l);
-    //                     let active = neiboors(state, cell, d4);
+    //                     let active = neighbors(state, cell, d4);
     //                     if active == 3 || (state.contains(&cell) && active == 2) {
     //                         new_state.insert(cell);
     //                     }
@@ -83,7 +83,7 @@ fn step(state: &HashSet<(i32, i32, i32, i32)>, d4: bool) -> HashSet<(i32, i32, i
             .multi_cartesian_product()
             .for_each(|v| {
                 let cell = (x + v[0], y + v[1], z + v[2], w + v[3]);
-                let active = neiboors(state, cell, d4);
+                let active = neighbors(state, cell, d4);
                 if active == 3 || (state.contains(&cell) && active == 2) {
                     new_state.insert(cell);
                 }

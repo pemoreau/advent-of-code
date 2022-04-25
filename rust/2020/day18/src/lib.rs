@@ -39,7 +39,7 @@ fn parse_line(s: &str) -> Exp {
         rule followOpt(left:Exp) -> Exp
           = _ "+" _ e:atom() f:followOpt(Exp::Add(Box::new(left.clone()), Box::new(e))) { f }
           / _ "*" _ e:atom() f:followOpt(Exp::Mul(Box::new(left.clone()), Box::new(e))) { f }
-          / { left.clone() }
+          / { left }
 
         rule expr() -> Exp
           = a:atom() _ f:followOpt(a) { f}

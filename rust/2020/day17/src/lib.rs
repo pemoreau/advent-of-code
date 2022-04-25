@@ -17,11 +17,11 @@ pub fn solve(input: String, d4: bool) -> i64 {
             }
         });
     });
-    (0..6).for_each(|_| state = step4(&state, d4));
+    (0..6).for_each(|_| state = step(&state, d4));
     state.len() as i64
 }
 
-fn neiboors4(
+fn neiboors(
     state: &HashSet<(i32, i32, i32, i32)>,
     (x, y, z, w): (i32, i32, i32, i32),
     d4: bool,
@@ -45,7 +45,7 @@ fn neiboors4(
     active
 }
 
-fn step4(state: &HashSet<(i32, i32, i32, i32)>, d4: bool) -> HashSet<(i32, i32, i32, i32)> {
+fn step(state: &HashSet<(i32, i32, i32, i32)>, d4: bool) -> HashSet<(i32, i32, i32, i32)> {
     let mut new_state: HashSet<(i32, i32, i32, i32)> = HashSet::new();
     let domain4 = if d4 { -1..2 } else { 0..1 };
     state.iter().for_each(|(x, y, z, w)| {
@@ -54,7 +54,7 @@ fn step4(state: &HashSet<(i32, i32, i32, i32)>, d4: bool) -> HashSet<(i32, i32, 
                 for k in -1..2 {
                     for l in domain4.clone() {
                         let cell = (x + i, y + j, z + k, w + l);
-                        let active = neiboors4(state, cell, d4);
+                        let active = neiboors(state, cell, d4);
                         if state.contains(&cell) && (active == 2 || active == 3) {
                             new_state.insert(cell);
                         }

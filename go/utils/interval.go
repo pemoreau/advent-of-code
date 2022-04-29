@@ -69,8 +69,8 @@ func (a Interval) Inter(b Interval) Interval {
 }
 
 func (a Interval) union(b Interval) Interval {
-	min := Max(a.Min, b.Min)
-	max := Min(a.Max, b.Max)
+	min := Min(a.Min, b.Min)
+	max := Max(a.Max, b.Max)
 	return Interval{min, max}
 }
 

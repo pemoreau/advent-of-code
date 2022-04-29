@@ -1,6 +1,8 @@
 package utils
 
-import "sort"
+import (
+	"sort"
+)
 
 type Interval struct{ Min, Max int }
 
@@ -28,12 +30,22 @@ func (a Interval) Sub(b Interval) Interval {
 }
 
 func (a Interval) Mul(b Interval) Interval {
+	if a.Min >= 0 && b.Min >= 0 {
+		return Interval{a.Min * b.Min, a.Max * b.Max}
+	} else if a.Max <= 0 && b.Max <= 0 {
+		return Interval{a.Max * b.Max, a.Min * b.Min}
+	}
 	v := []int{a.Min * b.Min, a.Min * b.Max, a.Max * b.Min, a.Max * b.Max}
 	sort.Ints(v)
 	return Interval{v[0], v[3]}
 }
 
 func (a Interval) Div(b Interval) Interval {
+	if a.Min >= 0 && b.Min >= 0 {
+		return Interval{a.Min / b.Min, a.Max / b.Max}
+	} else if a.Max <= 0 && b.Max <= 0 {
+		return Interval{a.Max / b.Max, a.Min / b.Min}
+	}
 	v := []int{a.Min / b.Min, a.Min / b.Max, a.Max / b.Min, a.Max / b.Max}
 	sort.Ints(v)
 	return Interval{v[0], v[3]}

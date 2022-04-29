@@ -30,10 +30,16 @@ func minmax(a, b, c, d int) (int, int) {
 	if a <= b {
 		min1 = a
 		max1 = b
+	} else {
+		min1 = b
+		max1 = a
 	}
 	if c <= d {
 		min2 = c
 		max2 = d
+	} else {
+		min2 = d
+		max2 = c
 	}
 	return Min(min1, min2), Max(max1, max2)
 }

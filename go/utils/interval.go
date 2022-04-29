@@ -1,9 +1,5 @@
 package utils
 
-import (
-	"sort"
-)
-
 type Interval struct{ Min, Max int }
 
 // https{//stackoverflow.com/questions/31057473/calculating-the-modulo-of-two-Intervals
@@ -29,26 +25,32 @@ func (a Interval) Sub(b Interval) Interval {
 	}
 }
 
+func minmax(a, b, c, d int) (int, int) {
+	var min1, max1, min2, max2 int
+	if a <= b {
+		min1 = a
+		max1 = b
+	}
+	if c <= d {
+		min2 = c
+		max2 = d
+	}
+	return Min(min1, min2), Max(max1, max2)
+}
+
 func (a Interval) Mul(b Interval) Interval {
 	if a.Min >= 0 && b.Min >= 0 {
 		return Interval{a.Min * b.Min, a.Max * b.Max}
 	} else if a.Max <= 0 && b.Max <= 0 {
 		return Interval{a.Max * b.Max, a.Min * b.Min}
 	}
-	v := []int{a.Min * b.Min, a.Min * b.Max, a.Max * b.Min, a.Max * b.Max}
-	sort.Ints(v)
-	return Interval{v[0], v[3]}
+	min, max := minmax(a.Min*b.Min, a.Min*b.Max, a.Max*b.Min, a.Max*b.Max)
+	return Interval{min, max}
 }
 
 func (a Interval) Div(b Interval) Interval {
-	if a.Min >= 0 && b.Min >= 0 {
-		return Interval{a.Min / b.Min, a.Max / b.Max}
-	} else if a.Max <= 0 && b.Max <= 0 {
-		return Interval{a.Max / b.Max, a.Min / b.Min}
-	}
-	v := []int{a.Min / b.Min, a.Min / b.Max, a.Max / b.Min, a.Max / b.Max}
-	sort.Ints(v)
-	return Interval{v[0], v[3]}
+	min, max := minmax(a.Min/b.Min, a.Min/b.Max, a.Max/b.Min, a.Max/b.Max)
+	return Interval{min, max}
 }
 
 func (a Interval) Inter(b Interval) Interval {

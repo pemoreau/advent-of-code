@@ -25,25 +25,32 @@ type Assign struct {
 }
 
 type Input struct {
-	reg Reg
 }
 
 func (a Assign) isInstr() {}
 func (i Input) isInstr()  {}
 
 func (i Input) String() string {
-	return fmt.Sprintf("Input %s\n", i.reg)
+	return "Input w"
 }
 
 func (a Assign) String() string {
-	return fmt.Sprintf("%s = %v\n", a.reg, a.rhs)
+	return fmt.Sprintf("%v = %v\n", a.reg, a.rhs)
 }
 
 type Expr interface {
 	isExpr()
 }
 type Value int
-type Reg string
+type Reg uint8 // w:0 x:1 y:2 z:3
+
+func (r Reg) String() string {
+	return string('w' + r)
+}
+
+func regIndex(name byte) Reg {
+	return Reg(name - 'w')
+}
 
 type Add struct {
 	reg Reg
@@ -82,10 +89,6 @@ func (e Eql) isExpr() {}
 func (v Value) String() string {
 	return fmt.Sprintf("%d", v)
 }
-func (r Reg) String() string {
-	return string(r)
-}
-
 func (a Add) String() string {
 	return fmt.Sprintf("(%s + %s)", a.reg, a.arg)
 }
@@ -102,20 +105,17 @@ func (e Eql) String() string {
 	return fmt.Sprintf("(%s == %s)", e.reg, e.arg)
 }
 
-func parse(input string, index *int) (r Instr) {
+func parse(input string) (r Instr) {
 	cmd := strings.Split(input, " ")
 
-	reg := Reg(cmd[1][0])
+	reg := regIndex(cmd[1][0])
 	if cmd[0] == "inp" {
-		var inputName = Reg(fmt.Sprintf("w%d", *index))
-		*index += 1
-		//return Assign{reg: reg, rhs: inputName}
-		return Input{inputName}
+		return Input{}
 	}
 
 	var arg Expr
 	if cmd[2] == "w" || cmd[2] == "x" || cmd[2] == "y" || cmd[2] == "z" {
-		arg = Reg(cmd[2])
+		arg = regIndex(cmd[2][0])
 	} else {
 		num, _ := strconv.Atoi(cmd[2])
 		arg = Value(num)
@@ -141,13 +141,9 @@ func value(e Expr, env *Env) int {
 	case Value:
 		return int(exp)
 	case Reg:
-		return env[regIndex(exp)]
+		return env[exp]
 	}
 	return 0
-}
-
-func regIndex(reg Reg) int {
-	return int(reg[0] - 'w')
 }
 
 type Env [4]int
@@ -173,7 +169,7 @@ func eval(e Instr, remaining []Instr, world World) World {
 		world = merge(world)
 		fmt.Printf("AFTER MERGE  = %v\n", len(world))
 
-		index := regIndex(instr.reg)
+		wIndex := regIndex('w')
 
 		var wg sync.WaitGroup
 		wg.Add(9)
@@ -183,10 +179,10 @@ func eval(e Instr, remaining []Instr, world World) World {
 				defer wg.Done()
 				for _, state := range world {
 					env := state.env
-					env[index] = i
+					env[wIndex] = i
 
 					envInterval := createEnvInterval(env)
-					envInterval[index] = utils.Interval{i, i}
+					envInterval[wIndex] = utils.Interval{i, i}
 					// If reachable(remaining, createEnvInterval(state.env)) {
 					if reachable(remaining, envInterval) {
 						newState := State{env: env, min: 10*state.min + i, max: 10*state.max + i}
@@ -208,40 +204,35 @@ func eval(e Instr, remaining []Instr, world World) World {
 	case Assign:
 		switch exp := instr.rhs.(type) {
 		case Add:
-			index := regIndex(exp.reg)
 			for _, state := range world {
-				state.env[index] += value(exp.arg, &state.env)
+				state.env[exp.reg] += value(exp.arg, &state.env)
 			}
 		case Mul:
-			index := regIndex(exp.reg)
 			for _, state := range world {
-				state.env[index] *= value(exp.arg, &state.env)
+				state.env[exp.reg] *= value(exp.arg, &state.env)
 			}
 		case Div:
-			index := regIndex(exp.reg)
 			for _, state := range world {
 				if value(exp.arg, &state.env) == 0 {
 					panic("divide by zero")
 				}
-				state.env[index] /= value(exp.arg, &state.env)
+				state.env[exp.reg] /= value(exp.arg, &state.env)
 			}
 		case Mod:
-			index := regIndex(exp.reg)
 			for _, state := range world {
-				if state.env[regIndex(exp.reg)] < 0 {
+				if state.env[exp.reg] < 0 {
 					panic("negative modulo")
 				} else if value(exp.arg, &state.env) <= 0 {
 					panic("modulo by zero or negative")
 				}
-				state.env[index] %= value(exp.arg, &state.env)
+				state.env[exp.reg] %= value(exp.arg, &state.env)
 			}
 		case Eql:
-			index := regIndex(exp.reg)
 			for _, state := range world {
-				if value(exp.arg, &state.env) == state.env[index] {
-					state.env[index] = 1
+				if value(exp.arg, &state.env) == state.env[exp.reg] {
+					state.env[exp.reg] = 1
 				} else {
-					state.env[index] = 0
+					state.env[exp.reg] = 0
 				}
 			}
 		}
@@ -279,9 +270,8 @@ func Solve(input string) {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 	instructions := make([]Instr, 0, len(lines))
-	index := 1
 	for _, line := range lines {
-		instructions = append(instructions, parse(line, &index))
+		instructions = append(instructions, parse(line))
 	}
 
 	world := World{&State{env: Env{0, 0, 0, 0}, min: 0, max: 0}}
@@ -289,8 +279,9 @@ func Solve(input string) {
 		fmt.Printf("#%d: %v\n", i, instr)
 		world = eval(instr, instructions[i+1:], world)
 	}
+	z := regIndex('z')
 	for _, state := range world {
-		if state.env[regIndex("z")] == 0 {
+		if state.env[z] == 0 {
 			min = utils.Min(min, state.min)
 			max = utils.Max(max, state.max)
 		}

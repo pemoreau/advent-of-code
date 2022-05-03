@@ -44,19 +44,121 @@ func minmax(a, b, c, d int) (int, int) {
 	return Min(min1, min2), Max(max1, max2)
 }
 
+const (
+	M  = iota // a<0 and b>0
+	Z  = iota // a==0 and b==0
+	P  = iota // a>=0 and b>0
+	P0 = iota // a==0 and b>0
+	P1 = iota // a>0 and b>0
+	N  = iota // a<0 and b<0
+	N0 = iota // a<0 and b==0
+	N1 = iota // a<0 and b<0
+	E  = iota // a>b
+)
+
+func class(i Interval) int {
+	a, b := i.Min, i.Max
+	switch {
+	// case a == 0 && b > 0:
+	// 	return P0
+	// case a > 0 && b > 0:
+	// 	return P1
+	case a >= 0 && b > 0:
+		return P
+	case a < 0 && b <= 0:
+		return N
+	// case a < 0 && b == 0:
+	// 	return N0
+	// case a < 0 && b < 0:
+	// 	return N1
+	case a < 0 && b > 0:
+		return M
+	case a == 0 && b == 0:
+		return Z
+	case a > b:
+		return E
+	}
+	panic("unreachable")
+}
+
 func (a Interval) Mul(b Interval) Interval {
 	if a.Min >= 0 && b.Min >= 0 {
 		return Interval{a.Min * b.Min, a.Max * b.Max}
 	} else if a.Max <= 0 && b.Max <= 0 {
 		return Interval{a.Max * b.Max, a.Min * b.Min}
 	}
-	min, max := minmax(a.Min*b.Min, a.Min*b.Max, a.Max*b.Min, a.Max*b.Max)
-	return Interval{min, max}
+
+	// From https://doi.org/10.1145/502102.502106
+	// Figure 6
+	ca := class(a)
+	cb := class(b)
+	switch {
+	case ca == P && cb == P:
+		return Interval{a.Min * b.Min, a.Max * b.Max}
+	case ca == N && cb == N:
+		return Interval{a.Max * b.Max, a.Min * b.Min}
+	case ca == Z || cb == Z:
+		return Interval{0, 0}
+	case ca == M && cb == P:
+		return Interval{a.Min * b.Max, a.Max * b.Max}
+	case ca == N && cb == P:
+		return Interval{a.Min * b.Max, a.Max * b.Min}
+	case ca == P && cb == M:
+		return Interval{a.Max * b.Min, a.Max * b.Max}
+	case ca == M && cb == M:
+		return Interval{Min(a.Min*b.Max, a.Max*b.Min), Max(a.Max*b.Max, a.Min*b.Min)}
+	case ca == N && cb == M:
+		return Interval{a.Min * b.Max, a.Min * b.Min}
+	case ca == P && cb == N:
+		return Interval{a.Max * b.Min, a.Min * b.Max}
+	case ca == M && cb == N:
+		return Interval{a.Max * b.Min, a.Min * b.Min}
+	case ca == E:
+		return a
+	case cb == E:
+		return b
+	}
+	panic("unreachable")
+
+	// min, max := minmax(a.Min*b.Min, a.Min*b.Max, a.Max*b.Min, a.Max*b.Max)
+	// return Interval{min, max}
 }
 
 func (a Interval) Div(b Interval) Interval {
-	min, max := minmax(a.Min/b.Min, a.Min/b.Max, a.Max/b.Min, a.Max/b.Max)
-	return Interval{min, max}
+	if a.Min >= 0 && b.Min >= 0 {
+		return Interval{a.Min / b.Max, a.Max / b.Min}
+	} else if a.Max <= 0 && b.Max <= 0 {
+		return Interval{a.Max / b.Min, a.Min / b.Max}
+	}
+
+	// From https://doi.org/10.1145/502102.502106
+	// Figure 7
+	ca := class(a)
+	cb := class(b)
+	switch {
+	case ca == P && cb == P:
+		return Interval{a.Min / b.Max, a.Max / b.Min}
+	case ca == N && cb == N:
+		return Interval{a.Max / b.Min, a.Min / b.Max}
+	case ca == N && cb == P:
+		return Interval{a.Min / b.Min, a.Max / b.Max}
+	case ca == P && cb == N:
+		return Interval{a.Max / b.Max, a.Min / b.Min}
+	case ca == M && cb == P:
+		return Interval{a.Min / b.Min, a.Max / b.Min}
+	case ca == M && cb == N:
+		return Interval{a.Max / b.Max, a.Min / b.Max}
+	case ca == Z:
+		return Interval{0, 0}
+	case ca == E:
+		return a
+	case cb == E:
+		return b
+	}
+	panic("unreachable")
+
+	// min, max := minmax(a.Min/b.Min, a.Min/b.Max, a.Max/b.Min, a.Max/b.Max)
+	// return Interval{min, max}
 }
 
 func (a Interval) Inter(b Interval) Interval {

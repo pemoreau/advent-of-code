@@ -31,17 +31,30 @@ const empty byte = '.'
 type World struct {
 	maxY int
 	grid []byte
-	// grid string
 }
 
 func createWorld(lines []string) World {
 	// WARNING: we assume no occupant is at home
 	world := World{
-		// grid: strings.Join(lines, "\n"),
 		grid: []byte(strings.Join(lines, "\n")),
 		maxY: len(lines),
 	}
+	world.setHome()
 	return world
+}
+
+// Set home all occupants which are already at home
+func (w World) setHome() {
+	for homeX := 3; homeX <= 9; homeX = homeX + 2 {
+		home := true
+		for homeY := w.maxY - 2; home && homeY >= 2; homeY-- {
+			p := Pos{homeX, homeY}
+			home = roomX(w.occupant(p)) == homeX
+			if home {
+				w.grid[index(p)] = byte(unicode.ToLower(rune(w.occupant(p))))
+			}
+		}
+	}
 }
 
 func (w World) String() string {
@@ -50,11 +63,6 @@ func (w World) String() string {
 
 func index(p Pos) int {
 	return p.y*14 + p.x
-}
-
-func replace(s string, p Pos, c byte) string {
-	i := index(p)
-	return s[:i] + string(c) + s[i+1:]
 }
 
 // An occupant can be '.', 'A', 'B', 'C', 'D', or 'a', 'b', 'c', 'd'
@@ -80,13 +88,6 @@ func (w World) move(src, dest Pos, home bool) World {
 	}
 	s[index(src)] = empty
 
-	// s := w.grid
-	// s = replace(s, src, empty)
-	// if !home {
-	// 	s = replace(s, dest, w.occupant(src))
-	// } else {
-	// 	s = replace(s, dest, byte(unicode.ToLower(rune(w.occupant(src)))))
-	// }
 	return World{
 		grid: s,
 		maxY: w.maxY,
@@ -542,10 +543,11 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2021 day 23 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(string(input_day)))
+	input3 := "#############\n#...........#\n###A#D#B#D###\n  #C#A#C#B#\n#########"
+	fmt.Println("part1: ", Part1(string(input3)))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(string(input_day)))
+	fmt.Println("part2: ", Part2(string(input3)))
 	fmt.Println(time.Since(start))
 }

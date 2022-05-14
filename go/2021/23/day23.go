@@ -34,11 +34,11 @@ type World struct {
 }
 
 func createWorld(lines []string) World {
-	// WARNING: we assume no occupant is at home
 	world := World{
 		grid: []byte(strings.Join(lines, "\n")),
 		maxY: len(lines),
 	}
+	// we check here is an occupant is already at home
 	world.setHome()
 	return world
 }
@@ -46,11 +46,11 @@ func createWorld(lines []string) World {
 // Set home all occupants which are already at home
 func (w World) setHome() {
 	for homeX := 3; homeX <= 9; homeX = homeX + 2 {
-		home := true
-		for homeY := w.maxY - 2; home && homeY >= 2; homeY-- {
+		atHome := true
+		for homeY := w.maxY - 2; atHome && homeY >= 2; homeY-- {
 			p := Pos{homeX, homeY}
-			home = roomX(w.occupant(p)) == homeX
-			if home {
+			atHome = roomX(w.occupant(p)) == homeX
+			if atHome {
 				w.grid[index(p)] = byte(unicode.ToLower(rune(w.occupant(p))))
 			}
 		}
@@ -543,11 +543,10 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2021 day 23 solution--")
 	start := time.Now()
-	input3 := "#############\n#...........#\n###A#D#B#D###\n  #C#A#C#B#\n#########"
-	fmt.Println("part1: ", Part1(string(input3)))
+	fmt.Println("part1: ", Part1(string(input_day)))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(string(input3)))
+	fmt.Println("part2: ", Part2(string(input_day)))
 	fmt.Println(time.Since(start))
 }

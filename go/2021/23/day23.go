@@ -104,18 +104,11 @@ func (w World) atHome(p Pos) bool {
 
 // Returns true when [src+1..dest-1] is no occupied
 func (w World) accessibleHallway(srcX, destX int) bool {
-	if srcX == destX {
-		return true
+	if srcX > destX {
+		srcX, destX = destX, srcX
 	}
 
-	if srcX < destX {
-		for x := srcX + 1; x <= destX; x++ {
-			if w.occupied(Pos{x, hallwayY}) {
-				return false
-			}
-		}
-	}
-	for x := srcX - 1; x >= destX; x-- {
+	for x := srcX + 1; x <= destX-1; x++ {
 		if w.occupied(Pos{x, hallwayY}) {
 			return false
 		}
@@ -274,21 +267,25 @@ func (w World) moveRoomToHome(x int) (World, int) {
 	for roomY := 2; roomY <= w.maxY-2; roomY++ {
 		p := Pos{x, roomY}
 		if w.occupied(p) {
+			if w.atHome(p) {
+				return w, cost
+			}
+
 			occupant := w.occupant(p)
 			homeX := roomX(occupant)
-
-			if w.atHome(p) || p.x == homeX {
+			if p.x == homeX {
 				return w, cost
 			}
 
 			homeY, ok := w.freeHomeY(homeX)
-			if ok && w.accessibleHallway(x, homeX) {
-				distance := manhattanDistance(p, Pos{homeX, hallwayY}) + manhattanDistance(Pos{homeX, hallwayY}, Pos{homeX, homeY})
-				cost += distance * costMove(occupant)
-				w = w.moveHome(p, Pos{homeX, homeY})
-			} else {
+			if !ok || !w.accessibleHallway(x, homeX) {
 				return w, cost
 			}
+			hallway := Pos{homeX, hallwayY}
+			home := Pos{homeX, homeY}
+			distance := manhattanDistance(p, hallway) + manhattanDistance(hallway, home)
+			cost += distance * costMove(occupant)
+			w = w.moveHome(p, Pos{homeX, homeY})
 		}
 	}
 	return w, cost
@@ -339,10 +336,10 @@ func (w World) step() []State {
 	cost += c
 
 	// This is an optimization, not necessary
-	for roomX := 3; roomX <= 9; roomX += 2 {
-		w, c = w.moveRoomToHome(roomX)
-		cost += c
-	}
+	// for roomX := 3; roomX <= 9; roomX += 2 {
+	// 	w, c = w.moveRoomToHome(roomX)
+	// 	cost += c
+	// }
 
 	for roomX := 3; roomX <= 9; roomX += 2 {
 		for _, m := range w.moveRoomToHallway(roomX) {
@@ -444,7 +441,7 @@ func path(start, to World) (path []World, distance int) {
 	for {
 		if frontier.Len() == 0 {
 			// There's no path, return found false.
-			return
+			return path, 0
 		}
 		var current World = heap.Pop(frontier).(*node).World
 		var currentSignature = signature(current)
@@ -549,4 +546,55 @@ func main() {
 	start = time.Now()
 	fmt.Println("part2: ", Part2(string(input_day)))
 	fmt.Println(time.Since(start))
+	return
+
+	if false {
+		set := make(map[string]bool)
+		perm([]rune("AABBCCDD"), 0, set)
+
+		var d1, d2, n1, n2, max1, max2 int64
+
+		for letters := range set {
+			input := fmt.Sprintf("#############\n#...........#\n###%c#%c#%c#%c###\n  #%c#%c#%c#%c#\n  #########\n", letters[0], letters[1], letters[2], letters[3], letters[4], letters[5], letters[6], letters[7])
+
+			start := time.Now()
+			score := Part1(input)
+			t1 := time.Since(start).Milliseconds()
+			if score > 0 {
+				d1 += t1
+				n1 += 1
+				if t1 > max1 {
+					max1 = t1
+				}
+			}
+
+			start = time.Now()
+			score = Part2(input)
+			t2 := time.Since(start).Milliseconds()
+			if score > 0 {
+				d2 += t2
+				n2 += 1
+				if t2 > max2 {
+					max2 = t2
+				}
+			}
+		}
+		fmt.Printf("#entries: %d / %d\n", n1, n2)
+		fmt.Printf("part1: avg: %f ms max: %d\n", float64(d1)/float64(n1), max1)
+		fmt.Printf("part2: avg: %f ms max: %d\n", float64(d2)/float64(n2), max2)
+	}
+}
+
+func perm(str []rune, i int, set map[string]bool) {
+	if i == len(str) {
+		// fmt.Println(string(str))
+		// res = append(res, string(str))
+		set[string(str)] = true
+	} else {
+		for j := i; j < len(str); j++ {
+			str[i], str[j] = str[j], str[i]
+			perm(str, i+1, set)
+			str[i], str[j] = str[j], str[i]
+		}
+	}
 }

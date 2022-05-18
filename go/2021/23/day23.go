@@ -15,6 +15,62 @@ var input_day string
 const hallwayY int = 1
 
 var hallwayPos = []Pos{{1, 1}, {2, 1}, {4, 1}, {6, 1}, {8, 1}, {10, 1}, {11, 1}}
+var _roomX []int
+var _costMove []int
+
+func roomX(b byte) int {
+	if _roomX == nil {
+		_roomX = make([]int, 256)
+		_roomX['A'] = 3
+		_roomX['a'] = 3
+		_roomX['B'] = 5
+		_roomX['b'] = 5
+		_roomX['C'] = 7
+		_roomX['c'] = 7
+		_roomX['D'] = 9
+		_roomX['d'] = 9
+	}
+	return _roomX[b]
+	// switch b {
+	// case 'A', 'a':
+	// 	return 3
+	// case 'B', 'b':
+	// 	return 5
+	// case 'C', 'c':
+	// 	return 7
+	// case 'D', 'd':
+	// 	return 9
+	// default:
+	// 	return 0
+	// }
+}
+
+func costMove(b byte) int {
+	if _costMove == nil {
+		_costMove = make([]int, 256)
+		_costMove['A'] = 1
+		_costMove['a'] = 1
+		_costMove['B'] = 10
+		_costMove['b'] = 10
+		_costMove['C'] = 100
+		_costMove['c'] = 100
+		_costMove['D'] = 1000
+		_costMove['d'] = 1000
+	}
+	return _costMove[b]
+	// switch b {
+	// case 'A', 'a':
+	// 	return 1
+	// case 'B', 'b':
+	// 	return 10
+	// case 'C', 'c':
+	// 	return 100
+	// case 'D', 'd':
+	// 	return 1000
+	// default:
+	// 	return 0
+	// }
+}
 
 type Pos struct {
 	x, y int
@@ -210,35 +266,6 @@ func (w World) freeHomeY(roomX int) (int, bool) {
 	return 0, false
 }
 
-func roomX(b byte) int {
-	switch b {
-	case 'A', 'a':
-		return 3
-	case 'B', 'b':
-		return 5
-	case 'C', 'c':
-		return 7
-	case 'D', 'd':
-		return 9
-	default:
-		return 0
-	}
-}
-func costMove(b byte) int {
-	switch b {
-	case 'A', 'a':
-		return 1
-	case 'B', 'b':
-		return 10
-	case 'C', 'c':
-		return 100
-	case 'D', 'd':
-		return 1000
-	default:
-		return 0
-	}
-}
-
 func (w World) moveHallwayToHome() (World, int) {
 	cost := 0
 	stop := false
@@ -285,7 +312,8 @@ func (w World) moveRoomToHome(x int) (World, int) {
 			home := Pos{homeX, homeY}
 			distance := manhattanDistance(p, hallway) + manhattanDistance(hallway, home)
 			cost += distance * costMove(occupant)
-			w = w.moveHome(p, Pos{homeX, homeY})
+			w = w.moveHome(p, home)
+			return w, cost
 		}
 	}
 	return w, cost
@@ -336,6 +364,7 @@ func (w World) step() []State {
 	cost += c
 
 	// This is an optimization, not necessary
+	// WARNING: This optimization seems to be wrong but I do not see why
 	// for roomX := 3; roomX <= 9; roomX += 2 {
 	// 	w, c = w.moveRoomToHome(roomX)
 	// 	cost += c
@@ -381,8 +410,9 @@ func heuristicCost(w World) int {
 			p := Pos{x, y}
 			if w.occupied(p) && !w.atHome(p) {
 				occupant := w.occupant(p)
-				cpt[roomX(occupant)] += 1
-				distance := cpt[roomX(occupant)] + manhattanDistance(p, Pos{roomX(occupant), hallwayY})
+				homeX := roomX(occupant)
+				cpt[homeX] += 1
+				distance := cpt[homeX] + manhattanDistance(p, Pos{homeX, hallwayY})
 				res += distance * costMove(occupant)
 			}
 		}
@@ -390,8 +420,9 @@ func heuristicCost(w World) int {
 	for _, p := range hallwayPos {
 		if w.occupied(p) {
 			occupant := w.occupant(p)
-			cpt[roomX(occupant)] += 1
-			distance := cpt[roomX(occupant)] + manhattanDistance(p, Pos{roomX(occupant), hallwayY})
+			homeX := roomX(occupant)
+			cpt[homeX] += 1
+			distance := cpt[homeX] + manhattanDistance(p, Pos{homeX, hallwayY})
 			res += distance * costMove(occupant)
 		}
 	}
@@ -462,7 +493,7 @@ func path(start, to World) (path []World, distance int) {
 		for _, neighbor := range next {
 			newCost := costSoFar[currentSignature] + neighbor.cost
 			neighborSignature := signature(neighbor.world)
-			if _, ok := costSoFar[neighborSignature]; !ok || newCost < costSoFar[neighborSignature] {
+			if oldCost, ok := costSoFar[neighborSignature]; !ok || newCost < oldCost {
 				costSoFar[neighborSignature] = newCost
 				priority := newCost + heuristicCost(neighbor.world)
 				heap.Push(frontier, &node{World: neighbor.world, priority: priority})
@@ -513,13 +544,12 @@ func (pq *PriorityQueue) Pop() interface{} {
 //   #B#A#D#C#
 //   #########
 func Part1(input string) int {
-	var d int
 	input = strings.TrimSuffix(input, "\n")
 	l := strings.Split(input, "\n")
 	w := createWorld(l)
 	t := "  #a#b#c#d#  "
 	g := createWorld([]string{l[0], l[1], t, t, l[4]})
-	_, d = path(w, g)
+	_, d := path(w, g)
 	return d
 }
 
@@ -534,7 +564,6 @@ func Part2(input string) int {
 	g := createWorld([]string{l[0], l[1], t, t, t, t, l[4]})
 	_, d := path(w, g)
 	return d
-	// return 0
 }
 
 func main() {
@@ -546,9 +575,9 @@ func main() {
 	start = time.Now()
 	fmt.Println("part2: ", Part2(string(input_day)))
 	fmt.Println(time.Since(start))
-	return
 
 	if false {
+		fmt.Println("-- solving all possible inputs --")
 		set := make(map[string]bool)
 		perm([]rune("AABBCCDD"), 0, set)
 

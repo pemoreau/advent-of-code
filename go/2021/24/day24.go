@@ -165,9 +165,9 @@ func (w World) String() string {
 func eval(e Instr, remaining []Instr, world World) World {
 	switch instr := e.(type) {
 	case Input:
-		fmt.Printf("BEFORE MERGE = %v\n", len(world))
+		// fmt.Printf("BEFORE MERGE = %v\n", len(world))
 		world = merge(world)
-		fmt.Printf("AFTER MERGE  = %v\n", len(world))
+		// fmt.Printf("AFTER MERGE  = %v\n", len(world))
 
 		wIndex := regIndex('w')
 
@@ -187,7 +187,6 @@ func eval(e Instr, remaining []Instr, world World) World {
 					if reachable(remaining, envInterval) {
 						newState := State{env: env, min: 10*state.min + i, max: 10*state.max + i}
 						tmp[i] = append(tmp[i], &newState)
-						// fmt.Printf("tmp[%d]=%v\n", i, tmp[i])
 					}
 				}
 			}(i)
@@ -200,7 +199,6 @@ func eval(e Instr, remaining []Instr, world World) World {
 			newWorld = append(newWorld, tmp[i]...)
 		}
 		world = newWorld
-		// fmt.Printf("AFTER INPUT  = %v\n", len(world))
 	case Assign:
 		switch exp := instr.rhs.(type) {
 		case Add:
@@ -242,15 +240,12 @@ func eval(e Instr, remaining []Instr, world World) World {
 
 func merge(w World) World {
 	m := map[Env]*struct{ min, max int }{}
-	//fmt.Printf("MERGE %v\n", w)
 	for _, state := range w {
 		if entry, ok := m[state.env]; ok {
 			entry.min = utils.Min(entry.min, state.min)
 			entry.max = utils.Max(entry.max, state.max)
-			//fmt.Printf("UPDATE %v -> %v\n", state, entry)
 		} else {
 			m[state.env] = &struct{ min, max int }{min: state.min, max: state.max}
-			//fmt.Printf("ADD %v -> %v\n", state, m[state.env])
 		}
 	}
 	res := make(World, 0, len(m))
@@ -276,7 +271,7 @@ func Solve(input string) {
 
 	world := World{&State{env: Env{0, 0, 0, 0}, min: 0, max: 0}}
 	for i, instr := range instructions {
-		fmt.Printf("#%d: %v\n", i, instr)
+		// fmt.Printf("#%d: %v\n", i, instr)
 		world = eval(instr, instructions[i+1:], world)
 	}
 	z := regIndex('z')

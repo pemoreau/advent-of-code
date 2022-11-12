@@ -14,7 +14,7 @@ Example of input:
 
 ### [Go](./go/2022/01/day01.go)
 
-## [Day 02: https://adventofcode.com/2022/day/2)
+## [Day 02: ](https://adventofcode.com/2022/day/2)
 
 Example of input:
 

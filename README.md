@@ -17,7 +17,9 @@ Mostly written in Rust and Go
 - `go test` to run unit tests
 - `go test -bench .` to run benchmarks
 
-# Year 2021
+# [Year 2022](README-2022.md)
+
+# [Year 2021](README-2021.md)
 
 Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
@@ -75,5 +77,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 18](./rust/2020/day18) | ` 4.187 ms` | ` 4.134 ms` |                                 |             |             |
 
 # Comments
+
+## [README for year 2022](README-2022.md)
 
 ## [README for year 2021](README-2021.md)

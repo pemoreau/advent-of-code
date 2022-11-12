@@ -22,3 +22,9 @@ https://github.com/AxlLind/adventofcode2021
 ### Python (smart)
 
 https://github.com/r0f1/adventofcode2021
+
+pour info pour profiler j'ai fait ça :
+
+- j'ai ajouté un test qui appelle Part1 au lieu du main
+- j'ai fait go test -cpuprofile cpu.prof -bench .
+- puis go tool pprof -http=:8800 cpu.prof

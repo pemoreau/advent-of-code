@@ -2,7 +2,7 @@ use day16::{part1, part2};
 use std::time::Instant;
 
 fn main() {
-    println!("--2021 day 16 solution--");
+    println!("--2020 day 16 solution--");
     let now = Instant::now();
 
     println!(

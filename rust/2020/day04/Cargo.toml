@@ -6,4 +6,4 @@ edition = "2021"
 
 [dependencies]
 utils = { path = "../../utils" }
-nom = "6"
+nom = "7.1.1"

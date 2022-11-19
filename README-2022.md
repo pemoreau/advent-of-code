@@ -79,3 +79,213 @@ Example of input:
 ### [Rust](./rust/2022/day07)
 
 ### [Go](./go/2022/07/day07.go)
+
+
+## [Day 08: ](https://adventofcode.com/2022/day/8)
+
+Example of input:
+
+```
+
+```
+
+## [Day 09: ](https://adventofcode.com/2022/day/9)
+
+Example of input:
+
+```
+
+```
+
+### [Go](./go/2022/09/day09.go)
+
+## [Day 10: ](https://adventofcode.com/2022/day/10)
+
+Example of input:
+
+```
+
+```
+
+### [Go](./go/2022/10/day10.go)
+
+### [Rust](./rust/2022/day10)
+
+## [Day 11: ](https://adventofcode.com/2022/day/11)
+
+Example of input:
+
+```
+
+```
+
+### [Go](./go/2022/11/day11.go)
+
+### [Rust](./rust/2022/day11)
+
+## [Day 12: ](https://adventofcode.com/2022/day/12)
+
+Example of input:
+
+```
+
+```
+
+### [Go](./go/2022/12/day12.go)
+
+## [Day 13: ](https://adventofcode.com/2022/day/13)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day13)
+
+### [Go](./go/2022/13/day13.go)
+
+## [Day 14: ](https://adventofcode.com/2022/day/14)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day14)
+
+### [Go](./go/2022/14/day14.go)
+
+## [Day 15: ](https://adventofcode.com/2022/day/15)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day15)
+
+### [Go](./go/2022/15/day15.go)
+
+## [Day 16: ](https://adventofcode.com/2022/day/16)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day16)
+
+### [Go](./go/2022/16/day16.go)
+
+## [Day 17: ](https://adventofcode.com/2022/day/17)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day17)
+
+### [Go](./go/2022/17/day17.go)
+
+## [Day 18: ](https://adventofcode.com/2022/day/18)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day18)
+
+### [Go](./go/2022/18/day18.go)
+
+## [Day 19: ](https://adventofcode.com/2022/day/19)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day19)
+
+### [Go](./go/2022/19/day19.go)
+
+## [Day 20: ](https://adventofcode.com/2022/day/20)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day20)
+
+### [Go](./go/2022/20/day20.go)
+
+## [Day 21: ](https://adventofcode.com/2022/day/21)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day21)
+
+### [Go](./go/2022/21/day21.go)
+
+## [Day 22: ](https://adventofcode.com/2022/day/22)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day22)
+
+### [Go](./go/2022/22/day22.go)
+
+## [Day 23: ](https://adventofcode.com/2022/day/23)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day23)
+
+### [Go](./go/2022/23/day23.go)
+
+## [Day 24: ](https://adventofcode.com/2022/day/24)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day24)
+
+### [Go](./go/2022/24/day24.go)
+
+## [Day 25: ](https://adventofcode.com/2022/day/25)
+
+Example of input:
+
+```
+
+```
+
+### [Rust](./rust/2022/day25)
+
+### [Go](./go/2022/25/day25.go)
+

@@ -51,7 +51,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                             |             |             | [day 24](./go/2021/24/day24.go)            | ` 660.4 ms` | ` 0.003 ms` |
 |                             |             |             | [day 25](./go/2021/25/day25.go)            | ` 98.00 ms` | ` 0.003 ms` |
 
-# Year 2020
+# [Year 2020](README-2020.md)
 
 Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
@@ -81,3 +81,5 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 ## [README for year 2022](README-2022.md)
 
 ## [README for year 2021](README-2021.md)
+
+## [README for year 2020](README-2020.md)

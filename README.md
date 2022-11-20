@@ -84,7 +84,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
 | Rust                        | part A      | part B      | Go                              | part A      | part B      |
-| :-------------------------- | :---------- | :---------- | ------------------------------- | ----------- | ----------- |
+| :-------------------------- | :---------- | :---------- |---------------------------------|-------------|-------------|
 | [day 01](./rust/2020/day01) | ` 0.034 ms` | ` 9.541 ms` | [day 01](./go/2020/01/day01.go) | ` 0.049 ms` | ` 5.399 ms` |
 | [day 02](./rust/2020/day02) | ` 0.331 ms` | ` 0.266 ms` |                                 |             |             |
 | [day 03](./rust/2020/day03) | ` 0.199 ms` | ` 1.040 ms` |                                 |             |             |
@@ -103,6 +103,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 16](./rust/2020/day16) | ` 0.464 ms` | ` 0.706 ms` |                                 |             |             |
 | [day 17](./rust/2020/day17) | ` 17.52 ms` | ` 768.0 ms` |                                 |             |             |
 | [day 18](./rust/2020/day18) | ` 4.187 ms` | ` 4.134 ms` |                                 |             |             |
+|                             |             |             | [day 19](./go/2020/19/day19.go) | ` 4.766 ms` | ` 9.456 ms` |
 
 # Comments
 

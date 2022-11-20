@@ -133,7 +133,7 @@ Example of input:
 
 ### [Rust](./rust/2021/day05)
 
-A bit slow due the the use of regex for parsing
+A bit slow due to the use of regex for parsing
 
 Discovered the `signum` function
 
@@ -478,6 +478,8 @@ target area: x=20..30, y=-10..-5
 
 Brute force approach. Not very proud of it.
 
+Used `regexp` to parse the input.
+
 ## [Day 18: Snailfish](https://adventofcode.com/2021/day/18)
 
 Example of input:
@@ -518,7 +520,7 @@ Example of input:
 
 ### [Go](./go/2021/19/day19.go)
 
-not a good day for me
+Not a good day for me
 
 ## [Day 20: Trench Map](https://adventofcode.com/2021/day/20)
 
@@ -576,6 +578,8 @@ on x=10..10,y=10..10,z=10..1
 ### [Go](./go/2021/22/day22.go)
 
 Implemented a Cuboid data-structure with an `overlap(c1,c2 Cuboid)` function (which splits `c1` into smaller disjoint ones when `c2` overlaps)
+
+Used `fmt.Sscanf` to parse the input.
 
 ## [Day 23: Amphipod](https://adventofcode.com/2021/day/23)
 

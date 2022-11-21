@@ -132,10 +132,8 @@ func Part2(input string) int {
 	messages := strings.Split(parts[1], "\n")
 	count := 0
 	for _, message := range messages {
-		//fmt.Println("message = ", message, len(message))
-
-		var index = 0
-		var m, n = 0, 0
+		var index int
+		var m, n int
 		for {
 			newIndex, err := recognize(message, index, grammar, grammar[42])
 			if err != nil {
@@ -143,8 +141,6 @@ func Part2(input string) int {
 			}
 			m++
 			index = newIndex
-			//fmt.Println("m = ", m)
-			//fmt.Println("index = ", index)
 		}
 		for {
 			newIndex, err := recognize(message, index, grammar, grammar[31])
@@ -153,8 +149,6 @@ func Part2(input string) int {
 			}
 			n++
 			index = newIndex
-			//fmt.Println("n = ", n)
-			//fmt.Println("index = ", index)
 		}
 
 		if m > n && n >= 1 && index == len(message) {

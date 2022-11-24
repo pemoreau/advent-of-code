@@ -82,19 +82,19 @@ func ids(tiles []AbstractTile) []int {
 	return res
 }
 
-func puzzle(board, tiles []AbstractTile, index int, size int, result *[]int) {
+func puzzle(board, tiles []AbstractTile, index int, size int, rotations map[AbstractTile][]AbstractTile, result *[]int) bool {
 	n := int(math.Sqrt(float64(size)))
 	if index >= size {
 		fmt.Println("Solution found")
-		fmt.Println("index: ", index)
-		fmt.Println("tiles: ", len(tiles))
-		for _, t := range board {
-			fmt.Println(t)
-		}
+		// fmt.Println("index: ", index)
+		// fmt.Println("tiles: ", len(tiles))
+		// for _, t := range board {
+		// 	fmt.Println(t)
+		// }
 		value := board[0].id * board[n-1].id * board[size-n].id * board[size-1].id
 		fmt.Println("value: ", value)
 		*result = append(*result, value)
-		return
+		return true
 	}
 	// fmt.Printf("index: %d, board: %d tiles: %d\n", index, len(board), len(tiles))
 	// fmt.Printf("\tboard: %d\n", board)
@@ -103,7 +103,7 @@ func puzzle(board, tiles []AbstractTile, index int, size int, result *[]int) {
 	y := index / n
 	// fmt.Printf("x: %d, y: %d\n", x, y)
 	for _, tile := range tiles {
-		for _, t := range allRotations(tile) {
+		for _, t := range rotations[tile] {
 			if x > 0 && board[index-1].east != t.west {
 				continue
 			}
@@ -118,21 +118,23 @@ func puzzle(board, tiles []AbstractTile, index int, size int, result *[]int) {
 
 			// fmt.Printf("placer: %d\n", t.id)
 			// fmt.Printf("tiles: %d\n", ids(copyTiles))
-			puzzle(append(copyBoard, t), removeTile(copyTiles, t.id), index+1, size, result)
+			r := puzzle(append(copyBoard, t), removeTile(copyTiles, t.id), index+1, size, rotations, result)
+			if r {
+				return true
+			}
 			// fmt.Printf("retirer: %d\n", t.id)
 			// fmt.Printf("tiles: %d\n", ids(copyTiles))
 
 		}
 	}
 	// fmt.Printf("No solution found index=%d\n", index)
+	return false
 }
 
 func Part1(input string) int {
-	// input = strings.TrimSuffix(input, "\n")
-	// lines := strings.Split(input, "\n")
 	input = strings.TrimSuffix(input, "\n")
 	parts := strings.Split(input, "\n\n")
-	tiles := make(map[int]AbstractTile)
+	var tiles []AbstractTile
 	for _, part := range parts {
 		lines := strings.Split(part, "\n")
 		var tileNumber int
@@ -148,17 +150,16 @@ func Part1(input string) int {
 		}
 		tile.west = toInt(string(left))
 		tile.east = toInt(string(right))
-		tiles[tileNumber] = tile
+		tiles = append(tiles, tile)
+	}
+	rotations := make(map[AbstractTile][]AbstractTile)
+	for _, tile := range tiles {
+		rotations[tile] = allRotations(tile)
 	}
 	fmt.Println("number of tiles: ", len(tiles))
 	board := make([]AbstractTile, 0)
-	list := make([]AbstractTile, 0)
-	for _, t := range tiles {
-		list = append(list, t)
-	}
 	result := make([]int, 0)
-	puzzle(board, list, 0, len(tiles), &result)
-	// fmt.Println("result: ", result)
+	puzzle(board, tiles, 0, len(tiles), rotations, &result)
 	return result[0]
 }
 

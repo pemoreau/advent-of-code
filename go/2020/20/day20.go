@@ -82,7 +82,7 @@ func ids(tiles []AbstractTile) []int {
 	return res
 }
 
-func puzzle(board, tiles []AbstractTile, index int, size int, result []int) {
+func puzzle(board, tiles []AbstractTile, index int, size int, result *[]int) {
 	n := int(math.Sqrt(float64(size)))
 	if index >= size {
 		fmt.Println("Solution found")
@@ -93,7 +93,7 @@ func puzzle(board, tiles []AbstractTile, index int, size int, result []int) {
 		}
 		value := board[0].id * board[n-1].id * board[size-n].id * board[size-1].id
 		fmt.Println("value: ", value)
-		result = append(result, value)
+		*result = append(*result, value)
 		return
 	}
 	// fmt.Printf("index: %d, board: %d tiles: %d\n", index, len(board), len(tiles))
@@ -157,9 +157,9 @@ func Part1(input string) int {
 		list = append(list, t)
 	}
 	result := make([]int, 0)
-	puzzle(board, list, 0, len(tiles), result)
-	fmt.Println("result: ", result)
-	return 0
+	puzzle(board, list, 0, len(tiles), &result)
+	// fmt.Println("result: ", result)
+	return result[0]
 }
 
 func Part2(input string) int {

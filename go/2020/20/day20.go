@@ -8,28 +8,55 @@ import (
 	"time"
 )
 
-//go:embed input.txt
+//go:embed input_test.txt
 var input_day string
 
+type ID int
 type AbstractTile struct {
-	id     int
+	id     ID
 	nbBits int
 	north  uint
 	south  uint
 	east   uint
 	west   uint
+	lines  []string
 }
 
 func (t AbstractTile) String() string {
 	return fmt.Sprintf("#%d: N:%.3d S:%.3d E:%.3d W:%.3d", t.id, t.north, t.south, t.east, t.west)
 }
 
+func reverseString(s string) string {
+	var res string
+	for _, c := range s {
+		res = string(c) + res
+	}
+	return res
+}
+
 func flip(t AbstractTile) AbstractTile {
-	return AbstractTile{id: t.id, nbBits: t.nbBits, north: reverseBits(t.north, t.nbBits), south: reverseBits(t.south, t.nbBits), east: t.west, west: t.east}
+	lines := make([]string, len(t.lines))
+	for i, line := range t.lines {
+		lines[i] = reverseString(line)
+	}
+	return AbstractTile{id: t.id, nbBits: t.nbBits, north: reverseBits(t.north, t.nbBits), south: reverseBits(t.south, t.nbBits), east: t.west, west: t.east, lines: lines}
 }
 
 func rot90(t AbstractTile) AbstractTile {
-	return AbstractTile{id: t.id, nbBits: t.nbBits, north: t.east, south: t.west, east: reverseBits(t.south, t.nbBits), west: reverseBits(t.north, t.nbBits)}
+	return AbstractTile{id: t.id, nbBits: t.nbBits, north: t.east, south: t.west, east: reverseBits(t.south, t.nbBits), west: reverseBits(t.north, t.nbBits), lines: rot90lines(t.lines)}
+}
+
+func rot90lines(lines []string) []string {
+	n := len(lines)
+	res := make([]string, n)
+	for i := 0; i < n; i++ {
+		var line string
+		for j := 0; j < n; j++ {
+			line += string(lines[j][n-i-1])
+		}
+		res[i] = line
+	}
+	return res
 }
 
 func toInt(s string) uint {
@@ -59,7 +86,7 @@ func allRotations(t AbstractTile) []AbstractTile {
 		flip(t), rot90(flip(t)), rot90(rot90(flip(t))), rot90(rot90(rot90(flip(t))))}
 }
 
-func removeTile(tiles []AbstractTile, id int) []AbstractTile {
+func removeTile(tiles []AbstractTile, id ID) []AbstractTile {
 	n := len(tiles)
 	for i, t := range tiles {
 		if t.id == id {
@@ -68,42 +95,24 @@ func removeTile(tiles []AbstractTile, id int) []AbstractTile {
 	}
 	if len(tiles) != n-1 {
 		fmt.Printf("Error: tile %d not found\n", id)
-		fmt.Printf("tiles: %d\n", tiles)
+		fmt.Printf("tiles: %s\n", tiles)
 		panic("tile not found")
 	}
 	return tiles
 }
 
-func ids(tiles []AbstractTile) []int {
-	var res []int
-	for _, t := range tiles {
-		res = append(res, t.id)
-	}
-	return res
-}
-
-func puzzle(board, tiles []AbstractTile, index int, size int, rotations map[AbstractTile][]AbstractTile, result *[]int) bool {
+func puzzle(board, tiles []AbstractTile, index int, size int, rotations map[ID][]AbstractTile, result *[]int) (bool, []AbstractTile) {
 	n := int(math.Sqrt(float64(size)))
 	if index >= size {
 		fmt.Println("Solution found")
-		// fmt.Println("index: ", index)
-		// fmt.Println("tiles: ", len(tiles))
-		// for _, t := range board {
-		// 	fmt.Println(t)
-		// }
-		value := board[0].id * board[n-1].id * board[size-n].id * board[size-1].id
-		fmt.Println("value: ", value)
+		value := int(board[0].id) * int(board[n-1].id) * int(board[size-n].id) * int(board[size-1].id)
 		*result = append(*result, value)
-		return true
+		return true, board
 	}
-	// fmt.Printf("index: %d, board: %d tiles: %d\n", index, len(board), len(tiles))
-	// fmt.Printf("\tboard: %d\n", board)
-	// fmt.Printf("\ttiles: %d\n", ids(tiles))
 	x := index % n
 	y := index / n
-	// fmt.Printf("x: %d, y: %d\n", x, y)
 	for _, tile := range tiles {
-		for _, t := range rotations[tile] {
+		for _, t := range rotations[tile.id] {
 			if x > 0 && board[index-1].east != t.west {
 				continue
 			}
@@ -111,24 +120,20 @@ func puzzle(board, tiles []AbstractTile, index int, size int, rotations map[Abst
 				continue
 			}
 
-			copyBoard := make([]AbstractTile, len(board))
+			// we make copies to avoid side-effects during recursion
+			copyBoard := make([]AbstractTile, len(board), len(board)+1)
 			copy(copyBoard, board)
 			copyTiles := make([]AbstractTile, len(tiles))
 			copy(copyTiles, tiles)
 
-			// fmt.Printf("placer: %d\n", t.id)
-			// fmt.Printf("tiles: %d\n", ids(copyTiles))
-			r := puzzle(append(copyBoard, t), removeTile(copyTiles, t.id), index+1, size, rotations, result)
+			r, b := puzzle(append(copyBoard, t), removeTile(copyTiles, t.id), index+1, size, rotations, result)
 			if r {
-				return true
+				return true, b
 			}
-			// fmt.Printf("retirer: %d\n", t.id)
-			// fmt.Printf("tiles: %d\n", ids(copyTiles))
-
 		}
 	}
 	// fmt.Printf("No solution found index=%d\n", index)
-	return false
+	return false, board
 }
 
 func Part1(input string) int {
@@ -139,7 +144,7 @@ func Part1(input string) int {
 		lines := strings.Split(part, "\n")
 		var tileNumber int
 		fmt.Sscanf(lines[0], "Tile %d:", &tileNumber)
-		tile := AbstractTile{id: tileNumber, nbBits: len(lines[1])}
+		tile := AbstractTile{id: ID(tileNumber), nbBits: len(lines[1])}
 		tile.north = toInt(lines[1])
 		tile.south = toInt(lines[len(lines)-1])
 		var left = make([]byte, 0)
@@ -150,16 +155,31 @@ func Part1(input string) int {
 		}
 		tile.west = toInt(string(left))
 		tile.east = toInt(string(right))
+		tile.lines = lines[1:]
 		tiles = append(tiles, tile)
 	}
-	rotations := make(map[AbstractTile][]AbstractTile)
+	rotations := make(map[ID][]AbstractTile)
 	for _, tile := range tiles {
-		rotations[tile] = allRotations(tile)
+		rotations[tile.id] = allRotations(tile)
 	}
+	// fmt.Println("All rotations computed")
+	// for _, tile := range rotations[ID(2953)] {
+	// 	for line := range tile.lines {
+	// 		fmt.Println(tile.lines[line])
+	// 	}
+	// 	fmt.Println()
+	// }
+
 	fmt.Println("number of tiles: ", len(tiles))
-	board := make([]AbstractTile, 0)
+	board := make([]AbstractTile, 0, len(tiles))
 	result := make([]int, 0)
-	puzzle(board, tiles, 0, len(tiles), rotations, &result)
+	_, b := puzzle(board, tiles, 0, len(tiles), rotations, &result)
+	for _, tile := range b {
+		for line := range tile.lines {
+			fmt.Println(tile.lines[line])
+		}
+		fmt.Println()
+	}
 	return result[0]
 }
 

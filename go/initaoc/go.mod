@@ -1,3 +1,3 @@
 module github.com/pemoreau/advent-of-code/go/initaoc
 
-go 1.18
+go 1.19

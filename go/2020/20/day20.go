@@ -3,11 +3,12 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 )
 
-//go:embed input_test.txt
+//go:embed input.txt
 var input_day string
 
 type AbstractTile struct {
@@ -23,24 +24,12 @@ func (t AbstractTile) String() string {
 	return fmt.Sprintf("#%d: N:%.3d S:%.3d E:%.3d W:%.3d", t.id, t.north, t.south, t.east, t.west)
 }
 
-func leftToRight(t AbstractTile) AbstractTile {
-	return AbstractTile{id: t.id, north: reverseBits(t.north, t.nbBits), south: reverseBits(t.south, t.nbBits), east: t.west, west: t.east}
-}
-
-func topToBottom(t AbstractTile) AbstractTile {
-	return AbstractTile{id: t.id, north: t.south, south: t.north, east: reverseBits(t.east, t.nbBits), west: reverseBits(t.west, t.nbBits)}
+func flip(t AbstractTile) AbstractTile {
+	return AbstractTile{id: t.id, nbBits: t.nbBits, north: reverseBits(t.north, t.nbBits), south: reverseBits(t.south, t.nbBits), east: t.west, west: t.east}
 }
 
 func rot90(t AbstractTile) AbstractTile {
-	return AbstractTile{id: t.id, north: t.east, south: t.west, east: t.south, west: t.north}
-}
-
-func rot180(t AbstractTile) AbstractTile {
-	return AbstractTile{id: t.id, north: t.south, south: t.north, east: t.west, west: t.east}
-}
-
-func rot270(t AbstractTile) AbstractTile {
-	return AbstractTile{id: t.id, north: t.west, south: t.east, east: t.north, west: t.south}
+	return AbstractTile{id: t.id, nbBits: t.nbBits, north: t.east, south: t.west, east: reverseBits(t.south, t.nbBits), west: reverseBits(t.north, t.nbBits)}
 }
 
 func toInt(s string) uint {
@@ -62,6 +51,80 @@ func reverseBits(v uint, nbBits int) uint {
 		v = v >> 1
 	}
 	return res
+}
+
+func allRotations(t AbstractTile) []AbstractTile {
+	return []AbstractTile{
+		t, rot90(t), rot90(rot90(t)), rot90(rot90(rot90(t))),
+		flip(t), rot90(flip(t)), rot90(rot90(flip(t))), rot90(rot90(rot90(flip(t))))}
+}
+
+func removeTile(tiles []AbstractTile, id int) []AbstractTile {
+	n := len(tiles)
+	for i, t := range tiles {
+		if t.id == id {
+			return append(tiles[:i], tiles[i+1:]...)
+		}
+	}
+	if len(tiles) != n-1 {
+		fmt.Printf("Error: tile %d not found\n", id)
+		fmt.Printf("tiles: %d\n", tiles)
+		panic("tile not found")
+	}
+	return tiles
+}
+
+func ids(tiles []AbstractTile) []int {
+	var res []int
+	for _, t := range tiles {
+		res = append(res, t.id)
+	}
+	return res
+}
+
+func puzzle(board, tiles []AbstractTile, index int, size int, result []int) {
+	n := int(math.Sqrt(float64(size)))
+	if index >= size {
+		fmt.Println("Solution found")
+		fmt.Println("index: ", index)
+		fmt.Println("tiles: ", len(tiles))
+		for _, t := range board {
+			fmt.Println(t)
+		}
+		value := board[0].id * board[n-1].id * board[size-n].id * board[size-1].id
+		fmt.Println("value: ", value)
+		result = append(result, value)
+		return
+	}
+	// fmt.Printf("index: %d, board: %d tiles: %d\n", index, len(board), len(tiles))
+	// fmt.Printf("\tboard: %d\n", board)
+	// fmt.Printf("\ttiles: %d\n", ids(tiles))
+	x := index % n
+	y := index / n
+	// fmt.Printf("x: %d, y: %d\n", x, y)
+	for _, tile := range tiles {
+		for _, t := range allRotations(tile) {
+			if x > 0 && board[index-1].east != t.west {
+				continue
+			}
+			if y > 0 && board[index-n].south != t.north {
+				continue
+			}
+
+			copyBoard := make([]AbstractTile, len(board))
+			copy(copyBoard, board)
+			copyTiles := make([]AbstractTile, len(tiles))
+			copy(copyTiles, tiles)
+
+			// fmt.Printf("placer: %d\n", t.id)
+			// fmt.Printf("tiles: %d\n", ids(copyTiles))
+			puzzle(append(copyBoard, t), removeTile(copyTiles, t.id), index+1, size, result)
+			// fmt.Printf("retirer: %d\n", t.id)
+			// fmt.Printf("tiles: %d\n", ids(copyTiles))
+
+		}
+	}
+	// fmt.Printf("No solution found index=%d\n", index)
 }
 
 func Part1(input string) int {
@@ -88,7 +151,14 @@ func Part1(input string) int {
 		tiles[tileNumber] = tile
 	}
 	fmt.Println("number of tiles: ", len(tiles))
-
+	board := make([]AbstractTile, 0)
+	list := make([]AbstractTile, 0)
+	for _, t := range tiles {
+		list = append(list, t)
+	}
+	result := make([]int, 0)
+	puzzle(board, list, 0, len(tiles), result)
+	fmt.Println("result: ", result)
 	return 0
 }
 

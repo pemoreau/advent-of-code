@@ -1,5 +1,6 @@
 package main
 
+// from https://github.com/jasontconnell/advent
 import (
 	"flag"
 	"fmt"

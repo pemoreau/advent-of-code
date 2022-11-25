@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-//go:embed input_test.txt
+//go:embed input.txt
 var input_day string
 
 type ID int
@@ -90,7 +90,12 @@ func removeTile(tiles []AbstractTile, id ID) []AbstractTile {
 	n := len(tiles)
 	for i, t := range tiles {
 		if t.id == id {
-			return append(tiles[:i], tiles[i+1:]...)
+			// we make a copy to not modify the underlying array (needed when bracktrack)
+			res := make([]AbstractTile, n-1)
+			copy(res, tiles[:i])
+			copy(res[i:], tiles[i+1:])
+			return res
+			// return append(tiles[:i], tiles[i+1:]...)
 		}
 	}
 	if len(tiles) != n-1 {
@@ -120,13 +125,7 @@ func puzzle(board, tiles []AbstractTile, index int, size int, rotations map[ID][
 				continue
 			}
 
-			// we make copies to avoid side-effects during recursion
-			copyBoard := make([]AbstractTile, len(board), len(board)+1)
-			copy(copyBoard, board)
-			copyTiles := make([]AbstractTile, len(tiles))
-			copy(copyTiles, tiles)
-
-			r, b := puzzle(append(copyBoard, t), removeTile(copyTiles, t.id), index+1, size, rotations, result)
+			r, b := puzzle(append(board, t), removeTile(tiles, t.id), index+1, size, rotations, result)
 			if r {
 				return true, b
 			}

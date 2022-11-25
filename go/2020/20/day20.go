@@ -106,12 +106,10 @@ func removeTile(tiles []AbstractTile, id ID) []AbstractTile {
 	return tiles
 }
 
-func puzzle(board, tiles []AbstractTile, index int, size int, rotations map[ID][]AbstractTile, result *[]int) (bool, []AbstractTile) {
+func puzzle(board, tiles []AbstractTile, index int, size int, rotations map[ID][]AbstractTile) (bool, []AbstractTile) {
 	n := int(math.Sqrt(float64(size)))
 	if index >= size {
-		fmt.Println("Solution found")
-		value := int(board[0].id) * int(board[n-1].id) * int(board[size-n].id) * int(board[size-1].id)
-		*result = append(*result, value)
+		// fmt.Println("Solution found")
 		return true, board
 	}
 	x := index % n
@@ -125,7 +123,7 @@ func puzzle(board, tiles []AbstractTile, index int, size int, rotations map[ID][
 				continue
 			}
 
-			r, b := puzzle(append(board, t), removeTile(tiles, t.id), index+1, size, rotations, result)
+			r, b := puzzle(append(board, t), removeTile(tiles, t.id), index+1, size, rotations)
 			if r {
 				return true, b
 			}
@@ -135,7 +133,7 @@ func puzzle(board, tiles []AbstractTile, index int, size int, rotations map[ID][
 	return false, board
 }
 
-func Part1(input string) int {
+func parse(input string) []AbstractTile {
 	input = strings.TrimSuffix(input, "\n")
 	parts := strings.Split(input, "\n\n")
 	var tiles []AbstractTile
@@ -157,35 +155,133 @@ func Part1(input string) int {
 		tile.lines = lines[1:]
 		tiles = append(tiles, tile)
 	}
+	return tiles
+}
+
+func solve(input string) []AbstractTile {
+	tiles := parse(input)
+	n := len(tiles)
 	rotations := make(map[ID][]AbstractTile)
 	for _, tile := range tiles {
 		rotations[tile.id] = allRotations(tile)
 	}
-	// fmt.Println("All rotations computed")
-	// for _, tile := range rotations[ID(2953)] {
-	// 	for line := range tile.lines {
-	// 		fmt.Println(tile.lines[line])
-	// 	}
-	// 	fmt.Println()
-	// }
 
-	fmt.Println("number of tiles: ", len(tiles))
-	board := make([]AbstractTile, 0, len(tiles))
-	result := make([]int, 0)
-	_, b := puzzle(board, tiles, 0, len(tiles), rotations, &result)
-	for _, tile := range b {
-		for line := range tile.lines {
-			fmt.Println(tile.lines[line])
+	board := make([]AbstractTile, 0, n)
+	_, board = puzzle(board, tiles, 0, n, rotations)
+	return board
+}
+
+func Part1(input string) int {
+	board := solve(input)
+	n := len(board)
+	size := int(math.Sqrt(float64(n)))
+	return int(board[0].id) * int(board[size-1].id) * int(board[n-size].id) * int(board[n-1].id)
+}
+
+type Pos struct{ x, y int16 }
+type Image map[Pos]bool
+
+func buildImage(board []AbstractTile) Image {
+	n := len(board)
+	size := int(math.Sqrt(float64(n)))
+	image := make(Image)
+
+	for i, tile := range board {
+		x := i % size
+		y := i / size
+		for j, line := range tile.lines[1 : len(tile.lines)-1] {
+			for k, c := range line[1 : len(line)-1] {
+				pos := Pos{x: int16(x*8 + k), y: int16(y*8 + j)}
+				if c == '#' {
+					image[pos] = true
+				} else {
+					image[pos] = false
+				}
+			}
 		}
-		fmt.Println()
 	}
-	return result[0]
+	return image
+}
+
+func rot90Image(image Image) Image {
+	n := 0
+	m := 0
+	for pos := range image {
+		if int(pos.x) > n {
+			n = int(pos.x)
+		}
+		if int(pos.y) > m {
+			m = int(pos.y)
+		}
+	}
+	res := make(Image)
+	for pos, v := range image {
+		res[Pos{x: pos.y, y: int16(m - 1 - int(pos.x))}] = v
+	}
+	return res
+}
+
+func flipImage(image Image) Image {
+	n := 0
+	m := 0
+	for pos := range image {
+		if int(pos.x) > n {
+			n = int(pos.x)
+		}
+		if int(pos.y) > m {
+			m = int(pos.y)
+		}
+	}
+	res := make(Image)
+	for pos, v := range image {
+		res[Pos{x: int16(n - 1 - int(pos.x)), y: pos.y}] = v
+	}
+	return res
+}
+
+func allImageRotation(image Image) []Image {
+
+	return []Image{
+		image, rot90Image(image), rot90Image(rot90Image(image)), rot90Image(rot90Image(rot90Image(image))),
+		flipImage(image), rot90Image(flipImage(image)), rot90Image(rot90Image(flipImage(image))), rot90Image(rot90Image(rot90Image(flipImage(image))))}
 }
 
 func Part2(input string) int {
-	// input = strings.TrimSuffix(input, "\n")
-	// lines := strings.Split(input, "\n")
-	return 0
+	board := solve(input)
+	image := buildImage(board)
+
+	nbPixels := 0
+	for _, v := range image {
+		if v {
+			nbPixels++
+		}
+	}
+
+	monster := make(map[Pos]bool)
+	monsterPos := []Pos{
+		{18, 0},
+		{0, 1}, {5, 1}, {6, 1}, {11, 1}, {12, 1}, {17, 1}, {18, 1}, {19, 1},
+		{1, 2}, {4, 2}, {7, 2}, {10, 2}, {13, 2}, {16, 2}}
+	for _, pos := range monsterPos {
+		monster[pos] = true
+	}
+	allMonsters := allImageRotation(monster)
+	nbMonsters := 0
+	for _, monster := range allMonsters {
+		for pos := range image {
+			found := true
+			for monsterPos := range monster {
+				if !image[Pos{x: pos.x + monsterPos.x, y: pos.y + monsterPos.y}] {
+					found = false
+					break
+				}
+			}
+			if found {
+				nbMonsters++
+			}
+		}
+	}
+	return nbPixels - len(monster)*nbMonsters
 
 }
 

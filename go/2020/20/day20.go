@@ -11,18 +11,18 @@ import (
 //go:embed input.txt
 var input_day string
 
-type ID int
-type AbstractTile struct {
+type ID uint16
+type Tile struct {
 	id     ID
-	nbBits int
-	north  uint
-	south  uint
-	east   uint
-	west   uint
+	nbBits uint16
+	north  uint16
+	south  uint16
+	east   uint16
+	west   uint16
 	lines  []string
 }
 
-func (t AbstractTile) String() string {
+func (t Tile) String() string {
 	return fmt.Sprintf("#%d: N:%.3d S:%.3d E:%.3d W:%.3d", t.id, t.north, t.south, t.east, t.west)
 }
 
@@ -34,16 +34,16 @@ func reverseString(s string) string {
 	return res
 }
 
-func flip(t AbstractTile) AbstractTile {
+func flip(t Tile) Tile {
 	lines := make([]string, len(t.lines))
 	for i, line := range t.lines {
 		lines[i] = reverseString(line)
 	}
-	return AbstractTile{id: t.id, nbBits: t.nbBits, north: reverseBits(t.north, t.nbBits), south: reverseBits(t.south, t.nbBits), east: t.west, west: t.east, lines: lines}
+	return Tile{id: t.id, nbBits: t.nbBits, north: reverseBits(t.north, t.nbBits), south: reverseBits(t.south, t.nbBits), east: t.west, west: t.east, lines: lines}
 }
 
-func rot90(t AbstractTile) AbstractTile {
-	return AbstractTile{id: t.id, nbBits: t.nbBits, north: t.east, south: t.west, east: reverseBits(t.south, t.nbBits), west: reverseBits(t.north, t.nbBits), lines: rot90lines(t.lines)}
+func rot90(t Tile) Tile {
+	return Tile{id: t.id, nbBits: t.nbBits, north: t.east, south: t.west, east: reverseBits(t.south, t.nbBits), west: reverseBits(t.north, t.nbBits), lines: rot90lines(t.lines)}
 }
 
 func rot90lines(lines []string) []string {
@@ -59,8 +59,8 @@ func rot90lines(lines []string) []string {
 	return res
 }
 
-func toInt(s string) uint {
-	var res uint
+func toInt(s string) uint16 {
+	var res uint16
 	for _, c := range s {
 		if c == '#' {
 			res = (res << 1) | 1
@@ -71,27 +71,27 @@ func toInt(s string) uint {
 	return res
 }
 
-func reverseBits(v uint, nbBits int) uint {
-	var res uint
-	for i := 0; i < nbBits; i++ {
+func reverseBits(v uint16, nbBits uint16) uint16 {
+	var res uint16
+	for i := uint16(0); i < nbBits; i++ {
 		res = (res << 1) | (v & 1)
 		v = v >> 1
 	}
 	return res
 }
 
-func allRotations(t AbstractTile) []AbstractTile {
-	return []AbstractTile{
+func allRotations(t Tile) []Tile {
+	return []Tile{
 		t, rot90(t), rot90(rot90(t)), rot90(rot90(rot90(t))),
 		flip(t), rot90(flip(t)), rot90(rot90(flip(t))), rot90(rot90(rot90(flip(t))))}
 }
 
-func removeTile(tiles []AbstractTile, id ID) []AbstractTile {
+func removeTile(tiles []Tile, id ID) []Tile {
 	n := len(tiles)
 	for i, t := range tiles {
 		if t.id == id {
-			// we make a copy to not modify the underlying array (needed when bracktrack)
-			res := make([]AbstractTile, n-1)
+			// we make a copy to not modify the underlying array (needed when backtrack)
+			res := make([]Tile, n-1)
 			copy(res, tiles[:i])
 			copy(res[i:], tiles[i+1:])
 			return res
@@ -106,8 +106,8 @@ func removeTile(tiles []AbstractTile, id ID) []AbstractTile {
 	return tiles
 }
 
-func puzzle(board, tiles []AbstractTile, index int, size int, rotations map[ID][]AbstractTile) (bool, []AbstractTile) {
-	n := int(math.Sqrt(float64(size)))
+func puzzle(board, tiles []Tile, index uint16, size uint16, rotations map[ID][]Tile) (bool, []Tile) {
+	n := uint16(math.Sqrt(float64(size)))
 	if index >= size {
 		// fmt.Println("Solution found")
 		return true, board
@@ -133,15 +133,15 @@ func puzzle(board, tiles []AbstractTile, index int, size int, rotations map[ID][
 	return false, board
 }
 
-func parse(input string) []AbstractTile {
+func parse(input string) []Tile {
 	input = strings.TrimSuffix(input, "\n")
 	parts := strings.Split(input, "\n\n")
-	var tiles []AbstractTile
+	var tiles []Tile
 	for _, part := range parts {
 		lines := strings.Split(part, "\n")
 		var tileNumber int
 		fmt.Sscanf(lines[0], "Tile %d:", &tileNumber)
-		tile := AbstractTile{id: ID(tileNumber), nbBits: len(lines[1])}
+		tile := Tile{id: ID(tileNumber), nbBits: uint16(len(lines[1]))}
 		tile.north = toInt(lines[1])
 		tile.south = toInt(lines[len(lines)-1])
 		var left = make([]byte, 0)
@@ -158,15 +158,15 @@ func parse(input string) []AbstractTile {
 	return tiles
 }
 
-func solve(input string) []AbstractTile {
+func solve(input string) []Tile {
 	tiles := parse(input)
-	n := len(tiles)
-	rotations := make(map[ID][]AbstractTile)
+	n := uint16(len(tiles))
+	rotations := make(map[ID][]Tile)
 	for _, tile := range tiles {
 		rotations[tile.id] = allRotations(tile)
 	}
 
-	board := make([]AbstractTile, 0, n)
+	board := make([]Tile, 0, n)
 	_, board = puzzle(board, tiles, 0, n, rotations)
 	return board
 }
@@ -181,7 +181,7 @@ func Part1(input string) int {
 type Pos struct{ x, y int16 }
 type Image map[Pos]bool
 
-func buildImage(board []AbstractTile) Image {
+func buildImage(board []Tile) Image {
 	n := len(board)
 	size := int(math.Sqrt(float64(n)))
 	image := make(Image)
@@ -204,43 +204,42 @@ func buildImage(board []AbstractTile) Image {
 }
 
 func rot90Image(image Image) Image {
-	n := 0
-	m := 0
+	var n int16 = 0
+	var m int16 = 0
 	for pos := range image {
-		if int(pos.x) > n {
-			n = int(pos.x)
+		if pos.x > n {
+			n = pos.x
 		}
-		if int(pos.y) > m {
-			m = int(pos.y)
+		if pos.y > m {
+			m = pos.y
 		}
 	}
 	res := make(Image)
 	for pos, v := range image {
-		res[Pos{x: pos.y, y: int16(m - 1 - int(pos.x))}] = v
+		res[Pos{x: pos.y, y: m - 1 - pos.x}] = v
 	}
 	return res
 }
 
 func flipImage(image Image) Image {
-	n := 0
-	m := 0
+	var n int16 = 0
+	var m int16 = 0
 	for pos := range image {
-		if int(pos.x) > n {
-			n = int(pos.x)
+		if pos.x > n {
+			n = pos.x
 		}
-		if int(pos.y) > m {
-			m = int(pos.y)
+		if pos.y > m {
+			m = pos.y
 		}
 	}
 	res := make(Image)
 	for pos, v := range image {
-		res[Pos{x: int16(n - 1 - int(pos.x)), y: pos.y}] = v
+		res[Pos{x: n - 1 - pos.x, y: pos.y}] = v
 	}
 	return res
 }
 
 func allImageRotation(image Image) []Image {
-
 	return []Image{
 		image, rot90Image(image), rot90Image(rot90Image(image)), rot90Image(rot90Image(rot90Image(image))),
 		flipImage(image), rot90Image(flipImage(image)), rot90Image(rot90Image(flipImage(image))), rot90Image(rot90Image(rot90Image(flipImage(image))))}

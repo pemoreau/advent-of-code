@@ -287,10 +287,10 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2020 day 20 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(string(input_day)))
+	fmt.Println("part1: ", Part1(input_day))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(string(input_day)))
+	fmt.Println("part2: ", Part2(input_day))
 	fmt.Println(time.Since(start))
 }

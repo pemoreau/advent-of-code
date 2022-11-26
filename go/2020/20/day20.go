@@ -11,14 +11,14 @@ import (
 //go:embed input.txt
 var input_day string
 
-type ID uint16
+type ID int16
 type Tile struct {
 	id     ID
-	nbBits uint16
-	north  uint16
-	south  uint16
-	east   uint16
-	west   uint16
+	nbBits int16
+	north  int16
+	south  int16
+	east   int16
+	west   int16
 	lines  []string
 }
 
@@ -59,8 +59,8 @@ func rot90lines(lines []string) []string {
 	return res
 }
 
-func toInt(s string) uint16 {
-	var res uint16
+func toInt(s string) int16 {
+	var res int16
 	for _, c := range s {
 		if c == '#' {
 			res = (res << 1) | 1
@@ -71,9 +71,9 @@ func toInt(s string) uint16 {
 	return res
 }
 
-func reverseBits(v uint16, nbBits uint16) uint16 {
-	var res uint16
-	for i := uint16(0); i < nbBits; i++ {
+func reverseBits(v int16, nbBits int16) int16 {
+	var res int16
+	for i := int16(0); i < nbBits; i++ {
 		res = (res << 1) | (v & 1)
 		v = v >> 1
 	}
@@ -106,8 +106,8 @@ func removeTile(tiles []Tile, id ID) []Tile {
 	return tiles
 }
 
-func puzzle(board, tiles []Tile, index uint16, size uint16, rotations map[ID][]Tile) (bool, []Tile) {
-	n := uint16(math.Sqrt(float64(size)))
+func puzzle(board, tiles []Tile, index int16, size int16, rotations map[ID][]Tile) (bool, []Tile) {
+	n := int16(math.Sqrt(float64(size)))
 	if index >= size {
 		// fmt.Println("Solution found")
 		return true, board
@@ -141,7 +141,7 @@ func parse(input string) []Tile {
 		lines := strings.Split(part, "\n")
 		var tileNumber int
 		fmt.Sscanf(lines[0], "Tile %d:", &tileNumber)
-		tile := Tile{id: ID(tileNumber), nbBits: uint16(len(lines[1]))}
+		tile := Tile{id: ID(tileNumber), nbBits: int16(len(lines[1]))}
 		tile.north = toInt(lines[1])
 		tile.south = toInt(lines[len(lines)-1])
 		var left = make([]byte, 0)
@@ -160,7 +160,7 @@ func parse(input string) []Tile {
 
 func solve(input string) []Tile {
 	tiles := parse(input)
-	n := uint16(len(tiles))
+	n := int16(len(tiles))
 	rotations := make(map[ID][]Tile)
 	for _, tile := range tiles {
 		rotations[tile.id] = allRotations(tile)

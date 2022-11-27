@@ -361,17 +361,41 @@ aaaabbb
 
 ### [Go](./go/2020/19/day19.go)
 
-## [Day 20: ](https://adventofcode.com/2020/day/20)
+## [Day 20: Jurassic Jigsaw](https://adventofcode.com/2020/day/20)
 
 Example of input:
 
 ```
+Tile 2311:
+..##.#..#.
+##..#.....
+#...##..#.
+####.#...#
+##.##.###.
+##...#.###
+.#.#.#..##
+..#....#..
+###...#.#.
+..###..###
+
+Tile 1951:
+#.##...##.
+#.####...#
+.....#..##
+#...######
+.##.#....#
+.###.#####
+###.##.##.
+.###....#.
+..#.#..#.#
+#...##.#..
 
 ```
 
-### [Rust](./rust/2020/day20)
-
 ### [Go](./go/2020/20/day20.go)
+
+Classic backtracking. Tee border of each tile has been encoded by an unsigned integer.
+I don't know if it is a good idea but that simplified comparisons
 
 ## [Day 21: ](https://adventofcode.com/2020/day/21)
 

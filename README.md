@@ -20,7 +20,7 @@ Mostly written in Rust and Go
 # [Year 2022](README-2022.md)
 
 | Go                              | part A      | part B      |
-| ------------------------------- | ----------- | ----------- |
+|---------------------------------|-------------|-------------|
 | [day 01](./go/2022/01/day01.go) | ` 0.000 ms` | ` 0.000 ms` |
 | [day 02](./go/2022/02/day02.go) | ` 0.000 ms` | ` 0.000 ms` |
 | [day 03](./go/2022/03/day03.go) | ` 0.000 ms` | ` 0.000 ms` |
@@ -49,10 +49,13 @@ Mostly written in Rust and Go
 
 # [Year 2021](README-2021.md)
 
+<a href="https://adventofcode.com"><img src="assets/calendar_2021.png" width="80%" /></a>
+
+
 Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
 | Rust                        | part A      | part B      | Go                                         | part A      | part B      |
-| :-------------------------- | :---------- | :---------- | ------------------------------------------ | ----------- | ----------- |
+|:----------------------------|:------------|:------------|--------------------------------------------|-------------|-------------|
 | [day 01](./rust/2021/day01) | ` 0.089 ms` | ` 0.067 ms` | [day 01](./go/2021/01/day01.go)            | ` 0.047 ms` | ` 0.048 ms` |
 | [day 02](./rust/2021/day02) | ` 0.092 ms` | ` 0.063 ms` | [day 02](./go/2021/02/day02.go)            | ` 0.102 ms` | ` 0.103 ms` |
 | [day 03](./rust/2021/day03) | ` 0.157 ms` | ` 0.084 ms` |                                            |             |             |
@@ -84,7 +87,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
 | Rust                        | part A      | part B      | Go                              | part A      | part B      |
-| :-------------------------- | :---------- | :---------- |---------------------------------|-------------|-------------|
+|:----------------------------|:------------|:------------|---------------------------------|-------------|-------------|
 | [day 01](./rust/2020/day01) | ` 0.034 ms` | ` 9.541 ms` | [day 01](./go/2020/01/day01.go) | ` 0.049 ms` | ` 5.399 ms` |
 | [day 02](./rust/2020/day02) | ` 0.331 ms` | ` 0.266 ms` |                                 |             |             |
 | [day 03](./rust/2020/day03) | ` 0.199 ms` | ` 1.040 ms` |                                 |             |             |
@@ -104,6 +107,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 17](./rust/2020/day17) | ` 17.52 ms` | ` 768.0 ms` |                                 |             |             |
 | [day 18](./rust/2020/day18) | ` 4.187 ms` | ` 4.134 ms` |                                 |             |             |
 |                             |             |             | [day 19](./go/2020/19/day19.go) | ` 4.766 ms` | ` 9.456 ms` |
+|                             |             |             | [day 20](./go/2020/20/day20.go) | ` 36.66 ms` | ` 44.65 ms` |
 
 # Comments
 

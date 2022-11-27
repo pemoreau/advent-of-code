@@ -49,6 +49,9 @@ Mostly written in Rust and Go
 
 # [Year 2021](README-2021.md)
 
+<a href="https://adventofcode.com"><img src="assets/calendar_2021.png" width="80%" /></a>
+
+
 Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
 | Rust                        | part A      | part B      | Go                                         | part A      | part B      |

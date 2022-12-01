@@ -2,12 +2,25 @@
 
 # Comments
 
-## [Day 01: ](https://adventofcode.com/2022/day/1)
+## [Day 01: Calorie Counting](https://adventofcode.com/2022/day/1)
 
 Example of input:
 
 ```
+1000
+2000
+3000
 
+4000
+
+5000
+6000
+
+7000
+8000
+9000
+
+10000
 ```
 
 ### [Go](./go/2022/01/day01.go)

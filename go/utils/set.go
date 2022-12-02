@@ -1,0 +1,69 @@
+package utils
+
+type Set[T comparable] map[T]struct{}
+
+func BuildSet[T comparable]() Set[T] {
+	return make(map[T]struct{})
+}
+
+func (s Set[T]) Add(value T) {
+	s[value] = struct{}{}
+}
+
+func (s Set[T]) Remove(value T) {
+	delete(s, value)
+}
+
+func (s Set[T]) Contains(value T) bool {
+	_, ok := s[value]
+	return ok
+}
+
+func (s Set[T]) IsEmpty() bool {
+	return len(s) == 0
+}
+
+func (s Set[T]) Len() int {
+	return len(s)
+}
+
+func (s Set[T]) Equal(other Set[T]) bool {
+	if s.Len() != other.Len() {
+		return false
+	}
+	for elem := range s {
+		if !other.Contains(elem) {
+			return false
+		}
+	}
+	return true
+}
+
+func (s Set[T]) Union(other Set[T]) Set[T] {
+	res := make(Set[T], Max(s.Len(), other.Len()))
+	for elem := range s {
+		res.Add(elem)
+	}
+	for elem := range other {
+		res.Add(elem)
+	}
+	return res
+}
+
+func (s Set[T]) Intersect(other Set[T]) Set[T] {
+	res := BuildSet[T]()
+	if s.Len() < other.Len() {
+		for elem := range s {
+			if other.Contains(elem) {
+				res.Add(elem)
+			}
+		}
+	} else {
+		for elem := range other {
+			if s.Contains(elem) {
+				res.Add(elem)
+			}
+		}
+	}
+	return res
+}

@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"strconv"
 	"strings"
 	"time"
@@ -55,24 +56,13 @@ func step(env *Env) {
 	}
 }
 
-type IntSet map[int]struct{}
-
-func (s IntSet) add(v int) {
-	s[v] = struct{}{}
-}
-
-func (s IntSet) includes(v int) bool {
-	_, ok := s[v]
-	return ok
-}
-
 func terminates(env Env) (bool, int) {
-	visited := make(IntSet)
-	for !visited.includes(env.pc) {
+	visited := utils.BuildSet[int]()
+	for !visited.Contains(env.pc) {
 		if env.pc >= len(env.prg) {
 			return true, env.acc
 		}
-		visited.add(env.pc)
+		visited.Add(env.pc)
 		step(&env)
 	}
 	return false, env.acc

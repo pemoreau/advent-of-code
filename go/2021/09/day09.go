@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"sort"
 	"strings"
 	"time"
@@ -14,23 +15,6 @@ var input_day string
 type matrix [][]uint8
 type Pos struct {
 	i, j int
-}
-type set map[Pos]struct{}
-
-func BuildSet() set {
-	return make(map[Pos]struct{})
-}
-
-func (s set) Add(value Pos) {
-	s[value] = struct{}{}
-}
-
-func (s set) Contains(value Pos) bool {
-	_, ok := s[value]
-	return ok
-}
-func (s set) Len() int {
-	return len(s)
 }
 
 func BuildMatrix(lines []string) matrix {
@@ -65,14 +49,14 @@ func smallerThanNeighboors(m matrix, i, j int) bool {
 	return true
 }
 
-func explore(m matrix) []set {
-	collectedBasin := []set{}
+func explore(m matrix) []utils.Set[Pos] {
+	collectedBasin := []utils.Set[Pos]{}
 	for i := range m {
 		for j := range m[i] {
 			if m[i][j] == 9 {
 				// already visited: skip
 			} else {
-				newBasin := BuildSet()
+				newBasin := utils.BuildSet[Pos]()
 				collectNeighboors(Pos{i, j}, m, newBasin)
 				collectedBasin = append(collectedBasin, newBasin)
 			}
@@ -81,7 +65,7 @@ func explore(m matrix) []set {
 	return collectedBasin
 }
 
-func collectNeighboors(p Pos, m matrix, collected set) {
+func collectNeighboors(p Pos, m matrix, collected utils.Set[Pos]) {
 	if collected.Contains(p) {
 		return
 	}

@@ -11,43 +11,57 @@ import (
 var input_day string
 
 func play1(i, j uint8) int {
-	if i == j {
+	if i == j { // drawn
 		return int(3 + (j + 1))
 	}
-	if j == (i+1)%3 {
+	if j == (i+1)%3 { // win
 		return int(6 + (j + 1))
 	}
+	// loose
 	return int(j + 1)
 }
 
 func play2(i, j uint8) int {
-	if j == 1 { // drawn
-		return play1(i, i)
+	switch j {
+	case 0: // loose
+		//return play1(i, (3+i-1)%3)
+		return int(1 + (3+i-1)%3)
+	case 1: // draw
+		//return play1(i, i)
+		return int(3 + (i + 1))
+	default: // win
+		//return play1(i, (i+1)%3)
+		return int(6 + 1 + (i+1)%3)
 	}
-	if j == 0 { // loose
-		return play1(i, (3+i-1)%3)
-	}
-	// win
-	return play1(i, (i+1)%3)
 }
 
-func Part(input string, play func(uint8, uint8) int) int {
+func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 	score := 0
 	for _, line := range lines {
-		s := strings.Split(line, " ")
-		score += play(s[0][0]-'A', s[1][0]-'X')
+		score += play1(line[0]-'A', line[2]-'X')
 	}
 	return score
 }
 
-func Part1(input string) int {
-	return Part(input, play1)
-}
-
 func Part2(input string) int {
-	return Part(input, play2)
+	input = strings.TrimSuffix(input, "\n")
+	lines := strings.Split(input, "\n")
+	score := 0
+	for _, line := range lines {
+		i := line[0] - 'A'
+		j := line[2] - 'X'
+		switch j {
+		case 0: // loose
+			score += int(1 + (3+i-1)%3)
+		case 1: // draw
+			score += int(3 + (i + 1))
+		default: // win
+			score += int(6 + 1 + (i+1)%3)
+		}
+	}
+	return score
 }
 
 func main() {

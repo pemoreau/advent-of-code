@@ -3,21 +3,21 @@ package utils
 type Interval struct{ Min, Max int }
 
 // https{//stackoverflow.com/questions/31057473/calculating-the-modulo-of-two-Intervals
-func (a Interval) Len() int {
-	return a.Max - a.Min + 1
+func (i Interval) Len() int {
+	return i.Max - i.Min + 1
 }
 
-func (a Interval) Negate() Interval {
-	return Interval{-a.Max, -a.Min}
+func (i Interval) Negate() Interval {
+	return Interval{-i.Max, -i.Min}
 }
 
-func (a Interval) Add(b Interval) Interval {
-	return Interval{a.Min + b.Min, a.Max + b.Max}
+func (i Interval) Add(b Interval) Interval {
+	return Interval{i.Min + b.Min, i.Max + b.Max}
 }
 
-func (a Interval) Sub(b Interval) Interval {
-	min := a.Min - b.Min
-	max := a.Max - b.Max
+func (i Interval) Sub(b Interval) Interval {
+	min := i.Min - b.Min
+	max := i.Max - b.Max
 	if min < max {
 		return Interval{min, max}
 	} else {
@@ -44,48 +44,48 @@ func minmax(a, b, c, d int) (int, int) {
 	return Min(min1, min2), Max(max1, max2)
 }
 
-func (a Interval) Mul(b Interval) Interval {
-	if a.Min >= 0 && b.Min >= 0 {
-		return Interval{a.Min * b.Min, a.Max * b.Max}
-	} else if a.Max <= 0 && b.Max <= 0 {
-		return Interval{a.Max * b.Max, a.Min * b.Min}
+func (i Interval) Mul(b Interval) Interval {
+	if i.Min >= 0 && b.Min >= 0 {
+		return Interval{i.Min * b.Min, i.Max * b.Max}
+	} else if i.Max <= 0 && b.Max <= 0 {
+		return Interval{i.Max * b.Max, i.Min * b.Min}
 	}
 
 	// From https://doi.org/10.1145/502102.502106
 	// Figure 6
 	// but it is not more efficient than the following 2 lines
 
-	min, max := minmax(a.Min*b.Min, a.Min*b.Max, a.Max*b.Min, a.Max*b.Max)
+	min, max := minmax(i.Min*b.Min, i.Min*b.Max, i.Max*b.Min, i.Max*b.Max)
 	return Interval{min, max}
 }
 
-func (a Interval) Div(b Interval) Interval {
-	if a.Min >= 0 && b.Min >= 0 {
-		return Interval{a.Min / b.Max, a.Max / b.Min}
-	} else if a.Max <= 0 && b.Max <= 0 {
-		return Interval{a.Max / b.Min, a.Min / b.Max}
+func (i Interval) Div(b Interval) Interval {
+	if i.Min >= 0 && b.Min >= 0 {
+		return Interval{i.Min / b.Max, i.Max / b.Min}
+	} else if i.Max <= 0 && b.Max <= 0 {
+		return Interval{i.Max / b.Min, i.Min / b.Max}
 	}
 
 	// From https://doi.org/10.1145/502102.502106
 	// Figure 7
 	// but it is not more efficient than the following 2 lines
 
-	min, max := minmax(a.Min/b.Min, a.Min/b.Max, a.Max/b.Min, a.Max/b.Max)
+	min, max := minmax(i.Min/b.Min, i.Min/b.Max, i.Max/b.Min, i.Max/b.Max)
 	return Interval{min, max}
 }
 
-func (a Interval) Inter(b Interval) Interval {
-	if a.Max < b.Min || b.Max < a.Min {
+func (i Interval) Inter(b Interval) Interval {
+	if i.Max < b.Min || b.Max < i.Min {
 		return Interval{0, -1}
 	}
-	min := Max(a.Min, b.Min)
-	max := Min(a.Max, b.Max)
+	min := Max(i.Min, b.Min)
+	max := Min(i.Max, b.Max)
 	return Interval{min, max}
 }
 
-func (a Interval) union(b Interval) Interval {
-	min := Min(a.Min, b.Min)
-	max := Max(a.Max, b.Max)
+func (i Interval) union(b Interval) Interval {
+	min := Min(i.Min, b.Min)
+	max := Max(i.Max, b.Max)
 	return Interval{min, max}
 }
 

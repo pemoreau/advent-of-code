@@ -3,7 +3,7 @@ package utils
 type Set[T comparable] map[T]struct{}
 
 func BuildSet[T comparable]() Set[T] {
-	return make(map[T]struct{})
+	return make(Set[T])
 }
 
 func (s Set[T]) Add(value T) {

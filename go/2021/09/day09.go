@@ -17,7 +17,7 @@ type Pos struct {
 	i, j int
 }
 
-func BuildMatrix(lines []string) matrix {
+func buildMatrix(lines []string) matrix {
 	m := make([][]uint8, len(lines))
 	for i, l := range lines {
 		l = strings.TrimSpace(l)
@@ -29,8 +29,8 @@ func BuildMatrix(lines []string) matrix {
 	return m
 }
 
-func neighboors(m matrix, i, j int) []Pos {
-	res := []Pos{}
+func neighbors(m matrix, i, j int) []Pos {
+	var res []Pos
 	pos := []Pos{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
 	for _, p := range pos {
 		if p.i >= 0 && p.i < len(m) && p.j >= 0 && p.j < len(m[p.i]) {
@@ -40,8 +40,8 @@ func neighboors(m matrix, i, j int) []Pos {
 	return res
 }
 
-func smallerThanNeighboors(m matrix, i, j int) bool {
-	for _, p := range neighboors(m, i, j) {
+func smallerThanNeighbors(m matrix, i, j int) bool {
+	for _, p := range neighbors(m, i, j) {
 		if !(m[i][j] < m[p.i][p.j]) {
 			return false
 		}
@@ -50,14 +50,14 @@ func smallerThanNeighboors(m matrix, i, j int) bool {
 }
 
 func explore(m matrix) []utils.Set[Pos] {
-	collectedBasin := []utils.Set[Pos]{}
+	var collectedBasin []utils.Set[Pos]
 	for i := range m {
 		for j := range m[i] {
 			if m[i][j] == 9 {
 				// already visited: skip
 			} else {
 				newBasin := utils.BuildSet[Pos]()
-				collectNeighboors(Pos{i, j}, m, newBasin)
+				collectNeighbors(Pos{i, j}, m, newBasin)
 				collectedBasin = append(collectedBasin, newBasin)
 			}
 		}
@@ -65,7 +65,7 @@ func explore(m matrix) []utils.Set[Pos] {
 	return collectedBasin
 }
 
-func collectNeighboors(p Pos, m matrix, collected utils.Set[Pos]) {
+func collectNeighbors(p Pos, m matrix, collected utils.Set[Pos]) {
 	if collected.Contains(p) {
 		return
 	}
@@ -74,18 +74,18 @@ func collectNeighboors(p Pos, m matrix, collected utils.Set[Pos]) {
 	}
 	collected.Add(p)
 	m[p.i][p.j] = 9 // mark as visited
-	for _, n := range neighboors(m, p.i, p.j) {
-		collectNeighboors(n, m, collected)
+	for _, n := range neighbors(m, p.i, p.j) {
+		collectNeighbors(n, m, collected)
 	}
 }
 
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := BuildMatrix(lines)
+	m := buildMatrix(lines)
 	res := 0
 	for i := range m {
 		for j := range m[i] {
-			if smallerThanNeighboors(m, i, j) {
+			if smallerThanNeighbors(m, i, j) {
 				res += int(m[i][j] + 1)
 			}
 		}
@@ -95,7 +95,7 @@ func Part1(input string) int {
 
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := BuildMatrix(lines)
+	m := buildMatrix(lines)
 
 	collectedBasin := explore(m) // m is modified here
 	sizes := make([]int, 0, len(collectedBasin))

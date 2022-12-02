@@ -25,12 +25,14 @@ Example of input:
 
 ### [Go](./go/2022/01/day01.go)
 
-## [Day 02: ](https://adventofcode.com/2022/day/2)
+## [Day 02: Rock Paper Scissors](https://adventofcode.com/2022/day/2)
 
 Example of input:
 
 ```
-
+A Y
+B X
+C Z
 ```
 
 ### [Go](./go/2022/02/day02.go)

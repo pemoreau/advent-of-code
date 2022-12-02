@@ -14,3 +14,11 @@ Cargo.lock
 **/*.rs.bk
 go/2020/20/res
 go/initaoc/initaoc
+
+# vim
+**/*.swp
+**/*.swo
+
+#OSX
+**/.DS_Store
+

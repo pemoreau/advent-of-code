@@ -16,7 +16,7 @@ var input_day string
 func parse(input string) []int {
 	input = strings.TrimSuffix(input, "\n")
 	parts := strings.Split(input, "\n\n")
-	elves := make([]int, 0)
+	var elves []int
 	for _, part := range parts {
 		sum := 0
 		for _, line := range strings.Split(part, "\n") {

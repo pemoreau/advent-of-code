@@ -24,6 +24,7 @@ Example of input:
 ```
 
 ### [Go](./go/2022/01/day01.go)
+Nothing special.
 
 ## [Day 02: Rock Paper Scissors](https://adventofcode.com/2022/day/2)
 
@@ -36,17 +37,24 @@ C Z
 ```
 
 ### [Go](./go/2022/02/day02.go)
+Convert letters into numbers 0, 1, and 2. Then use the modulo operator.
 
-## [Day 03: ](https://adventofcode.com/2022/day/3)
+
+## [Day 03: Rucksack Reorganization](https://adventofcode.com/2022/day/3)
 
 Example of input:
 
 ```
-
+vJrwpWtwJgWrhcsFMMfFFhFp
+jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw
 ```
 
 ### [Go](./go/2022/03/day03.go)
-
+Use sets and intersections
 
 ## [Day 04: ](https://adventofcode.com/2022/day/4)
 

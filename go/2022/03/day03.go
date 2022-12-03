@@ -65,6 +65,7 @@ func Part1(input string) int {
 		for i := 0; i < n/2; i++ {
 			tab[line[i]] = true
 		}
+	loop:
 		for i := n / 2; i < n; i++ {
 			c := line[i]
 			if tab[c] {
@@ -73,7 +74,7 @@ func Part1(input string) int {
 				} else {
 					res += int(27 + c - 'A')
 				}
-				i = n
+				break loop
 			}
 		}
 	}

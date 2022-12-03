@@ -32,7 +32,7 @@ func score(i utils.Set[uint8]) int {
 	return res
 }
 
-func Part1(input string) int {
+func Part1_slow(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 	res := 0
@@ -43,13 +43,73 @@ func Part1(input string) int {
 	return res
 }
 
-func Part2(input string) int {
+func Part2_slow(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 	res := 0
 	for l := 0; l < len(lines); l += 3 {
 		i := set(lines[l]).Intersect(set(lines[l+1])).Intersect(set(lines[l+2]))
 		res += score(i)
+	}
+	return res
+}
+
+func Part1(input string) int {
+	input = strings.TrimSuffix(input, "\n")
+	lines := strings.Split(input, "\n")
+
+	res := 0
+	for _, line := range lines {
+		tab := [123]bool{}
+		n := len(line)
+		for i := 0; i < n/2; i++ {
+			tab[line[i]] = true
+		}
+		for i := n / 2; i < n; i++ {
+			c := line[i]
+			if tab[c] {
+				if unicode.IsLower(rune(c)) {
+					res += int(1 + c - 'a')
+				} else {
+					res += int(27 + c - 'A')
+				}
+				i = n
+			}
+		}
+	}
+	return res
+}
+
+func Part2(input string) int {
+	input = strings.TrimSuffix(input, "\n")
+	lines := strings.Split(input, "\n")
+	res := 0
+	for l := 0; l < len(lines); l += 3 {
+		tab0 := [123]bool{}
+		tab1 := [123]bool{}
+		line0 := lines[l]
+		line1 := lines[l+1]
+		for _, c := range line0 {
+			tab0[c] = true
+		}
+		for _, c := range line1 {
+			tab1[c] = true
+		}
+
+	loop:
+		for _, c := range lines[l+2] {
+			if tab0[c] && tab1[c] {
+				if unicode.IsLower(c) {
+					res += int(1 + c - 'a')
+				} else {
+					res += int(27 + c - 'A')
+				}
+				break loop
+			}
+		}
+
+		//i := set(lines[l]).Intersect(set(lines[l+1])).Intersect(set(lines[l+2]))
+		//res += score(i)
 	}
 	return res
 }

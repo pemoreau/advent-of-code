@@ -13,7 +13,7 @@ import (
 var input_day string
 
 func set(s string) utils.Set[uint8] {
-	res := utils.BuildSet[uint8]()
+	res := make(utils.Set[uint8], len(s))
 	for _, c := range s {
 		res.Add(uint8(c))
 	}

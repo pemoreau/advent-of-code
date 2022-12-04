@@ -67,3 +67,11 @@ func (s Set[T]) Intersect(other Set[T]) Set[T] {
 	}
 	return res
 }
+
+func (s Set[T]) MutableIntersect(other Set[T]) {
+	for elem := range s {
+		if !other.Contains(elem) {
+			delete(s, elem)
+		}
+	}
+}

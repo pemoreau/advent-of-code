@@ -5,7 +5,7 @@ import "errors"
 type Stack[T any] []T
 
 func BuildStack[T any]() Stack[T] {
-	return make([]T, 0)
+	return make(Stack[T], 0)
 }
 
 func (s *Stack[T]) Push(c T) {

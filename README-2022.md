@@ -56,15 +56,21 @@ CrZsJsPPZsGzwwsLwLmpwMDw
 ### [Go](./go/2022/03/day03.go)
 Use sets and intersections
 
-## [Day 04: ](https://adventofcode.com/2022/day/4)
+## [Day 04: Camp Cleanup](https://adventofcode.com/2022/day/4)
 
 Example of input:
 
 ```
-
+2-4,6-8
+2-3,4-5
+5-7,7-9
+2-8,3-7
+6-6,4-6
+2-6,4-8
 ```
 
 ### [Go](./go/2022/04/day04.go)
+Nothing special
 
 ## [Day 05: ](https://adventofcode.com/2022/day/5)
 

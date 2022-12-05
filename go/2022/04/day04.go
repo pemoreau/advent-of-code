@@ -13,7 +13,6 @@ import (
 var input_day string
 
 func Part1(input string) int {
-	//input = strings.TrimSuffix(input, "\n")
 	var s scanner.Scanner
 	s.Init(strings.NewReader(input))
 	s.Filename = "example"
@@ -22,7 +21,6 @@ func Part1(input string) int {
 
 	res := 0
 	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
-		//fmt.Printf("%s: %s\n", s.Position, s.TokenText())
 		a, _ := strconv.Atoi(s.TokenText())
 		//s.Scan() // skip -
 		s.Scan()
@@ -42,7 +40,6 @@ func Part1(input string) int {
 }
 
 func Part2(input string) int {
-	//input = strings.TrimSuffix(input, "\n")
 	var s scanner.Scanner
 	s.Init(strings.NewReader(input))
 	s.Whitespace |= 1<<'-' | 1<<',' // skip minus and comma

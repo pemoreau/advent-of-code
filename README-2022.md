@@ -72,15 +72,29 @@ Example of input:
 ### [Go](./go/2022/04/day04.go)
 Nothing special
 
-## [Day 05: ](https://adventofcode.com/2022/day/5)
+## [Day 05: Supply Stacks](https://adventofcode.com/2022/day/5)
 
 Example of input:
 
 ```
+    [D]
+[N] [C]
+[Z] [M] [P]
+ 1   2   3
 
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2
 ```
 
 ### [Go](./go/2022/05/day05.go)
+Use a scanner to collect stack's columns
+
+Allocate and fill al ist of stacks
+
+Use an extra stack for part2
+
 
 ## [Day 06: ](https://adventofcode.com/2022/day/6)
 

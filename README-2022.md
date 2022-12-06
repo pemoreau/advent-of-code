@@ -96,15 +96,16 @@ Allocate and fill al ist of stacks
 Use an extra stack for part2
 
 
-## [Day 06: ](https://adventofcode.com/2022/day/6)
+## [Day 06: Tuning Trouble](https://adventofcode.com/2022/day/6)
 
 Example of input:
 
 ```
-
+bvwbjplbgvbhsrlpgdmjqwftvncz
 ```
 
 ### [Go](./go/2022/06/day06.go)
+Use an array to check the all-diff constraint
 
 ## [Day 07: ](https://adventofcode.com/2022/day/7)
 

@@ -39,10 +39,33 @@ func reverse[S ~[]E, E any](s S) {
 		s[i], s[j] = s[j], s[i]
 	}
 }
+
+func scan(s string, index int) (int, int) {
+	res := 0
+	for i := index; i < len(s); i++ {
+		if s[i] == ' ' {
+			return res, i
+		}
+		res = res*10 + int(s[i]-'0')
+	}
+	return res, len(s)
+}
+
+func parseInstruction(instruction string) (n, src, dest int) {
+	i := 5
+	n, i = scan(instruction, i)
+	i += 6
+	src, i = scan(instruction, i)
+	i += 4
+	dest, i = scan(instruction, i)
+	return
+}
+
 func eval(stacks []utils.Stack[uint8], instructions []string, part2 bool) string {
 	for _, instruction := range instructions {
-		var n, src, dest int
-		fmt.Sscanf(instruction, "move %d from %d to %d", &n, &src, &dest)
+
+		n, src, dest := parseInstruction(instruction)
+
 		if !part2 {
 			e, _ := stacks[src-1].PopN(n)
 			reverse(e)

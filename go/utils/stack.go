@@ -23,6 +23,21 @@ func (s *Stack[T]) Pop() (T, error) {
 	return top, nil
 }
 
+func (s *Stack[T]) PushN(c []T) {
+	*s = append(*s, c...)
+}
+
+func (s *Stack[T]) PopN(n int) ([]T, error) {
+	l := len(*s)
+	if l < n {
+		var zero []T
+		return zero, errors.New("stack is empty")
+	}
+	top := (*s)[l-n:]
+	*s = (*s)[:l-n]
+	return top, nil
+}
+
 func (s *Stack[T]) Peek() (T, error) {
 	if s.IsEmpty() {
 		var zero T

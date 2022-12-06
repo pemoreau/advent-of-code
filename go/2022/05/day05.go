@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
 	"strings"
-	"text/scanner"
 	"time"
 )
 
@@ -16,50 +15,41 @@ func BuildStacks(part0 string) []utils.Stack[uint8] {
 	lines := strings.Split(part0, "\n")
 	stackLines := lines[0 : len(lines)-1]
 	axe := lines[len(lines)-1]
-	columns := make([]int, 0)
-
-	// parse axe
-	var s scanner.Scanner
-	s.Init(strings.NewReader(axe))
-	for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
-		columns = append(columns, s.Position.Column-1)
-	}
 
 	// build stacks
 	stacks := make([]utils.Stack[uint8], 0)
-	for i := 0; i < len(columns); i++ {
+	for i := 1; i < len(axe); i += 4 {
 		stacks = append(stacks, utils.BuildStack[uint8]())
 	}
+
 	// parse stacks
-	for i := len(stackLines) - 1; i >= 0; i-- {
-		for index, j := range columns {
-			if j <= len(stackLines[i]) && stackLines[i][j] != ' ' {
-				stacks[index].Push(stackLines[i][j])
+	reverse(stackLines)
+	for _, line := range stackLines {
+		for i, j := 0, 1; j < len(line); i, j = i+1, j+4 {
+			if line[j] != ' ' {
+				stacks[i].Push(line[j])
 			}
 		}
 	}
 	return stacks
 }
 
+func reverse[S ~[]E, E any](s S) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+}
 func eval(stacks []utils.Stack[uint8], instructions []string, part2 bool) string {
-	tmpStack := utils.BuildStack[uint8]()
 	for _, instruction := range instructions {
 		var n, src, dest int
 		fmt.Sscanf(instruction, "move %d from %d to %d", &n, &src, &dest)
 		if !part2 {
-			for i := 0; i < n; i++ {
-				e, _ := stacks[src-1].Pop()
-				stacks[dest-1].Push(e)
-			}
+			e, _ := stacks[src-1].PopN(n)
+			reverse(e)
+			stacks[dest-1].PushN(e)
 		} else {
-			for i := 0; i < n; i++ {
-				e, _ := stacks[src-1].Pop()
-				tmpStack.Push(e)
-			}
-			for i := 0; i < n; i++ {
-				e, _ := tmpStack.Pop()
-				stacks[dest-1].Push(e)
-			}
+			e, _ := stacks[src-1].PopN(n)
+			stacks[dest-1].PushN(e)
 		}
 	}
 	res := ""

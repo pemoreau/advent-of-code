@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
+	"strconv"
 	"strings"
 	"text/scanner"
 	"time"
@@ -41,11 +42,36 @@ func BuildStacks(part0 string) []utils.Stack[uint8] {
 	return stacks
 }
 
+func scan(s string, index int) (string, int) {
+	for i := index; i < len(s); i++ {
+		if s[i] == ' ' {
+			return s[index:i], i
+		}
+	}
+	return s[index:], len(s)
+}
+
+func parseInstruction(instruction string) (n, src, dest int) {
+	var s string
+	var i int
+	s, i = scan(instruction, 5)
+	n, _ = strconv.Atoi(s)
+	i += 6
+	s, i = scan(instruction, i)
+	src, _ = strconv.Atoi(s)
+	i += 4
+	s, i = scan(instruction, i)
+	dest, _ = strconv.Atoi(s)
+	return
+}
+
 func eval(stacks []utils.Stack[uint8], instructions []string, part2 bool) string {
 	tmpStack := utils.BuildStack[uint8]()
 	for _, instruction := range instructions {
-		var n, src, dest int
-		fmt.Sscanf(instruction, "move %d from %d to %d", &n, &src, &dest)
+
+		n, src, dest := parseInstruction(instruction)
+		//fmt.Sscanf(instruction, "move %d from %d to %d", &n, &src, &dest)
+
 		if !part2 {
 			for i := 0; i < n; i++ {
 				e, _ := stacks[src-1].Pop()

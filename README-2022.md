@@ -89,12 +89,11 @@ move 1 from 1 to 2
 ```
 
 ### [Go](./go/2022/05/day05.go)
-Use a scanner to collect stack's columns
+Use +4 offset to collect columns and build stacks
 
-Allocate and fill al ist of stacks
+Use a hand made parser for instructions (much more efficient than `sscanf`)
 
-Use an extra stack for part2
-
+Use `pushN`, `popN` and `reverse` to move stacks
 
 ## [Day 06: Tuning Trouble](https://adventofcode.com/2022/day/6)
 

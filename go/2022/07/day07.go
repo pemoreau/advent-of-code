@@ -59,12 +59,8 @@ func Part2(input string) int {
 
 	sizes := fs.root.dirsizes()
 	sort.Ints(sizes)
-	for _, s := range sizes {
-		if s > toDelete {
-			return s
-		}
-	}
-	return 0
+	i := sort.Search(len(sizes), func(i int) bool { return sizes[i] >= toDelete })
+	return sizes[i]
 }
 
 func main() {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
 )
 
@@ -33,13 +32,18 @@ func NewFile(name string, size int) *node {
 }
 
 func (n *node) size() int {
-	size := n._size
-	if n.isdir {
-		for _, child := range n.children {
-			size += child.size()
-		}
+	if !n.isdir {
+		return n._size
 	}
-	return size
+
+	if n._size > 0 {
+		return n._size
+	}
+
+	for _, child := range n.children {
+		n._size += child.size()
+	}
+	return n._size
 }
 
 func (fs fs) addNode(node *node) {
@@ -71,9 +75,6 @@ func (fs fs) cd(dir string) {
 		}
 		return
 	}
-	if dir == "." {
-		return
-	}
 	if dir == ".." {
 		if len(*fs.path) > 1 {
 			fs.path.Pop()
@@ -88,18 +89,6 @@ func (fs fs) cd(dir string) {
 			return
 		}
 	}
-}
-
-func (fs fs) String() string {
-	current, _ := fs.path.Peek()
-	return fmt.Sprintf("root: %v\n   -> %v", fs.root, current)
-}
-
-func (n *node) String() string {
-	if n.isdir {
-		return fmt.Sprintf("dir %s %v", n.name, n.children)
-	}
-	return fmt.Sprintf("(%d %v)", n._size, n.name)
 }
 
 func (n *node) search(max int) []*node {

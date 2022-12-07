@@ -10,12 +10,12 @@ import (
 var input_day string
 
 func allDifferent(s string) bool {
-	var tab ['z' + 1]bool
+	var tab [26]bool
 	for i := 0; i < len(s); i++ {
-		if tab[s[i]] {
+		if tab[s[i]-'a'] {
 			return false
 		}
-		tab[s[i]] = true
+		tab[s[i]-'a'] = true
 	}
 	return true
 }

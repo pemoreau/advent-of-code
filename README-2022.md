@@ -106,16 +106,40 @@ bvwbjplbgvbhsrlpgdmjqwftvncz
 ### [Go](./go/2022/06/day06.go)
 Use an array to check the all-diff constraint
 
-## [Day 07: ](https://adventofcode.com/2022/day/7)
+## [Day 07: No Space Left On Device](https://adventofcode.com/2022/day/7)
 
 Example of input:
 
 ```
-
+$ cd /
+$ ls
+dir a
+14848514 b.txt
+8504156 c.dat
+dir d
+$ cd a
+$ ls
+dir e
+29116 f
+2557 g
+62596 h.lst
+$ cd e
+$ ls
+584 i
+$ cd ..
+$ cd ..
+$ cd d
+$ ls
+4060174 j
+8033020 d.log
+5626152 d.ext
+7214296 k
 ```
 
 ### [Go](./go/2022/07/day07.go)
+Not very proud of my solution.
 
+Got a bit confused when combining pointers and interface
 
 ## [Day 08: ](https://adventofcode.com/2022/day/8)
 

@@ -15,10 +15,6 @@ type max struct {
 	N, S, E, W int8
 }
 
-type pos struct {
-	X, Y uint8
-}
-
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
@@ -117,8 +113,6 @@ func Part2(input string) int {
 					break
 				}
 			}
-
-			fmt.Printf("(%d,%d)[%d] --> n:%d s:%d e:%d w:%d\n", j, i, v, n, s, e, w)
 			res = utils.Max(res, n*s*e*w)
 		}
 	}

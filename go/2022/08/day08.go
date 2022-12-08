@@ -23,52 +23,40 @@ func Part1(input string) int {
 	maxY := len(matrix)
 	maxX := len(matrix[0])
 
-	maxmatrix := make([][]max, maxY)
+	m := make([][]max, maxY)
 	for j := 0; j < maxY; j++ {
-		maxmatrix[j] = make([]max, maxX)
+		m[j] = make([]max, maxX)
 		for i := 0; i < maxX; i++ {
 			N := int8(-1)
 			if j > 0 {
-				N = int8(utils.Max(int(maxmatrix[j-1][i].N), int(matrix[j-1][i])))
+				N = int8(utils.Max(int(m[j-1][i].N), int(matrix[j-1][i])))
 			}
 			W := int8(-1)
 			if i > 0 {
-				W = int8(utils.Max(int(maxmatrix[j][i-1].W), int(matrix[j][i-1])))
+				W = int8(utils.Max(int(m[j][i-1].W), int(matrix[j][i-1])))
 			}
-			maxmatrix[j][i] = max{N: N, W: W}
+			m[j][i] = max{N: N, W: W}
 		}
 	}
 	for j := maxY - 1; j >= 0; j-- {
 		for i := maxX - 1; i >= 0; i-- {
 			S := int8(-1)
 			if j < maxY-1 {
-				S = int8(utils.Max(int(maxmatrix[j+1][i].S), int(matrix[j+1][i])))
+				S = int8(utils.Max(int(m[j+1][i].S), int(matrix[j+1][i])))
 			}
 			E := int8(-1)
 			if i < maxX-1 {
-				E = int8(utils.Max(int(maxmatrix[j][i+1].E), int(matrix[j][i+1])))
+				E = int8(utils.Max(int(m[j][i+1].E), int(matrix[j][i+1])))
 			}
-			maxmatrix[j][i] = max{S: S, E: E, N: maxmatrix[j][i].N, W: maxmatrix[j][i].W}
+			m[j][i] = max{S: S, E: E, N: m[j][i].N, W: m[j][i].W}
 		}
 	}
-
-	//for j := 0; j < maxY; j++ {
-	//	for i := 0; i < maxX; i++ {
-	//		if int8(matrix[j][i]) > maxmatrix[j][i].N || int8(matrix[j][i]) > maxmatrix[j][i].S || int8(matrix[j][i]) > maxmatrix[j][i].E || int8(matrix[j][i]) > maxmatrix[j][i].W {
-	//			fmt.Printf("[%d N:%d S%d E:%d W:%d] | ", matrix[j][i],
-	//				maxmatrix[j][i].N, maxmatrix[j][i].S, maxmatrix[j][i].E, maxmatrix[j][i].W)
-	//		} else {
-	//			fmt.Printf(" %d N:%d S%d E:%d W:%d  | ", matrix[j][i],
-	//				maxmatrix[j][i].N, maxmatrix[j][i].S, maxmatrix[j][i].E, maxmatrix[j][i].W)
-	//		}
-	//	}
-	//	fmt.Println()
-	//}
 
 	res := 0
 	for j := 0; j < maxY; j++ {
 		for i := 0; i < maxX; i++ {
-			if int8(matrix[j][i]) > maxmatrix[j][i].N || int8(matrix[j][i]) > maxmatrix[j][i].S || int8(matrix[j][i]) > maxmatrix[j][i].E || int8(matrix[j][i]) > maxmatrix[j][i].W {
+			v := int8(matrix[j][i])
+			if v > m[j][i].N || v > m[j][i].S || v > m[j][i].E || v > m[j][i].W {
 				res++
 			}
 		}

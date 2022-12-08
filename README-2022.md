@@ -141,15 +141,20 @@ Not very proud of my solution.
 
 Got a bit confused when combining pointers and interface
 
-## [Day 08: ](https://adventofcode.com/2022/day/8)
+## [Day 08: Treetop Tree House](https://adventofcode.com/2022/day/8)
 
 Example of input:
 
 ```
-
+30373
+25512
+65332
+33549
+35390
 ```
 
 ### [Go](./go/2022/08/day08.go)
+Not fan of my solution
 
 ## [Day 09: ](https://adventofcode.com/2022/day/9)
 

@@ -13,8 +13,6 @@ import (
 //go:embed input.txt
 var input_day string
 
-// 2906 too low
-
 type Pos struct {
 	x, y int
 }
@@ -82,24 +80,24 @@ func (s *State) Move(dir byte) {
 	}
 }
 
-// var step = map[Pos]Pos{
-// 	{-2, 0}:  {-1, 0},
-// 	{2, 0}:   {1, 0},
-// 	{0, -2}:  {0, -1},
-// 	{0, 2}:   {0, 1},
-// 	{-1, -2}: {0, -1},
-// 	{-1, 2}:  {0, 1},
-// 	{1, -2}:  {0, -1},
-// 	{1, 2}:   {0, 1},
-// 	{-2, -1}: {-1, 0},
-// 	{-2, 1}:  {-1, 0},
-// 	{2, -1}:  {1, 0},
-// 	{2, 1}:   {1, 0},
-// 	{-2, -2}: {-1, -1},
-// 	{-2, 2}:  {-1, 1},
-// 	{2, -2}:  {1, -1},
-// 	{2, 2}:   {1, 1},
-// }
+var step = map[Pos]Pos{
+	{-2, 0}:  {-1, 0},
+	{2, 0}:   {1, 0},
+	{0, -2}:  {0, -1},
+	{0, 2}:   {0, 1},
+	{-1, -2}: {0, -1},
+	{-1, 2}:  {0, 1},
+	{1, -2}:  {0, -1},
+	{1, 2}:   {0, 1},
+	{-2, -1}: {-1, 0},
+	{-2, 1}:  {-1, 0},
+	{2, -1}:  {1, 0},
+	{2, 1}:   {1, 0},
+	{-2, -2}: {-1, -1},
+	{-2, 2}:  {-1, 1},
+	{2, -2}:  {1, -1},
+	{2, 2}:   {1, 1},
+}
 
 func (s *State) MoveTail() {
 	// for i := 1; i < s.n; i++ {
@@ -108,6 +106,8 @@ func (s *State) MoveTail() {
 	// 	if ok {
 	// 		s.rope[i].x = s.rope[i-1].x - d.x
 	// 		s.rope[i].y = s.rope[i-1].y - d.y
+	// 	} else {
+	// 		return
 	// 	}
 	// }
 
@@ -143,8 +143,6 @@ func run(input string, n int) int {
 		for i := 0; i < nb; i++ {
 			state.Move(dir)
 			state.MoveTail()
-			// fmt.Printf("dir %c head: %v, tail: %v\n", dir, state.head, state.tail)
-			// fmt.Println(state)
 		}
 	}
 	return state.path.Len()

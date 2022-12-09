@@ -156,12 +156,19 @@ Example of input:
 ### [Go](./go/2022/08/day08.go)
 Not fan of my solution
 
-## [Day 09: ](https://adventofcode.com/2022/day/9)
+## [Day 09: Rope Bridge](https://adventofcode.com/2022/day/9)
 
 Example of input:
 
 ```
-
+R 4
+U 4
+L 3
+D 1
+R 4
+D 1
+L 5
+R 2
 ```
 
 ### [Go](./go/2022/09/day09.go)

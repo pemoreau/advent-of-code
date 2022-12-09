@@ -3,7 +3,6 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -29,41 +28,7 @@ func NewState(n int) *State {
 		rope: make([]Pos, n),
 		path: utils.BuildSet[Pos](),
 	}
-	for i := 0; i < n; i++ {
-		res.rope[i] = Pos{0, 0}
-	}
 	res.path.Add(res.rope[n-1])
-	return res
-}
-
-func (s *State) String() string {
-	res := ""
-	for y := 15; y >= -6; y-- {
-		for x := -10; x < 10; x++ {
-			output := false
-			for i := 0; i < s.n; i++ {
-				if s.rope[i].x == x && s.rope[i].y == y {
-					if i == 0 {
-						res += "H"
-					} else if i == s.n-1 {
-						res += "T"
-					} else {
-						res += strconv.Itoa(i)
-					}
-					output = true
-					break
-				}
-			}
-			if !output {
-				if s.path.Contains(Pos{x, y}) {
-					res += "#"
-				} else {
-					res += "."
-				}
-			}
-		}
-		res += "\n"
-	}
 	return res
 }
 
@@ -80,53 +45,21 @@ func (s *State) Move(dir byte) {
 	}
 }
 
-var step = map[Pos]Pos{
-	{-2, 0}:  {-1, 0},
-	{2, 0}:   {1, 0},
-	{0, -2}:  {0, -1},
-	{0, 2}:   {0, 1},
-	{-1, -2}: {0, -1},
-	{-1, 2}:  {0, 1},
-	{1, -2}:  {0, -1},
-	{1, 2}:   {0, 1},
-	{-2, -1}: {-1, 0},
-	{-2, 1}:  {-1, 0},
-	{2, -1}:  {1, 0},
-	{2, 1}:   {1, 0},
-	{-2, -2}: {-1, -1},
-	{-2, 2}:  {-1, 1},
-	{2, -2}:  {1, -1},
-	{2, 2}:   {1, 1},
-}
-
 func (s *State) MoveTail() {
-	// for i := 1; i < s.n; i++ {
-	// 	delta := Pos{s.rope[i-1].x - s.rope[i].x, s.rope[i-1].y - s.rope[i].y}
-	// 	d, ok := step[delta]
-	// 	if ok {
-	// 		s.rope[i].x = s.rope[i-1].x - d.x
-	// 		s.rope[i].y = s.rope[i-1].y - d.y
-	// 	} else {
-	// 		return
-	// 	}
-	// }
-
 	for i := 1; i < s.n; i++ {
 		delta := Pos{s.rope[i-1].x - s.rope[i].x, s.rope[i-1].y - s.rope[i].y}
 		if utils.Abs(delta.x) <= 1 && utils.Abs(delta.y) <= 1 {
 			return
 		}
-		if utils.Abs(delta.x) > 1 || utils.Abs(delta.y) > 1 {
-			if delta.y > 0 {
-				s.rope[i].y++
-			} else if delta.y < 0 {
-				s.rope[i].y--
-			}
-			if delta.x > 0 {
-				s.rope[i].x++
-			} else if delta.x < 0 {
-				s.rope[i].x--
-			}
+		if delta.y > 0 {
+			s.rope[i].y++
+		} else if delta.y < 0 {
+			s.rope[i].y--
+		}
+		if delta.x > 0 {
+			s.rope[i].x++
+		} else if delta.x < 0 {
+			s.rope[i].x--
 		}
 	}
 	s.path.Add(s.rope[s.n-1])

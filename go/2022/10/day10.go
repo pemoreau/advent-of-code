@@ -36,29 +36,27 @@ func (s *Signal) value() (int, string) {
 }
 
 type Screen struct {
-	w, h         int
-	lines        []string
-	cursor       int
-	current_line string
+	lines       []string
+	cursor      int
+	currentLine string
 }
 
-func NewScreen(w int) *Screen {
+func NewScreen() *Screen {
 	return &Screen{
-		w:     w,
 		lines: make([]string, 0),
 	}
 }
 
 func (s *Screen) tick(x int) {
 	if s.cursor >= x-1 && s.cursor <= x+1 {
-		s.current_line += "#"
+		s.currentLine += "#"
 	} else {
-		s.current_line += "."
+		s.currentLine += "."
 	}
 	s.cursor++
-	if s.cursor >= s.w {
-		s.lines = append(s.lines, s.current_line)
-		s.current_line = ""
+	if s.cursor >= 40 {
+		s.lines = append(s.lines, s.currentLine)
+		s.currentLine = ""
 		s.cursor = 0
 	}
 }
@@ -94,7 +92,7 @@ func Part1(input string) int {
 	return i
 }
 func Part2(input string) string {
-	_, s := run(input, NewScreen(40))
+	_, s := run(input, NewScreen())
 	return s
 }
 

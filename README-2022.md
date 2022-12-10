@@ -173,16 +173,18 @@ R 2
 
 ### [Go](./go/2022/09/day09.go)
 
-## [Day 10: ](https://adventofcode.com/2022/day/10)
+## [Day 10: Cathode-Ray Tube](https://adventofcode.com/2022/day/10)
 
 Example of input:
 
 ```
-
+noop
+addx 3
+addx -5
 ```
 
 ### [Go](./go/2022/10/day10.go)
-
+Use an interface to write the simulator once and use it for both parts
 
 ## [Day 11: ](https://adventofcode.com/2022/day/11)
 

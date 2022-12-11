@@ -11,12 +11,12 @@ import (
 var input_day string
 
 type Monkey struct {
-	name  int
+	name  int8
 	data  []int
 	op    transformer
 	div   int
-	dest1 int
-	dest2 int
+	dest1 int8
+	dest2 int8
 	done  int
 }
 
@@ -26,11 +26,11 @@ func (m *Monkey) String() string {
 
 func (m *Monkey) step(monkey []*Monkey) {
 	for i := 0; i < len(m.data); i++ {
-		new := m.op(m.data[i])
-		if new%m.div == 0 {
-			monkey[m.dest1].data = append(monkey[m.dest1].data, new)
+		n := m.op(m.data[i])
+		if n%m.div == 0 {
+			monkey[m.dest1].data = append(monkey[m.dest1].data, n)
 		} else {
-			monkey[m.dest2].data = append(monkey[m.dest2].data, new)
+			monkey[m.dest2].data = append(monkey[m.dest2].data, n)
 		}
 		m.done++
 	}
@@ -90,7 +90,7 @@ func GenMonkeys(part int) []*Monkey {
 		if part == 1 {
 			m.op = div(3, m.op)
 		} else {
-			p := 2 * 17 * 19 * 3 * 5 * 13 * 7 * 11
+			var p int = 2 * 17 * 19 * 3 * 5 * 13 * 7 * 11
 			m.op = mod(p, m.op)
 		}
 	}
@@ -105,7 +105,7 @@ func run(part int, n int) int {
 	}
 	work := make([]int, len(monkeys))
 	for i, m := range monkeys {
-		work[i] = m.done
+		work[i] = int(m.done)
 	}
 	sort.Ints(work)
 	return work[len(work)-1] * work[len(work)-2]

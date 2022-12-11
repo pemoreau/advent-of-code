@@ -34,7 +34,7 @@ func (m *Monkey) step(monkey []*Monkey) {
 		}
 		m.done++
 	}
-	m.data = nil
+	m.data = m.data[:0] // faster than nil since underlying array is not deallocated
 }
 
 type transformer func(int) int

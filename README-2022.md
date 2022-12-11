@@ -186,16 +186,32 @@ addx -5
 ### [Go](./go/2022/10/day10.go)
 Use an interface to write the simulator once and use it for both parts
 
-## [Day 11: ](https://adventofcode.com/2022/day/11)
+## [Day 11: Monkey in the Middle](https://adventofcode.com/2022/day/11)
 
 Example of input:
 
 ```
+Monkey 0:
+  Starting items: 79, 98
+  Operation: new = old * 19
+  Test: divisible by 23
+    If true: throw to monkey 2
+    If false: throw to monkey 3
+
+Monkey 1:
+  Starting items: 54, 65, 75, 74
+  Operation: new = old + 6
+  Test: divisible by 19
+    If true: throw to monkey 2
+    If false: throw to monkey 0
 
 ```
 
 ### [Go](./go/2022/11/day11.go)
 
+Used function combinators to implement monkeys
+
+Skip parsing
 
 ## [Day 12: ](https://adventofcode.com/2022/day/12)
 

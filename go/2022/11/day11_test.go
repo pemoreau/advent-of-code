@@ -10,7 +10,7 @@ var input_test string
 
 func TestPart1(t *testing.T) {
 	result := Part1(string(input_test))
-	expected := 0
+	expected := 10605
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}
@@ -18,7 +18,7 @@ func TestPart1(t *testing.T) {
 
 func TestPart1Input(t *testing.T) {
 	result := Part1(string(input_day))
-	expected := 0
+	expected := 112815
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}
@@ -26,7 +26,7 @@ func TestPart1Input(t *testing.T) {
 
 //func TestPart2(t *testing.T) {
 //	result := Part2(string(input_test))
-//	expected := 0
+//	expected := 2713310158
 //	if result != expected {
 //		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 //	}
@@ -34,7 +34,7 @@ func TestPart1Input(t *testing.T) {
 
 //func TestPart2Input(t *testing.T) {
 //	result := Part2(string(input_day))
-//	expected := 0
+//	expected := 25738411485
 //	if result != expected {
 //		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 //	}

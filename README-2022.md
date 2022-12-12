@@ -213,15 +213,25 @@ Used function combinators to implement monkeys
 
 Skip parsing
 
-## [Day 12: ](https://adventofcode.com/2022/day/12)
+## [Day 12: Hill Climbing Algorithm](https://adventofcode.com/2022/day/12)
 
 Example of input:
 
 ```
-
+Sabqponm
+abcryxxl
+accszExk
+acctuvwj
+abdefghi
 ```
 
 ### [Go](./go/2022/12/day12.go)
+Used (overkill) A*, because it was already implemented
+
+For part 2 I considered that all 'a' are neighbors of 'a' (with cost 0).
+The elevation's difference can be used as heuristic
+
+
 
 ## [Day 13: ](https://adventofcode.com/2022/day/13)
 

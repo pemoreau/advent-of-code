@@ -1,10 +1,9 @@
 package main
 
 import (
-	"container/heap"
 	_ "embed"
 	"fmt"
-	"math"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"strings"
 	"time"
 )
@@ -12,54 +11,27 @@ import (
 //go:embed input.txt
 var input_day string
 
-func search(c int16, m matrix) Pos {
-	for j, l := range m {
-		for i, c2 := range l {
-			if c2 == c {
-				return Pos{i, j}
-			}
-		}
-	}
-	return Pos{}
-}
-
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := BuildMatrix(lines)
+	m := utils.BuildIntMatrix(lines)
 	from := search('S', m)
 	to := search('E', m)
-	m[from.j][from.i] = 'a'
-	m[to.j][to.i] = 'z'
-	//fmt.Println(from, to)
-	pa, cost := path(from, to, m)
-	for i := len(pa) - 1; i >= 0; i-- {
-		//fmt.Printf("%v %c\n", pa[i], m[pa[i].j][pa[i].i])
-	}
+	m[from.Y][from.X] = 'a'
+	m[to.Y][to.X] = 'z'
+	_, cost := utils.Path(from, to, m, neighbors, cost, heuristic)
 	return cost
 }
 
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := BuildMatrix(lines)
+	m := utils.BuildIntMatrix(lines)
 
-	min := math.MaxInt
 	from := search('S', m)
 	to := search('E', m)
-	m[from.j][from.i] = 'a'
-	m[to.j][to.i] = 'z'
-
-	for j, l := range m {
-		for i, c := range l {
-			if c == 'a' {
-				from = Pos{i, j}
-				_, cost := path(from, to, m)
-				if cost > 0 && cost < min {
-					min = cost
-				}
-			}
-		}
-	}
-	return min
+	m[from.Y][from.X] = 'a'
+	m[to.Y][to.X] = 'z'
+	_, cost := utils.Path(from, to, m, neighbors2, cost2, heuristic2)
+	return cost
 }
 
 func main() {
@@ -73,31 +45,24 @@ func main() {
 	fmt.Println(time.Since(start))
 }
 
-type matrix [][]int16
-
-func BuildMatrix(lines []string) matrix {
-	m := make([][]int16, len(lines))
-	for j, l := range lines {
-		l = strings.TrimSpace(l)
-		m[j] = make([]int16, len(l))
+func search(v int, m utils.IntMatrix) utils.Pos {
+	for j, l := range m {
 		for i, c := range l {
-			m[j][i] = int16(c)
+			if c == v {
+				return utils.Pos{i, j}
+			}
 		}
 	}
-	return m
+	return utils.Pos{}
 }
 
-func (p Pos) String() string {
-	return fmt.Sprintf("(%d, %d)", p.i, p.j)
-}
-
-func neighboors(m matrix, i, j int) []Pos {
-	pos := []struct{ i, j int }{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
-	res := []Pos{}
+func neighbors(m utils.IntMatrix, i, j int) []utils.Pos {
+	pos := []utils.Pos{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
+	res := []utils.Pos{}
 	for _, p := range pos {
-		if p.j >= 0 && p.j < len(m) && p.i >= 0 && p.i < len(m[0]) {
+		if p.Y >= 0 && p.Y < len(m) && p.X >= 0 && p.X < len(m[0]) {
 			src := m[j][i]
-			dest := m[p.j][p.i]
+			dest := m[p.Y][p.X]
 			if dest-src <= 1 {
 				res = append(res, p)
 			}
@@ -106,18 +71,48 @@ func neighboors(m matrix, i, j int) []Pos {
 	return res
 }
 
-func manhattanDistance(from, to Pos) int {
-	absX := from.i - to.i
-	if absX < 0 {
-		absX = -absX
-	}
-	absY := from.j - to.j
-	if absY < 0 {
-		absY = -absY
-	}
-	return absX + absY
+func cost(from, to utils.Pos, m utils.IntMatrix) int {
+	return 1
 }
 
+func heuristic(from, to utils.Pos, m utils.IntMatrix) int {
+	//return manhattanDistance(from, to)
+	return m[to.Y][to.X] - m[from.Y][from.X]
+}
+
+func neighbors2(m utils.IntMatrix, i, j int) []utils.Pos {
+	n := neighbors(m, i, j)
+	if m[j][i] == 'a' {
+		a := search('a', m)
+		return append(n, a)
+	}
+	return n
+}
+
+func cost2(from, to utils.Pos, m utils.IntMatrix) int {
+	if m[from.Y][from.X] == 'a' && m[to.Y][to.X] == 'a' {
+		return 0
+	}
+	return 1
+}
+
+func heuristic2(from, to utils.Pos, m utils.IntMatrix) int {
+	return m[to.Y][to.X] - m[from.Y][from.X]
+}
+
+//func manhattanDistance(from, to utils.Pos) int {
+//	absX := from.X - to.X
+//	if absX < 0 {
+//		absX = -absX
+//	}
+//	absY := from.Y - to.Y
+//	if absY < 0 {
+//		absY = -absY
+//	}
+//	return absX + absY
+//}
+
+/*
 type Pos struct{ i, j int }
 type node struct {
 	Pos
@@ -125,7 +120,11 @@ type node struct {
 	index    int
 }
 
-func path(start, to Pos, m matrix) (path []Pos, distance int) {
+type heuristicFunction func(from, to Pos, m matrix) int
+type costFunction func(from, to Pos, m matrix) int
+type neighborsFunction func(m matrix, i, j int) []Pos
+
+func path(start, to Pos, m matrix, neighbors neighborsFunction, cost costFunction, heuristic heuristicFunction) (path []Pos, distance int) {
 	frontier := &PriorityQueue{}
 	heap.Init(frontier)
 	heap.Push(frontier, &node{Pos: start, priority: 0})
@@ -150,11 +149,11 @@ func path(start, to Pos, m matrix) (path []Pos, distance int) {
 			return path, costSoFar[to]
 		}
 
-		for _, neighbor := range neighboors(m, current.i, current.j) {
-			newCost := costSoFar[current] + 1
+		for _, neighbor := range neighbors(m, current.i, current.j) {
+			newCost := costSoFar[current] + cost(current, neighbor, m)
 			if _, ok := costSoFar[neighbor]; !ok || newCost < costSoFar[neighbor] {
 				costSoFar[neighbor] = newCost
-				priority := newCost + manhattanDistance(neighbor, to)
+				priority := newCost + heuristic(neighbor, to, m)
 				heap.Push(frontier, &node{Pos: neighbor, priority: priority})
 				cameFrom[neighbor] = current
 			}
@@ -196,3 +195,4 @@ func (pq *PriorityQueue) Pop() interface{} {
 	*pq = old[0 : n-1]
 	return item
 }
+*/

@@ -173,6 +173,8 @@ R 2
 
 ### [Go](./go/2022/09/day09.go)
 
+The rope is represented by an array of positions `[]Pos`, while the path is represented by a `Set[Pos]`
+
 ## [Day 10: Cathode-Ray Tube](https://adventofcode.com/2022/day/10)
 
 Example of input:
@@ -238,7 +240,17 @@ The elevation's difference can be used as heuristic
 Example of input:
 
 ```
+[1,1,3,1,1]
+[1,1,5,1,1]
 
+[[1],[2,3,4]]
+[[1],4]
+
+[9]
+[[8,7,6]]
+
+[[4,4],4,4]
+[[4,4],4,4,4]
 ```
 
 ### [Go](./go/2022/13/day13.go)
@@ -249,7 +261,8 @@ Example of input:
 Example of input:
 
 ```
-
+498,4 -> 498,6 -> 496,6
+503,4 -> 502,4 -> 502,9 -> 494,9
 ```
 
 ### [Go](./go/2022/14/day14.go)

@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"fmt"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -21,14 +20,6 @@ type node struct {
 	id       int
 	value    int
 	children []node
-}
-
-func (n node) String() string {
-	if n.id == VALUE {
-		return strconv.Itoa(n.value)
-	} else {
-		return fmt.Sprintf("%v", n.children)
-	}
 }
 
 func parseInt(s string, i int) (int, int) {
@@ -61,24 +52,6 @@ func parseList(s string, i int) (node, int) {
 	}
 	i++ // skip ]
 	return node{id: LIST, children: current}, i
-}
-
-func equals(a, b node) bool {
-	if a.id == VALUE && b.id == VALUE {
-		return a.value == b.value
-	}
-	if a.id == LIST && b.id == LIST {
-		if len(a.children) != len(b.children) {
-			return false
-		}
-		for i := 0; i < len(a.children); i++ {
-			if !equals(a.children[i], b.children[i]) {
-				return false
-			}
-		}
-		return true
-	}
-	return false
 }
 
 func compare(a, b node) int {
@@ -118,7 +91,6 @@ func Part1(input string) int {
 		}
 		index++
 	}
-	//lines := strings.Split(input, "\n")
 	return res
 }
 
@@ -137,26 +109,10 @@ func Part2(input string) int {
 	}
 
 	sort.Slice(l, func(i, j int) bool { return compare(l[i], l[j]) > 0 })
-	//fmt.Println(l)
-	i1, i2 := 0, 0
-	//t1 := node{id: LIST, children: []node{node{id: LIST, children: []node{node{id: VALUE, value: 2}}}}}
-	//t2 := node{id: LIST, children: []node{node{id: LIST, children: []node{node{id: VALUE, value: 6}}}}}
 	t1, _ := parseList("[[2]]", 0)
 	t2, _ := parseList("[[6]]", 0)
-	for i := 0; i < len(l); i++ {
-		if equals(l[i], t1) {
-			i1 = i
-		}
-		if equals(l[i], t2) {
-			i2 = i
-		}
-	}
-	//t1, _ := parseList("[[2]]", 0)
-	//t2, _ := parseList("[[6]]", 0)
-	//i1 := sort.Search(len(l), func(i int) bool { return equals(l[i], t1) })
-	//i2 := sort.Search(len(l), func(i int) bool { return equals(l[i], t2) })
-
-	//lines := strings.Split(input, "\n")
+	i1 := sort.Search(len(l), func(i int) bool { return compare(l[i], t1) <= 0 })
+	i2 := sort.Search(len(l), func(i int) bool { return compare(l[i], t2) <= 0 })
 	return (i1 + 1) * (i2 + 1)
 
 }

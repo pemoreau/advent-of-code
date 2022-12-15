@@ -293,13 +293,13 @@ Sensor at x=20, y=1: closest beacon is at x=15, y=3
 
 Nice problem!
 
-I have use a list of disjoint intervals to represent empty space for a given horizontal line `y`
+I have used a list of disjoint intervals to represent empty space for a given horizontal line `y`
 
 Given `y`, each interval corresponds to `[s.x - r, s.x + r]` where `r` is the distance from the sensor to the line `y`
 
-To solve part 2, the intervals are merge into a unique one for each `y`. When this results in more than a unique interval, a solution is found
+To solve part 2, the intervals are merged into a unique one for each `y`. When this results in more than a unique interval, a solution is found
 
-Use go routines to speed up the computation :-)
+Used go routines to speed up the computation :-)
 
 ## [Day 16: ](https://adventofcode.com/2022/day/16)
 

@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
-	"math"
 	"strings"
 	"time"
 )
@@ -20,66 +19,6 @@ type sensor struct {
 
 type beacon struct {
 	x, y int
-}
-
-func manhattanDistance(xa, ya, xb, yb int) int {
-	return utils.Abs(xa-xb) + utils.Abs(ya-yb)
-}
-
-func free(ty int, sensors []sensor, beacons utils.Set[beacon], min, max int) int {
-	candidates := make([]sensor, 0)
-
-	xmin := math.MaxInt
-	xmax := math.MinInt
-	for _, s := range sensors {
-		if utils.Abs(s.y-ty) <= s.dist {
-			candidates = append(candidates, s)
-			xmin = utils.Min(xmin, s.x-s.dist)
-			xmax = utils.Max(xmax, s.x+s.dist)
-		}
-	}
-	//fmt.Println("sensors: ", len(sensors))
-	//fmt.Println("candidates: ", len(candidates))
-	//fmt.Println("xmin: ", xmin)
-	//fmt.Println("xmax: ", xmax)
-
-	res := 0
-	for b := range beacons {
-		if b.y == ty {
-			res--
-			//fmt.Printf("beacon at y=%d: %v\n", ty, b)
-		}
-	}
-	for x := utils.Max(xmin, min); x <= utils.Min(xmax, max); x++ {
-		for _, s := range candidates {
-			d := manhattanDistance(x, ty, s.x, s.y)
-			if d <= s.dist {
-				res++
-				break
-			}
-		}
-	}
-	return res
-}
-
-func Part1(input string) int {
-	input = strings.TrimSuffix(input, "\n")
-	lines := strings.Split(input, "\n")
-	sensors := make([]sensor, 0)
-	beacons := utils.BuildSet[beacon]()
-	for _, line := range lines {
-		var xs, ys, xb, yb int
-		fmt.Sscanf(line, "Sensor at x=%d, y=%d: closest beacon is at x=%d, y=%d", &xs, &ys, &xb, &yb)
-		b := beacon{xb, yb}
-		s := sensor{xs, ys, &b, manhattanDistance(xs, ys, xb, yb)}
-		sensors = append(sensors, s)
-		beacons.Add(b)
-	}
-	xmin := math.MinInt
-	xmax := math.MaxInt
-	return free(10, sensors, beacons, xmin, xmax)
-	//return free(2000000)
-
 }
 
 // ordered list of disjoint intervals
@@ -160,136 +99,70 @@ func (fs *FreeSpace) Intersect(interval utils.Interval) {
 	fs.intervals = newSet
 }
 
-//func (fs *FreeSpace) Add(interval utils.Interval) {
-//	// https://coderbyte.com/algorithm/insert-interval-into-list-of-sorted-disjoint-intervals
-//	newSet := make([]utils.Interval, 0)
-//	run := true
-//	for _, v := range fs.intervals {
-//		if run {
-//			if (v.Min <= interval.Min && interval.Min <= v.Max) || interval.Min <= v.Min {
-//				newSet = append(newSet, utils.Interval{utils.Min(v.Min, interval.Min), utils.Max(v.Max, interval.Max)})
-//				run = false
-//			} else {
-//				newSet = append(newSet, v)
-//			}
-//		} else {
-//			newSet = append(newSet, v)
-//		}
-//	}
-//	if run {
-//		newSet = append(newSet, interval)
-//	}
-//	fs.intervals = newSet
-//}
+func (fs *FreeSpace) Cardinality() int {
+	res := 0
+	for _, i := range fs.intervals {
+		res += i.Max - i.Min + 1
+	}
+	return res
+}
 
-func Part2(input string) int {
+func getLine(sensors []sensor, ty int) FreeSpace {
+	line := FreeSpace{}
+	for _, s := range sensors {
+		r := s.dist - utils.Abs(s.y-ty)
+		if r > 0 {
+			line.Add(utils.Interval{s.x - r, s.x + r})
+		}
+	}
+	line.Merge()
+	return line
+}
+
+func manhattanDistance(xa, ya, xb, yb int) int {
+	return utils.Abs(xa-xb) + utils.Abs(ya-yb)
+}
+
+func parse(input string) []sensor {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 	sensors := make([]sensor, 0)
-	beacons := utils.BuildSet[beacon]()
 	for _, line := range lines {
 		var xs, ys, xb, yb int
 		fmt.Sscanf(line, "Sensor at x=%d, y=%d: closest beacon is at x=%d, y=%d", &xs, &ys, &xb, &yb)
 		b := beacon{xb, yb}
 		s := sensor{xs, ys, &b, manhattanDistance(xs, ys, xb, yb)}
 		sensors = append(sensors, s)
-		beacons.Add(b)
 	}
+	return sensors
+}
 
+func Part1(input string) int {
+	sensors := parse(input)
+	ty := 2000000
+	beacons := utils.BuildSet[beacon]()
+	for _, s := range sensors {
+		if s.beacon.y == ty {
+			beacons.Add(*s.beacon)
+		}
+	}
+	line := getLine(sensors, ty)
+	return line.Cardinality() - len(beacons)
+}
+
+func Part2(input string) int {
+	sensors := parse(input)
 	MAX := 4000000
 
 	for ty := 0; ty < MAX+1; ty++ {
-		line := FreeSpace{}
-		for _, s := range sensors {
-			r := s.dist - utils.Abs(s.y-ty)
-			if r > 0 {
-				line.Add(utils.Interval{s.x - r, s.x + r})
-			}
-		}
-		line.Merge()
+		line := getLine(sensors, ty)
 		line.Intersect(utils.Interval{0, MAX})
 		if len(line.intervals) > 1 {
 			tx := line.intervals[0].Max + 1
-			fmt.Println(tx, ty, line)
 			return 4000000*tx + ty
 		}
-
 	}
-	//x = 2721114
-	//y = 3367718
-	//10884459367718
-
-	//MIN := 0
-	////MAX := 20
-	//MAX := 4000000
-	//for ty := MIN; ty < MAX+1; ty++ {
-	//	if ty%10000 == 0 {
-	//		fmt.Println(ty)
-	//	}
-	//	nb := 0
-	//	for b := range beacons {
-	//		if b.y == ty {
-	//			nb++
-	//			//fmt.Printf("beacon at y=%d: %v\n", ty, b)
-	//		}
-	//	}
-	//
-	//	f := free(ty, sensors, beacons, MIN, MAX)
-	//	if nb+f < (MAX - MIN + 1) {
-	//		fmt.Printf("ty=%d: %d\n", ty, f)
-	//		for tx := MIN; tx <= MAX; tx++ {
-	//			marked := false
-	//			for _, s := range sensors {
-	//				d := manhattanDistance(tx, ty, s.x, s.y)
-	//				if d <= s.dist {
-	//					marked = true
-	//					break
-	//				}
-	//			}
-	//			if !marked {
-	//				return 4000000*tx + ty
-	//			}
-	//		}
-	//	}
-	//}
-
-	//	fmt.Println("ty: ", ty)
-	//	candidates := make([]sensor, 0)
-	//	xmin := math.MaxInt
-	//	xmax := math.MinInt
-	//	for _, s := range sensors {
-	//		if utils.Abs(s.y-ty) <= s.dist {
-	//			candidates = append(candidates, s)
-	//			xmin = utils.Min(xmin, s.x-s.dist)
-	//			xmax = utils.Max(xmax, s.x+s.dist)
-	//		}
-	//	}
-	//	fmt.Println("sensors: ", len(sensors))
-	//	fmt.Println("candidates: ", len(candidates))
-	//	fmt.Println("xmin: ", xmin)
-	//	fmt.Println("xmax: ", xmax)
-	//
-	//	res := 0
-	//	for b := range beacons {
-	//		if b.y == ty {
-	//			res--
-	//			fmt.Println("beacon at y=20: ", b)
-	//		}
-	//	}
-	//
-	//	for tx := utils.Max(0, xmin); tx < utils.Min(21, xmax); tx++ {
-	//		fmt.Println("tx: ", tx)
-	//		for _, s := range candidates {
-	//			d := manhattanDistance(tx, ty, s.x, s.y)
-	//			if d <= s.dist {
-	//				res := 4000000*tx + ty
-	//				return res
-	//			}
-	//		}
-	//	}
-	//}
 	return 0
-
 }
 
 func main() {

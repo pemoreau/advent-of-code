@@ -1,6 +1,12 @@
 package utils
 
+import "fmt"
+
 type Interval struct{ Min, Max int }
+
+func (i Interval) String() string {
+	return fmt.Sprintf("[%d, %d]", i.Min, i.Max)
+}
 
 // https{//stackoverflow.com/questions/31057473/calculating-the-modulo-of-two-Intervals
 func (i Interval) Len() int {

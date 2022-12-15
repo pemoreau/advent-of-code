@@ -111,8 +111,10 @@ func Part2(input string) int {
 	sort.Slice(l, func(i, j int) bool { return compare(l[i], l[j]) > 0 })
 	t1, _ := parseList("[[2]]", 0)
 	t2, _ := parseList("[[6]]", 0)
-	i1 := sort.Search(len(l), func(i int) bool { return compare(l[i], t1) <= 0 })
-	i2 := sort.Search(len(l), func(i int) bool { return compare(l[i], t2) <= 0 })
+	//i1 := sort.Search(len(l), func(i int) bool { return compare(l[i], t1) <= 0 })
+	//i2 := sort.Search(len(l), func(i int) bool { return compare(l[i], t2) <= 0 })
+	i1, _ := sort.Find(len(l), func(i int) int { return compare(l[i], t1) })
+	i2, _ := sort.Find(len(l), func(i int) int { return compare(l[i], t2) })
 	return (i1 + 1) * (i2 + 1)
 
 }

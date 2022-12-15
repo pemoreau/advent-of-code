@@ -299,6 +299,7 @@ Given `y`, each interval corresponds to `[s.x - r, s.x + r]` where `r` is the di
 
 To solve part 2, the intervals are merge into a unique one for each `y`. When this results in more than a unique interval, a solution is found
 
+Use go routines to speed up the computation :-)
 
 ## [Day 16: ](https://adventofcode.com/2022/day/16)
 

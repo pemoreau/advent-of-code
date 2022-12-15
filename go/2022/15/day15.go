@@ -154,15 +154,35 @@ func Part2(input string) int {
 	sensors := parse(input)
 	MAX := 4000000
 
-	for ty := 0; ty < MAX+1; ty++ {
-		line := getLine(sensors, ty)
-		line.Intersect(utils.Interval{0, MAX})
-		if len(line.intervals) > 1 {
-			tx := line.intervals[0].Max + 1
-			return 4000000*tx + ty
-		}
+	//for ty := 0; ty < MAX+1; ty++ {
+	//	line := getLine(sensors, ty)
+	//	line.Intersect(utils.Interval{0, MAX})
+	//	if len(line.intervals) > 1 {
+	//		tx := line.intervals[0].Max + 1
+	//		return 4000000*tx + ty
+	//	}
+	//}
+	N := 10
+	STEP := MAX / N
+	messages := make(chan int)
+
+	for i := 0; i < MAX; i = i + STEP {
+		go func(messages chan int, min, max int) {
+			//fmt.Println("Starting", min, max)
+			for ty := min; ty < max+1; ty++ {
+				line := getLine(sensors, ty)
+				line.Intersect(utils.Interval{0, MAX})
+				if len(line.intervals) > 1 {
+					tx := line.intervals[0].Max + 1
+					//fmt.Println("Found", tx, ty)
+					messages <- 4000000*tx + ty
+				}
+			}
+		}(messages, i, (i+STEP)-1)
 	}
-	return 0
+
+	res := <-messages
+	return res
 }
 
 func main() {

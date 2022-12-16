@@ -162,7 +162,7 @@ func Part2(input string) int {
 	//		return 4000000*tx + ty
 	//	}
 	//}
-	N := 10
+	N := 100
 	STEP := MAX / N
 	messages := make(chan int)
 

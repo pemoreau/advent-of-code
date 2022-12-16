@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
 	"math"
+	"sort"
 	"strings"
 	"time"
 )
@@ -132,21 +133,31 @@ func Part1(input string) int {
 	}
 
 	res := findMaxProduction(valves, start)
-	//p, _ := path(start, valves)
-	//fmt.Println(p)
-	//res := 0
-	//for _, n := range p {
-	//	res += (30 - n.time) * valves[n.name].rate
-	//}
 	return res
-	// 850 too low
 }
 
-func Part2(input string) int {
-	// input = strings.TrimSuffix(input, "\n")
-	// lines := strings.Split(input, "\n")
-	return 0
+var keys []string
+var space map[State3]int
 
+func Part2(input string) int {
+	valves := parse(input)
+	start := State2{
+		name1: "AA",
+		name2: "AA",
+		time1: 0,
+		time2: 0,
+		prod:  0,
+		path:  []string{},
+	}
+	for k := range valves {
+		keys = append(keys, k)
+	}
+	space = make(map[State3]int)
+	sort.Strings(keys)
+	fmt.Println("keys", keys)
+	res := findMaxProduction2(valves, start)
+	return res
+	//2184 too low
 }
 
 func main() {
@@ -166,8 +177,7 @@ func findMaxProduction(network Network, start State) int {
 	for len(queue) > 0 {
 		current := queue[0]
 		queue = queue[1:]
-		fmt.Println("current", current)
-
+		//fmt.Println("current", current)
 		maxProd = utils.Max(maxProd, current.prod)
 		n := neighbors(network, current)
 		for _, s := range n {
@@ -177,33 +187,94 @@ func findMaxProduction(network Network, start State) int {
 	return maxProd
 }
 
-type node struct {
-	State
-	priority int
-	index    int
-}
-
 type State2 struct {
-	name string
-	time int
-	path utils.Set[string]
-	prod int
+	name1 string
+	name2 string
+	time1 int
+	time2 int
+	path  []string
+	prod  int
 }
 
-func neighbors2(network Network, s State) []State {
-	res := []State{}
-	for name := range network {
-		candidate := network[name]
-		cost := network[s.name].cost[name]
-		if candidate.rate > 0 && !contains(s.path, candidate.name) && s.time+cost <= 30 {
-			res = append(res, State{
-				name: candidate.name,
-				time: s.time + cost,
-				path: s.path + candidate.name,
-				prod: s.prod + (30-(s.time+cost))*candidate.rate,
-			})
+type State3 struct {
+	name1 string
+	name2 string
+	time1 int
+	time2 int
+	path  string
+}
 
+func neighbors2(network Network, s State2) []State2 {
+	res := []State2{}
+	for i := 0; i < len(keys); i++ {
+		for j := 0; j < len(keys); j++ {
+			if i == j {
+				continue
+			}
+			name1 := keys[i]
+			name2 := keys[j]
+			candidate1 := network[name1]
+			candidate2 := network[name2]
+			cost1 := network[s.name1].cost[name1]
+			cost2 := network[s.name2].cost[name2]
+			activeCandidates := candidate1.rate > 0 && candidate2.rate > 0
+			notVisited := !listContains(s.path, candidate1.name) && !listContains(s.path, candidate2.name)
+			if activeCandidates && notVisited && s.time1+cost1 <= 26 && s.time2+cost2 <= 26 {
+				prod1 := (26 - (s.time1 + cost1)) * candidate1.rate
+				prod2 := (26 - (s.time2 + cost2)) * candidate2.rate
+				newPath := make([]string, len(s.path)+2)
+				copy(newPath, s.path)
+				newPath[len(s.path)] = candidate1.name
+				newPath[len(s.path)+1] = candidate2.name
+				//newPath := s.path + candidate1.name + candidate2.name
+				res = append(res, State2{
+					name1: candidate1.name,
+					name2: candidate2.name,
+					time1: s.time1 + cost1,
+					time2: s.time2 + cost2,
+					path:  newPath,
+					prod:  s.prod + prod1 + prod2,
+				})
+
+			}
 		}
 	}
 	return res
+}
+func findMaxProduction2(network Network, start State2) int {
+	queue := []State2{start}
+	maxProd := math.MinInt
+	cpt := 0
+	for len(queue) > 0 {
+		current := queue[0]
+		queue = queue[1:]
+
+		sort.Strings(current.path)
+		s3 := State3{
+			name1: current.name1,
+			name2: current.name2,
+			time1: current.time1,
+			time2: current.time2,
+			path:  strings.Join(current.path, ""),
+		}
+		if _, ok := space[s3]; ok {
+			//fmt.Println("already visited", s3, n)
+			continue
+		} else {
+			space[s3]++
+		}
+
+		//fmt.Println("current", current)
+		maxProd = utils.Max(maxProd, current.prod)
+		n := neighbors2(network, current)
+		for _, s := range n {
+			queue = append(queue, s)
+		}
+		cpt++
+		if cpt%1000 == 0 {
+			fmt.Println("cpt", cpt, "len", len(queue))
+			fmt.Println("current", current)
+		}
+	}
+	return maxProd
 }

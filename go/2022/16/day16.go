@@ -1,9 +1,10 @@
 package main
 
 import (
-	"container/heap"
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
+	"math"
 	"strings"
 	"time"
 )
@@ -16,12 +17,6 @@ type Valve struct {
 	rate int
 	dest []string
 	cost map[string]int
-}
-
-type State struct {
-	name string
-	time int
-	path string
 }
 
 type Network map[string]*Valve
@@ -45,6 +40,7 @@ func neighbors(network Network, s State) []State {
 				name: candidate.name,
 				time: s.time + cost,
 				path: s.path + candidate.name,
+				prod: s.prod + (30-(s.time+cost))*candidate.rate,
 			})
 
 		}
@@ -119,19 +115,29 @@ func distance(start, end string, network Network, path []string) []string {
 	return shortest
 }
 
+type State struct {
+	name string
+	time int
+	path string
+	prod int
+}
+
 func Part1(input string) int {
 	valves := parse(input)
 	start := State{
 		name: "AA",
 		time: 0,
+		prod: 0,
 		path: "",
 	}
-	p, _ := path(start, valves)
-	fmt.Println(p)
-	res := 0
-	for _, n := range p {
-		res += (30 - n.time) * valves[n.name].rate
-	}
+
+	res := findMaxProduction(valves, start)
+	//p, _ := path(start, valves)
+	//fmt.Println(p)
+	//res := 0
+	//for _, n := range p {
+	//	res += (30 - n.time) * valves[n.name].rate
+	//}
 	return res
 	// 850 too low
 }
@@ -154,83 +160,50 @@ func main() {
 	fmt.Println(time.Since(start))
 }
 
+func findMaxProduction(network Network, start State) int {
+	queue := []State{start}
+	maxProd := math.MinInt
+	for len(queue) > 0 {
+		current := queue[0]
+		queue = queue[1:]
+		fmt.Println("current", current)
+
+		maxProd = utils.Max(maxProd, current.prod)
+		n := neighbors(network, current)
+		for _, s := range n {
+			queue = append(queue, s)
+		}
+	}
+	return maxProd
+}
+
 type node struct {
 	State
 	priority int
 	index    int
 }
 
-func path(start State, network Network) (path []State, distance int) {
-	frontier := &PriorityQueue{}
-	heap.Init(frontier)
-	heap.Push(frontier, &node{State: start, priority: 0})
+type State2 struct {
+	name string
+	time int
+	path utils.Set[string]
+	prod int
+}
 
-	cameFrom := map[State]State{start: start}
-	costSoFar := map[State]int{start: 0}
+func neighbors2(network Network, s State) []State {
+	res := []State{}
+	for name := range network {
+		candidate := network[name]
+		cost := network[s.name].cost[name]
+		if candidate.rate > 0 && !contains(s.path, candidate.name) && s.time+cost <= 30 {
+			res = append(res, State{
+				name: candidate.name,
+				time: s.time + cost,
+				path: s.path + candidate.name,
+				prod: s.prod + (30-(s.time+cost))*candidate.rate,
+			})
 
-	for {
-		if frontier.Len() == 0 {
-			// There's no path, return found false.
-			return
-		}
-		current := heap.Pop(frontier).(*node).State
-		n := neighbors(network, current)
-		if len(n) == 0 {
-			// Found a path to the goal.
-			path := []State{}
-			curr := current
-			for curr != start {
-				path = append(path, curr)
-				curr = cameFrom[curr]
-			}
-			return path, costSoFar[current]
-		}
-
-		for _, neighbor := range n {
-			fmt.Println("neighbor", neighbor)
-			prod := (30 - current.time) * network[current.name].rate
-			newCost := costSoFar[current] + (100000 - prod)
-			if _, ok := costSoFar[neighbor]; !ok || newCost < costSoFar[neighbor] {
-				costSoFar[neighbor] = newCost
-				priority := newCost //+ manhattanDistance(neighbor, to)
-				heap.Push(frontier, &node{State: neighbor, priority: priority})
-				cameFrom[neighbor] = current
-			}
 		}
 	}
-}
-
-// A PriorityQueue implements heap.Interface and holds Items.
-// Code copied from https://pkg.go.dev/container/heap@go1.17.5
-type PriorityQueue []*node
-
-func (pq PriorityQueue) Len() int {
-	return len(pq)
-}
-
-func (pq PriorityQueue) Less(i, j int) bool {
-	return pq[i].priority < pq[j].priority
-}
-
-func (pq PriorityQueue) Swap(i, j int) {
-	pq[i], pq[j] = pq[j], pq[i]
-	pq[i].index = i
-	pq[j].index = j
-}
-
-func (pq *PriorityQueue) Push(x interface{}) {
-	n := len(*pq)
-	item := x.(*node)
-	item.index = n
-	*pq = append(*pq, item)
-}
-
-func (pq *PriorityQueue) Pop() interface{} {
-	old := *pq
-	n := len(old)
-	item := old[n-1]
-	old[n-1] = nil  // avoid memory leak
-	item.index = -1 // for safety
-	*pq = old[0 : n-1]
-	return item
+	return res
 }

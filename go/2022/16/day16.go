@@ -14,33 +14,26 @@ import (
 var input_day string
 
 type Valve struct {
-	name string
+	name int
 	rate int
-	dest []string
-	cost map[string]int
+	dest []int
+	cost map[int]int
 }
 
-type Network map[string]*Valve
-
-func contains(path string, name string) bool {
-	for i := 0; i < len(path); i = i + 2 {
-		if path[i:i+2] == name {
-			return true
-		}
-	}
-	return false
-}
+type Network map[int]*Valve
 
 func neighbors(network Network, s State) []State {
 	res := []State{}
 	for name := range network {
 		candidate := network[name]
 		cost := network[s.name].cost[name]
-		if candidate.rate > 0 && !contains(s.path, candidate.name) && s.time+cost <= 30 {
+		if candidate.rate > 0 && !s.path[candidate.name] && s.time+cost <= 30 {
+			newPath := s.path
+			newPath[candidate.name] = true
 			res = append(res, State{
 				name: candidate.name,
 				time: s.time + cost,
-				path: s.path + candidate.name,
+				path: newPath,
 				prod: s.prod + (30-(s.time+cost))*candidate.rate,
 			})
 
@@ -49,39 +42,48 @@ func neighbors(network Network, s State) []State {
 	return res
 }
 
-func parse(input string) Network {
+func parse(input string) (Network, int) {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
-	valves := make(map[string]*Valve)
+	valves := make(map[int]*Valve)
+
+	cpt := 0
+	toint := map[string]int{}
+	for _, line := range lines {
+		values := strings.Split(line, " ")
+		toint[values[1]] = cpt
+		cpt++
+	}
+
 	for _, line := range lines {
 		values := strings.Split(line, " ")
 		name := values[1]
 		var rate int
 		fmt.Sscanf(values[4], "rate=%d;", &rate)
-		dest := []string{}
+		dest := []int{}
 		for i := 9; i < len(values); i++ {
-			dest = append(dest, strings.TrimPrefix(strings.TrimSuffix(values[i], ","), " "))
+			dest = append(dest, toint[strings.TrimPrefix(strings.TrimSuffix(values[i], ","), " ")])
 		}
-		valves[name] = &Valve{
-			name: name,
+		valves[toint[name]] = &Valve{
+			name: toint[name],
 			rate: rate,
 			dest: dest,
 		}
 	}
 	for k := range valves {
-		valves[k].cost = make(map[string]int)
+		valves[k].cost = make(map[int]int)
 		for d := range valves {
 			if valves[d].rate > 0 {
-				valves[k].cost[d] = len(distance(k, d, valves, []string{}))
+				valves[k].cost[d] = len(distance(k, d, valves, []int{}))
 			}
 		}
 		fmt.Println(k, valves[k].cost)
 	}
-	return valves
+	return valves, toint["AA"]
 }
 
-func listContains(list []string, name string) bool {
+func listContains(list []int, name int) bool {
 	for _, n := range list {
 		if n == name {
 			return true
@@ -90,7 +92,7 @@ func listContains(list []string, name string) bool {
 	return false
 }
 
-func distance(start, end string, network Network, path []string) []string {
+func distance(start, end int, network Network, path []int) []int {
 	//fmt.Println("start", start, "end", end, "path", path)
 	path = append(path, start)
 	//fmt.Println("path", path)
@@ -99,9 +101,9 @@ func distance(start, end string, network Network, path []string) []string {
 	}
 	if _, ok := network[start]; !ok {
 		//fmt.Println("not found", start)
-		return []string{}
+		return []int{}
 	}
-	shortest := []string{}
+	shortest := []int{}
 	for _, n := range network[start].dest {
 		//fmt.Println("n", n)
 		if !listContains(path, n) {
@@ -117,43 +119,43 @@ func distance(start, end string, network Network, path []string) []string {
 }
 
 type State struct {
-	name string
+	name int
 	time int
-	path string
+	path [128]bool
 	prod int
 }
 
 func Part1(input string) int {
-	valves := parse(input)
+	valves, name := parse(input)
 	start := State{
-		name: "AA",
+		name: name,
 		time: 0,
 		prod: 0,
-		path: "",
+		path: [128]bool{},
 	}
 
 	res := findMaxProduction(valves, start)
 	return res
 }
 
-var keys []string
+var keys []int
 var space map[State3]int
 
 func Part2(input string) int {
-	valves := parse(input)
+	valves, name := parse(input)
 	start := State2{
-		name1: "AA",
-		name2: "AA",
+		name1: name,
+		name2: name,
 		time1: 0,
 		time2: 0,
 		prod:  0,
-		path:  []string{},
+		path:  [128]bool{},
 	}
 	for k := range valves {
 		keys = append(keys, k)
 	}
 	space = make(map[State3]int)
-	sort.Strings(keys)
+	sort.Ints(keys)
 	fmt.Println("keys", keys)
 	res := findMaxProduction2(valves, start)
 	return res
@@ -188,20 +190,33 @@ func findMaxProduction(network Network, start State) int {
 }
 
 type State2 struct {
-	name1 string
-	name2 string
+	name1 int
+	name2 int
 	time1 int
 	time2 int
-	path  []string
+	path  [128]bool
 	prod  int
 }
 
+func (s State2) String() string {
+	bits := 0
+	for i := 0; i < len(s.path); i++ {
+		if s.path[i] {
+			bits++
+		}
+	}
+	return fmt.Sprintf("%d %d t1=%d t2=%d [%d] prod=%d", s.name1, s.name2, s.time1, s.time2, bits, s.prod)
+}
+func (s State3) String() string {
+	return fmt.Sprintf("%d %d t1=%d t2=%d", s.name1, s.name2, s.time1, s.time2)
+}
+
 type State3 struct {
-	name1 string
-	name2 string
+	name1 int
+	name2 int
 	time1 int
 	time2 int
-	path  string
+	path  [128]bool
 }
 
 func neighbors2(network Network, s State2) []State2 {
@@ -218,29 +233,42 @@ func neighbors2(network Network, s State2) []State2 {
 			cost1 := network[s.name1].cost[name1]
 			cost2 := network[s.name2].cost[name2]
 			activeCandidates := candidate1.rate > 0 && candidate2.rate > 0
-			notVisited := !listContains(s.path, candidate1.name) && !listContains(s.path, candidate2.name)
+			notVisited := !s.path[candidate1.name] && !s.path[candidate2.name]
 			if activeCandidates && notVisited && s.time1+cost1 <= 26 && s.time2+cost2 <= 26 {
 				prod1 := (26 - (s.time1 + cost1)) * candidate1.rate
 				prod2 := (26 - (s.time2 + cost2)) * candidate2.rate
-				newPath := make([]string, len(s.path)+2)
-				copy(newPath, s.path)
-				newPath[len(s.path)] = candidate1.name
-				newPath[len(s.path)+1] = candidate2.name
-				//newPath := s.path + candidate1.name + candidate2.name
-				res = append(res, State2{
+				newPath := s.path
+				newPath[candidate1.name] = true
+				newPath[candidate2.name] = true
+				newProd := s.prod + prod1 + prod2
+				s3 := State3{
 					name1: candidate1.name,
 					name2: candidate2.name,
 					time1: s.time1 + cost1,
 					time2: s.time2 + cost2,
 					path:  newPath,
-					prod:  s.prod + prod1 + prod2,
-				})
+				}
+				if oldProd, ok := space[s3]; ok && newProd <= oldProd {
+					// do nothing
+					//fmt.Println("skip", s3, newProd, oldProd)
+				} else {
+					space[s3] = newProd
+					res = append(res, State2{
+						name1: candidate1.name,
+						name2: candidate2.name,
+						time1: s.time1 + cost1,
+						time2: s.time2 + cost2,
+						path:  newPath,
+						prod:  newProd,
+					})
+				}
 
 			}
 		}
 	}
 	return res
 }
+
 func findMaxProduction2(network Network, start State2) int {
 	queue := []State2{start}
 	maxProd := math.MinInt
@@ -249,20 +277,20 @@ func findMaxProduction2(network Network, start State2) int {
 		current := queue[0]
 		queue = queue[1:]
 
-		sort.Strings(current.path)
-		s3 := State3{
-			name1: current.name1,
-			name2: current.name2,
-			time1: current.time1,
-			time2: current.time2,
-			path:  strings.Join(current.path, ""),
-		}
-		if _, ok := space[s3]; ok {
-			//fmt.Println("already visited", s3, n)
-			continue
-		} else {
-			space[s3]++
-		}
+		//sort.Strings(current.path)
+		//s3 := State3{
+		//	name1: current.name1,
+		//	name2: current.name2,
+		//	time1: current.time1,
+		//	time2: current.time2,
+		//	path:  strings.Join(current.path, ""),
+		//}
+		//if _, ok := space[s3]; ok {
+		//	//fmt.Println("already visited", s3, n)
+		//	continue
+		//} else {
+		//	space[s3]++
+		//}
 
 		//fmt.Println("current", current)
 		maxProd = utils.Max(maxProd, current.prod)
@@ -271,7 +299,7 @@ func findMaxProduction2(network Network, start State2) int {
 			queue = append(queue, s)
 		}
 		cpt++
-		if cpt%1000 == 0 {
+		if cpt%10000 == 0 {
 			fmt.Println("cpt", cpt, "len", len(queue))
 			fmt.Println("current", current)
 		}

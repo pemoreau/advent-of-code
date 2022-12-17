@@ -4,11 +4,12 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
+	"reflect"
 	"strings"
 	"time"
 )
 
-//go:embed input_test.txt
+//go:embed input.txt
 var input_day string
 
 type Pos struct {
@@ -121,59 +122,102 @@ func (g Grid) fall(pos Pos, rock Rock, pattern string, index *int) Pos {
 
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
-	fmt.Println("pattern:", input)
+	fmt.Println("pattern:", len(input), input)
 	g := Grid{}
 	rocks := buildRocks()
+	addY := []int{1, 3, 3, 4, 2}
 	index := 0
+	maxY := 0
 	for i := 0; i < 2022; i++ {
-		r := rocks[i%len(rocks)]
-		start := Pos{X: 2, Y: g.maxY() + 3}
-		if g.free(start, r) {
-			g.add(start, r)
-			fmt.Println("added rock", i)
-			//g.display()
-			g.fall(start, r, input, &index)
-		}
+		rockIndex := i % len(rocks)
+		r := rocks[rockIndex]
+		start := Pos{X: 2, Y: maxY + 3}
+		g.add(start, r)
+		//fmt.Println("added rock", i)
+		//g.display()
+		pos := g.fall(start, r, input, &index)
+		maxY = utils.Max(maxY, pos.Y+addY[rockIndex])
 	}
 	//fmt.Println("after rock")
 	//g.display()
-	// lines := strings.Split(input, "\n")
-	return g.maxY()
+	return maxY
 }
 
 type state struct {
 	rockIndex int
 	x         int
+	diff      int
 }
 
-var cache = map[state]int{}
+var cache = map[[40]int]int{}
+
+func findCycle(input string) (int, int, int, int, []int, []int) {
+	input = strings.TrimSuffix(input, "\n")
+	g := Grid{}
+	rocks := buildRocks()
+	addY := []int{1, 3, 3, 4, 2}
+	values := []int{}
+	//indexes := []int{}
+	STEP := len(input)
+	index := 0
+	i := 0
+	maxY := 0
+	for i < 10*STEP {
+		rockIndex := i % len(rocks)
+		r := rocks[rockIndex]
+		start := Pos{X: 2, Y: maxY + 3}
+		g.add(start, r)
+		pos := g.fall(start, r, input, &index)
+		oldMaxY := maxY
+		maxY = utils.Max(maxY, pos.Y+addY[rockIndex])
+		values = append(values, maxY-oldMaxY)
+		//indexes = append(indexes, index)
+		i++
+	}
+	i, j := findRecurringElement(prefixes(values, len(input)))
+	//indexStart, indexCycle := findRecurringElement(prefixes(indexes, len(input)))
+	fmt.Println(values)
+	//fmt.Println(indexes)
+	sumStart := 0
+	sumCycle := 0
+	for k := 0; k < i; k++ {
+		sumStart += values[k]
+	}
+	for k := i; k < j; k++ {
+		sumCycle += values[k]
+	}
+	return i, j - i, sumStart, sumCycle, values[:i], values[i:j]
+}
 
 func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
-	fmt.Println("pattern:", input)
-	g := Grid{}
+	//g := Grid{}
 	//rocks := buildRocks()
+	//addY := []int{1, 3, 3, 4, 2}
+	N := 1000000000000
 	//index := 0
-	//for i := 0; i < 1000000000000; i++ {
-	//	rockIndex := i % len(rocks)
-	//	r := rocks[rockIndex]
-	//	if i%10000 == 0 {
-	//		fmt.Println("rock", i)
-	//	}
-	//	start := Pos{X: 2, Y: g.maxY() + 3}
-	//	if g.free(start, r) {
-	//		g.add(start, r)
-	//		//fmt.Println("added rock", i)
-	//		//g.display()
-	//		pos := g.fall(start, r, input, &index)
-	//		if _, ok := cache[state{rockIndex: rockIndex, x: pos.X}]; ok {
-	//			fmt.Println("found loop", i, rockIndex, pos)
-	//		} else {
-	//			cache[state{rockIndex: rockIndex, x: pos.X}] = pos.Y
-	//		}
-	//	}
-	//}
-	return g.maxY()
+	//acc := 0
+	//i := 0
+
+	prefix, cycle, sumStart, sumCycle, prefixValues, cycleValues := findCycle(input)
+	fmt.Println("prefix", prefix, "cycle", cycle, "sumStart", sumStart, "sumCycle", sumCycle)
+	fmt.Println("prefixValues", prefixValues)
+	fmt.Println("cycleValues", cycleValues)
+
+	quotient := (N - prefix) / cycle
+	remainder := (N - prefix) % cycle
+	//i = N - remainder
+	fmt.Println("quotient", quotient, "remainder", remainder)
+	//i = (prefix + quotient*cycle)
+	//fmt.Println("i", i)
+
+	//maxY := sumStart
+	maxY := sumStart + quotient*sumCycle
+	for i := 0; i < remainder; i++ {
+		maxY += cycleValues[i]
+	}
+
+	return maxY
 }
 
 func main() {
@@ -185,4 +229,29 @@ func main() {
 	start = time.Now()
 	fmt.Println("part2: ", Part2(input_day))
 	fmt.Println(time.Since(start))
+
+	//l := []int{0, 66, 59, 59, 64, 60, 61, 62, 59, 59, 59, 64, 60, 61, 62, 59, 59, 59, 64, 60, 61, 62}
+	//i, j := findRecurringElement(prefixes(l, 5))
+	//fmt.Println("recurring ", i, j)
+}
+
+func findRecurringElement(l [][]int) (int, int) {
+	for i := 0; i < len(l); i++ {
+		for j := i + 1; j < len(l); j++ {
+			if reflect.DeepEqual(l[i], l[j]) {
+				fmt.Println("found recurring", i, j, l[i], l[j])
+				return i, j
+			}
+		}
+	}
+	return -1, -1
+
+}
+
+func prefixes(l []int, n int) [][]int {
+	var res [][]int
+	for i := 0; i < len(l)-n; i++ {
+		res = append(res, l[i:i+n])
+	}
+	return res
 }

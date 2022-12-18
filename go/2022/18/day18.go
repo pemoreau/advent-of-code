@@ -58,8 +58,6 @@ func (p Pos) neighbors27() []Pos {
 	}
 }
 
-//type Grid utils.Set[Pos]
-
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
@@ -93,40 +91,17 @@ func Part2(input string) int {
 		g.Add(Pos{x, y, z})
 	}
 
-	components := []utils.Set[Pos]{}
-	for p := range g {
-		if !contains(components, p) {
-			newComponent := collectOccupied(p, g)
-			components = append(components, newComponent)
-		}
-	}
-
-	res := 0
-	for _, c := range components {
-		xmin, xmax, ymin, ymax, zmin, zmax := minmax(c)
-		volume := (xmax - xmin + 1) * (ymax - ymin + 1) * (zmax - zmin + 1)
-		occupied := len(c)
-		componentFree := collectFree(g, xmin, xmax, ymin, ymax, zmin, zmax)
-		free := len(componentFree)
-		internal := volume - occupied - free
-		fmt.Println("x", xmin, xmax, "y", ymin, ymax, "z", zmin, zmax)
-		fmt.Println(c)
-		fmt.Println("volume", volume, "occupied", occupied, "free", free, "internal", internal)
-		res += count(c, componentFree)
-	}
-
-	//1975 too low
+	xmin, xmax, ymin, ymax, zmin, zmax := minmax(g)
+	freeCells := collectFree(g, xmin, xmax, ymin, ymax, zmin, zmax)
+	res := count(g, freeCells)
 	return res
 }
 
 func count(component utils.Set[Pos], free utils.Set[Pos]) int {
 	res := 0
-	xmin, xmax, ymin, ymax, zmin, zmax := minmax(component)
 	for p := range component {
 		for _, q := range p.neighbors() {
-			if q.X < xmin || q.X > xmax || q.Y < ymin || q.Y > ymax || q.Z < zmin || q.Z > zmax {
-				res++
-			} else if !component.Contains(q) && free.Contains(q) {
+			if !component.Contains(q) && free.Contains(q) {
 				res++
 			}
 		}
@@ -146,15 +121,6 @@ func findFree(g utils.Set[Pos], xmin, xmax, ymin, ymax, zmin, zmax int) (Pos, bo
 		}
 	}
 	return Pos{}, false
-}
-
-func contains(components []utils.Set[Pos], p Pos) bool {
-	for _, c := range components {
-		if c.Contains(p) {
-			return true
-		}
-	}
-	return false
 }
 
 func minmax(g utils.Set[Pos]) (int, int, int, int, int, int) {
@@ -182,38 +148,14 @@ func collectFree(g utils.Set[Pos], xmin, xmax, ymin, ymax, zmin, zmax int) utils
 		p = todo.Pop()
 		//fmt.Println("p", p)
 		if g.Contains(p) || res.Contains(p) {
-			//fmt.Println("continue1")
 			continue
 		}
-		if p.X < xmin || p.X > xmax || p.Y < ymin || p.Y > ymax || p.Z < zmin || p.Z > zmax {
-			//fmt.Println("continue2")
+		if p.X < xmin-1 || p.X > xmax+1 || p.Y < ymin-1 || p.Y > ymax+1 || p.Z < zmin-1 || p.Z > zmax+1 {
 			continue
 		}
-		//fmt.Println("adding", p)
 		res.Add(p)
 		for _, q := range p.neighbors() {
-			//if !g.Contains(q) && !res.Contains(q) {
 			todo.Add(q)
-			//}
-		}
-	}
-	return res
-}
-
-func collectOccupied(p Pos, g utils.Set[Pos]) utils.Set[Pos] {
-	todo := utils.Set[Pos]{}
-	res := utils.Set[Pos]{}
-	todo.Add(p)
-	//fmt.Println("todo", len(todo))
-	for len(todo) > 0 {
-		p = todo.Pop()
-		if g.Contains(p) && !res.Contains(p) {
-			res.Add(p)
-			for _, q := range p.neighbors27() {
-				if g.Contains(q) && !res.Contains(q) {
-					todo.Add(q)
-				}
-			}
 		}
 	}
 	return res

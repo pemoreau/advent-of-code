@@ -19,6 +19,13 @@ func (s Set[T]) Contains(value T) bool {
 	return ok
 }
 
+func (s Set[T]) Element() T {
+	for elem := range s {
+		return elem
+	}
+	panic("Set is empty")
+}
+
 func (s Set[T]) IsEmpty() bool {
 	return len(s) == 0
 }

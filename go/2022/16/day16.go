@@ -49,7 +49,7 @@ func parse(input string) (Network, int) {
 	valves := make(map[int]*Valve)
 
 	cpt := 0
-	toint := map[string]int{}
+	toint := map[string]int{"AA": 0}
 	for _, line := range lines {
 		values := strings.Split(line, " ")
 		toint[values[1]] = cpt

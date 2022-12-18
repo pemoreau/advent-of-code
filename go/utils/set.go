@@ -26,6 +26,14 @@ func (s Set[T]) Element() T {
 	panic("Set is empty")
 }
 
+func (s Set[T]) Pop() T {
+	for elem := range s {
+		delete(s, elem)
+		return elem
+	}
+	panic("Set is empty")
+}
+
 func (s Set[T]) IsEmpty() bool {
 	return len(s) == 0
 }

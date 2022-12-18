@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
 	"math"
-	"sort"
 	"strings"
 	"time"
 )
@@ -42,45 +41,67 @@ func neighbors(network Network, s State) []State {
 	return res
 }
 
-func parse(input string) (Network, int) {
+func parse(input string) (Network, Network, int) {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
 	valves := make(map[int]*Valve)
 
-	cpt := 0
 	toint := map[string]int{"AA": 0}
+	cpt := 1
 	for _, line := range lines {
 		values := strings.Split(line, " ")
-		toint[values[1]] = cpt
-		cpt++
+		name := values[1]
+		var rate int
+		fmt.Sscanf(values[4], "rate=%d;", &rate)
+		if rate > 0 {
+			toint[name] = cpt
+			cpt++
+		}
+	}
+	for _, line := range lines {
+		values := strings.Split(line, " ")
+		name := values[1]
+		var rate int
+		fmt.Sscanf(values[4], "rate=%d;", &rate)
+		if _, ok := toint[name]; !ok && rate == 0 {
+			toint[name] = cpt
+			cpt++
+		}
 	}
 
 	for _, line := range lines {
 		values := strings.Split(line, " ")
-		name := values[1]
+		name := toint[values[1]]
 		var rate int
 		fmt.Sscanf(values[4], "rate=%d;", &rate)
 		dest := []int{}
 		for i := 9; i < len(values); i++ {
 			dest = append(dest, toint[strings.TrimPrefix(strings.TrimSuffix(values[i], ","), " ")])
 		}
-		valves[toint[name]] = &Valve{
-			name: toint[name],
+		valves[name] = &Valve{
+			name: name,
 			rate: rate,
 			dest: dest,
 		}
 	}
-	for k := range valves {
-		valves[k].cost = make(map[int]int)
-		for d := range valves {
-			if valves[d].rate > 0 {
-				valves[k].cost[d] = len(distance(k, d, valves, []int{}))
+
+	activesValves := make(map[int]*Valve)
+	for _, v := range valves {
+		name := v.name
+		if v.rate > 0 || v.name == 0 {
+			activeValve := Valve{name: v.name, rate: v.rate, cost: make(map[int]int)}
+			for d := range valves {
+				if d != name && valves[d].rate > 0 {
+					activeValve.dest = append(activeValve.dest, d)
+					activeValve.cost[d] = len(distance(name, d, valves, []int{}))
+				}
 			}
+			fmt.Println(name, activeValve.cost)
+			activesValves[name] = &activeValve
 		}
-		fmt.Println(k, valves[k].cost)
 	}
-	return valves, toint["AA"]
+	return valves, activesValves, toint["AA"]
 }
 
 func listContains(list []int, name int) bool {
@@ -125,54 +146,6 @@ type State struct {
 	prod int
 }
 
-func Part1(input string) int {
-	valves, name := parse(input)
-	start := State{
-		name: name,
-		time: 0,
-		prod: 0,
-		path: [128]bool{},
-	}
-
-	res := findMaxProduction(valves, start)
-	return res
-}
-
-var keys []int
-var space map[State3]int
-
-func Part2(input string) int {
-	valves, name := parse(input)
-	start := State2{
-		name1: name,
-		name2: name,
-		time1: 0,
-		time2: 0,
-		prod:  0,
-		path:  [128]bool{},
-	}
-	for k := range valves {
-		keys = append(keys, k)
-	}
-	space = make(map[State3]int)
-	sort.Ints(keys)
-	fmt.Println("keys", keys)
-	res := findMaxProduction2(valves, start)
-	return res
-	//2184 too low
-}
-
-func main() {
-	fmt.Println("--2022 day 16 solution--")
-	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
-	fmt.Println(time.Since(start))
-
-	start = time.Now()
-	fmt.Println("part2: ", Part2(input_day))
-	fmt.Println(time.Since(start))
-}
-
 func findMaxProduction(network Network, start State) int {
 	queue := []State{start}
 	maxProd := math.MinInt
@@ -187,6 +160,55 @@ func findMaxProduction(network Network, start State) int {
 		}
 	}
 	return maxProd
+}
+
+func Part1(input string) int {
+	_, actives, name := parse(input)
+	start := State{
+		name: name,
+		time: 0,
+		prod: 0,
+		path: [128]bool{},
+	}
+
+	res := findMaxProduction(actives, start)
+	return res
+}
+
+// var keys []int
+var space map[State3]int
+
+func Part2(input string) int {
+	_, actives, name := parse(input)
+	start := State2{
+		name1: name,
+		name2: name,
+		time1: 0,
+		time2: 0,
+		prod:  0,
+		path:  [128]bool{},
+	}
+	//for k := range actives {
+	//	keys = append(keys, k)
+	//}
+	//sort.Ints(keys)
+	//fmt.Println("keys", keys)
+
+	space = make(map[State3]int)
+	res := findMaxProduction2(actives, start)
+	return res
+	//2184 too low
+}
+
+func main() {
+	fmt.Println("--2022 day 16 solution--")
+	start := time.Now()
+	fmt.Println("part1: ", Part1(input_day))
+	fmt.Println(time.Since(start))
+
+	start = time.Now()
+	fmt.Println("part2: ", Part2(input_day))
+	fmt.Println(time.Since(start))
 }
 
 type State2 struct {
@@ -207,6 +229,7 @@ func (s State2) String() string {
 	}
 	return fmt.Sprintf("%d %d t1=%d t2=%d [%d] prod=%d", s.name1, s.name2, s.time1, s.time2, bits, s.prod)
 }
+
 func (s State3) String() string {
 	return fmt.Sprintf("%d %d t1=%d t2=%d", s.name1, s.name2, s.time1, s.time2)
 }
@@ -219,22 +242,23 @@ type State3 struct {
 	path  [128]bool
 }
 
-func neighbors2(network Network, s State2) []State2 {
+func neighbors2(actives Network, s State2) []State2 {
 	res := []State2{}
-	for i := 0; i < len(keys); i++ {
-		for j := 0; j < len(keys); j++ {
-			if i == j {
+	for name1 := 1; name1 < len(actives); name1++ {
+		offset := 0
+		if s.name1 == 0 && s.name2 == 0 {
+			offset = name1
+		}
+		for name2 := 1 + offset; name2 < len(actives); name2++ {
+			if name1 == name2 {
 				continue
 			}
-			name1 := keys[i]
-			name2 := keys[j]
-			candidate1 := network[name1]
-			candidate2 := network[name2]
-			cost1 := network[s.name1].cost[name1]
-			cost2 := network[s.name2].cost[name2]
-			activeCandidates := candidate1.rate > 0 && candidate2.rate > 0
+			candidate1 := actives[name1]
+			candidate2 := actives[name2]
+			cost1 := actives[s.name1].cost[name1]
+			cost2 := actives[s.name2].cost[name2]
 			notVisited := !s.path[candidate1.name] && !s.path[candidate2.name]
-			if activeCandidates && notVisited && s.time1+cost1 <= 26 && s.time2+cost2 <= 26 {
+			if notVisited && s.time1+cost1 <= 26 && s.time2+cost2 <= 26 {
 				prod1 := (26 - (s.time1 + cost1)) * candidate1.rate
 				prod2 := (26 - (s.time2 + cost2)) * candidate2.rate
 				newPath := s.path
@@ -244,9 +268,9 @@ func neighbors2(network Network, s State2) []State2 {
 				s3 := State3{
 					name1: candidate1.name,
 					name2: candidate2.name,
-					time1: s.time1 + cost1,
-					time2: s.time2 + cost2,
-					path:  newPath,
+					//time1: s.time1 + cost1,
+					//time2: s.time2 + cost2,
+					path: newPath,
 				}
 				if oldProd, ok := space[s3]; ok && newProd <= oldProd {
 					// do nothing

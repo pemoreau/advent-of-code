@@ -16,7 +16,6 @@ type Pos struct {
 	X, Y, Z int
 }
 
-// type Grid map[Pos]uint8
 func (p Pos) neighbors() []Pos {
 	return []Pos{
 		{p.X + 1, p.Y, p.Z},

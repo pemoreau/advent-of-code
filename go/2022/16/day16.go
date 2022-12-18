@@ -97,7 +97,7 @@ func parse(input string) (Network, Network, int) {
 					activeValve.cost[d] = len(distance(name, d, valves, []int{}))
 				}
 			}
-			fmt.Println(name, activeValve.cost)
+			//fmt.Println(name, activeValve.cost)
 			activesValves[name] = &activeValve
 		}
 	}
@@ -142,7 +142,7 @@ func distance(start, end int, network Network, path []int) []int {
 type State struct {
 	name int
 	time int
-	path [128]bool
+	path [64]bool
 	prod int
 }
 
@@ -168,7 +168,7 @@ func Part1(input string) int {
 		name: name,
 		time: 0,
 		prod: 0,
-		path: [128]bool{},
+		path: [64]bool{},
 	}
 
 	res := findMaxProduction(actives, start)
@@ -186,18 +186,12 @@ func Part2(input string) int {
 		time1: 0,
 		time2: 0,
 		prod:  0,
-		path:  [128]bool{},
+		path:  [64]bool{},
 	}
-	//for k := range actives {
-	//	keys = append(keys, k)
-	//}
-	//sort.Ints(keys)
-	//fmt.Println("keys", keys)
 
 	space = make(map[State3]int)
 	res := findMaxProduction2(actives, start)
 	return res
-	//2184 too low
 }
 
 func main() {
@@ -216,7 +210,7 @@ type State2 struct {
 	name2 int
 	time1 int
 	time2 int
-	path  [128]bool
+	path  [64]bool
 	prod  int
 }
 
@@ -239,7 +233,7 @@ type State3 struct {
 	name2 int
 	time1 int
 	time2 int
-	path  [128]bool
+	path  [64]bool
 }
 
 func neighbors2(actives Network, s State2) []State2 {
@@ -301,31 +295,14 @@ func findMaxProduction2(network Network, start State2) int {
 		current := queue[0]
 		queue = queue[1:]
 
-		//sort.Strings(current.path)
-		//s3 := State3{
-		//	name1: current.name1,
-		//	name2: current.name2,
-		//	time1: current.time1,
-		//	time2: current.time2,
-		//	path:  strings.Join(current.path, ""),
-		//}
-		//if _, ok := space[s3]; ok {
-		//	//fmt.Println("already visited", s3, n)
-		//	continue
-		//} else {
-		//	space[s3]++
-		//}
-
-		//fmt.Println("current", current)
 		maxProd = utils.Max(maxProd, current.prod)
 		n := neighbors2(network, current)
 		for _, s := range n {
 			queue = append(queue, s)
 		}
 		cpt++
-		if cpt%10000 == 0 {
+		if cpt%100000 == 0 {
 			fmt.Println("cpt", cpt, "len", len(queue))
-			fmt.Println("current", current)
 		}
 	}
 	return maxProd

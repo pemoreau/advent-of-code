@@ -47,13 +47,10 @@ func (g Grid) free(place Pos, rock Rock) bool {
 	for _, p := range rock {
 		X := place.X + p.X
 		Y := place.Y + p.Y
-		//fmt.Printf("check %d,%d\n", X, Y)
 		if X < 0 || X > 6 || Y < 0 {
-			//fmt.Printf("out of bounds %d,%d\n", X, Y)
 			return false
 		}
 		if _, ok := g[Pos{X: X, Y: Y}]; ok {
-			//fmt.Printf("occupied %d,%d\n", X, Y)
 			return false
 		}
 	}
@@ -109,7 +106,6 @@ func (g Grid) move(pos Pos, rock Rock, dir uint8) (Pos, bool) {
 func (g Grid) fall(pos Pos, rock Rock, pattern string, index *int) Pos {
 	falling := true
 	for falling {
-		//fmt.Printf("gaz [index=%d] push %c\n", *index, pattern[*index])
 		pos, falling = g.move(pos, rock, pattern[*index])
 		*index = (*index + 1) % len(pattern)
 		pos, falling = g.move(pos, rock, 'D')
@@ -117,29 +113,10 @@ func (g Grid) fall(pos Pos, rock Rock, pattern string, index *int) Pos {
 	return pos
 }
 
-func Part1(input string) int {
-	input = strings.TrimSuffix(input, "\n")
-	g := Grid{}
-	rocks := buildRocks()
-	addY := []int{1, 3, 3, 4, 2}
-	index := 0
-	maxY := 0
-	for i := 0; i < 2022; i++ {
-		rockIndex := i % len(rocks)
-		r := rocks[rockIndex]
-		start := Pos{X: 2, Y: maxY + 3}
-		g.add(start, r)
-		pos := g.fall(start, r, input, &index)
-		maxY = utils.Max(maxY, pos.Y+addY[rockIndex])
-	}
-	return maxY
-}
-
 func findRecurringElement(l [][]int) (int, int) {
 	for i := 0; i < len(l); i++ {
 		for j := i + 1; j < len(l); j++ {
 			if reflect.DeepEqual(l[i], l[j]) {
-				//fmt.Println("found recurring", i, j, l[i], l[j])
 				return i, j
 			}
 		}
@@ -186,18 +163,31 @@ func findCycle(input string) (int, int, int, int, []int, []int) {
 	return i, j - i, sumStart, sumCycle, values[:i], values[i:j]
 }
 
+func Part1(input string) int {
+	input = strings.TrimSuffix(input, "\n")
+	g := Grid{}
+	rocks := buildRocks()
+	addY := []int{1, 3, 3, 4, 2}
+	index := 0
+	maxY := 0
+	for i := 0; i < 2022; i++ {
+		rockIndex := i % len(rocks)
+		r := rocks[rockIndex]
+		start := Pos{X: 2, Y: maxY + 3}
+		g.add(start, r)
+		pos := g.fall(start, r, input, &index)
+		maxY = utils.Max(maxY, pos.Y+addY[rockIndex])
+	}
+	return maxY
+}
+
 func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	N := 1000000000000
 
 	prefix, cycle, sumStart, sumCycle, _, cycleValues := findCycle(input)
-	//fmt.Println("prefix", prefix, "cycle", cycle, "sumStart", sumStart, "sumCycle", sumCycle)
-	//fmt.Println("prefixValues", prefixValues)
-	//fmt.Println("cycleValues", cycleValues)
-
 	quotient := (N - prefix) / cycle
 	remainder := (N - prefix) % cycle
-	//fmt.Println("quotient", quotient, "remainder", remainder)
 	maxY := sumStart + quotient*sumCycle
 	for i := 0; i < remainder; i++ {
 		maxY += cycleValues[i]

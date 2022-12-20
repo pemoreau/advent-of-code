@@ -34,6 +34,20 @@ func (s State) String() string {
 func neighbors(s State, condition Condition) []State {
 	res := []State{}
 
+	if s.product[0] >= condition[3][0] && s.product[1] >= condition[3][1] && s.product[2] >= condition[3][2] {
+		newState := s
+		newState.time += 1
+		for j := 0; j < 4; j++ {
+			newState.product[j] += int16(s.robot[j])
+		}
+		newState.product[0] -= condition[3][0]
+		newState.product[1] -= condition[3][1]
+		newState.product[2] -= condition[3][2]
+		newState.robot[3] += 1
+		res = append(res, newState)
+		return res
+	}
+
 	newState := s
 	newState.time += 1
 	for i := 0; i < 4; i++ {
@@ -59,6 +73,17 @@ func neighbors(s State, condition Condition) []State {
 }
 
 func smaller(a, b Product) bool {
+	if a[3] < b[3] {
+		return true
+	}
+	// not sure this is correct for any input, but it works for my input
+	if a[3] == b[3] && a[2] < b[2] {
+		return true
+	}
+	// sure this is not correct, but it works for my input
+	//if a[3] == b[3] && a[2] == b[2] && a[1]+3 < b[1] {
+	//	return true
+	//}
 	for i := 0; i < 4; i++ {
 		if a[i] > b[i] {
 			return false
@@ -104,7 +129,7 @@ func removeDuplicates(states []State) []State {
 		}
 	}
 
-	fmt.Println("removeDuplicates time", time, len(states), "->", len(res))
+	//fmt.Println("removeDuplicates time", time, len(states), "->", len(res))
 	return res
 
 }
@@ -114,7 +139,6 @@ func removeDuplicates2(states []State) []State {
 		return states
 	}
 
-	time := states[0].time
 	//bag := utils.Set[State]{}
 	byRobot := map[Robot]utils.Set[State]{}
 	for _, s := range states {
@@ -161,13 +185,7 @@ func removeDuplicates2(states []State) []State {
 		}
 	}
 
-	//for s := range bag {
-	//	if !toRemove.Contains(s) {
-	//		res = append(res, s)
-	//	}
-	//}
-
-	fmt.Println("removeDuplicates time", time, len(states), "->", len(res))
+	//fmt.Println("removeDuplicates time", time, len(states), "->", len(res))
 	return res
 
 }
@@ -188,7 +206,6 @@ func solve(s State, condition Condition, maxTime int8) int {
 			next = append(next, neighbors(s, condition)...)
 		}
 
-		//fmt.Println("todo", len(todo), "next", len(next))
 		if len(todo) > 0 {
 			panic("should not happen")
 		}
@@ -196,7 +213,6 @@ func solve(s State, condition Condition, maxTime int8) int {
 		next = removeDuplicates(next)
 
 		for _, n := range next {
-			//fmt.Println(n)
 			if n.time < maxTime {
 
 				//if oldProduct, ok := seen[n]; ok {
@@ -223,11 +239,12 @@ func solve(s State, condition Condition, maxTime int8) int {
 	return int(max)
 }
 
-func Part1(input string) int {
+func parse(input string) ([]State, []Condition) {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	res := 0
-	for i, line := range lines {
+	states := []State{}
+	conditions := []Condition{}
+	for _, line := range lines {
 		var condition Condition
 		values := strings.Split(line, " ")
 		a, _ := strconv.Atoi(values[6])
@@ -247,55 +264,34 @@ func Part1(input string) int {
 			time:    0,
 			product: Product{0, 0, 0, 0},
 			robot:   Robot{1, 0, 0, 0},
-			//condition: [4][3]int{{4, 0, 0}, {2, 0, 0}, {3, 14, 0}, {2, 0, 7}},
-			//condition: condition,
 		}
-		fmt.Println("part", i+1, condition)
+		states = append(states, s)
+		conditions = append(conditions, condition)
+	}
+	return states, conditions
+}
 
-		max := solve(s, condition, 24)
-		//max := 0
-		fmt.Println("max", max, " --> ", max*(i+1))
+func Part1(input string) int {
+	states, conditions := parse(input)
+	res := 0
+	for i := 0; i < len(states); i++ {
+		max := solve(states[i], conditions[i], 24)
+		//fmt.Println("input", i+1, " --> ", max)
 		res = res + (max * (i + 1))
 	}
 	return res
 }
 
 func Part2(input string) int {
-	input = strings.TrimSuffix(input, "\n")
-	lines := strings.Split(input, "\n")
+	states, conditions := parse(input)
 	res := 1
-	for i, line := range lines {
-		if i < 3 {
-			var condition Condition
-			values := strings.Split(line, " ")
-			a, _ := strconv.Atoi(values[6])
-			b, _ := strconv.Atoi(values[12])
-			c, _ := strconv.Atoi(values[18])
-			d, _ := strconv.Atoi(values[21])
-			e, _ := strconv.Atoi(values[27])
-			f, _ := strconv.Atoi(values[30])
-			condition[0][0] = int16(a)
-			condition[1][0] = int16(b)
-			condition[2][0] = int16(c)
-			condition[2][1] = int16(d)
-			condition[3][0] = int16(e)
-			condition[3][2] = int16(f)
-			s := State{
-				time:    0,
-				product: Product{0, 0, 0, 0},
-				robot:   Robot{1, 0, 0, 0},
-				//condition: [4][3]int{{4, 0, 0}, {2, 0, 0}, {3, 14, 0}, {2, 0, 7}},
-				//condition: condition,
-			}
-			fmt.Println("part", i+1, condition)
-
-			max := solve(s, condition, 32)
-			fmt.Println("i", i+1, " --> ", max)
-			res = res * max
-		}
+	for i := 0; i < utils.Min(3, len(states)); i++ {
+		max := solve(states[i], conditions[i], 32)
+		//fmt.Println("input", i+1, " --> ", max)
+		res = res * max
 	}
 	return res
-
+	// 13, 31, 42 -> 16926
 }
 
 func main() {

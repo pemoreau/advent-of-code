@@ -138,7 +138,7 @@ func (l Value) String() string {
 	return fmt.Sprintf("LV: %s value=%d", l.Header, l.value)
 }
 func (o Operator) String() string {
-	return fmt.Sprintf("Op: %s packets=%v", o.Header, o.packets)
+	return fmt.Sprintf("op: %s packets=%v", o.Header, o.packets)
 }
 
 func decode(bytes []byte, bit_start uint32) (packet Packet, index uint32) {

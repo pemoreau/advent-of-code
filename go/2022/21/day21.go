@@ -12,7 +12,6 @@ import (
 var input_day string
 
 type Expr interface {
-	//eval(mem map[string]Expr, cache map[string]Value) Value
 	simplify(mem map[string]Expr) Expr
 	isValue() bool
 }
@@ -23,7 +22,7 @@ type Value struct {
 }
 type Var string
 type Op struct {
-	Op  byte
+	op  byte
 	lhs Expr
 	rhs Expr
 }
@@ -41,7 +40,7 @@ func (e Var) String() string {
 }
 
 func (e Op) String() string {
-	return fmt.Sprintf("(%v %c %v)", e.lhs, e.Op, e.rhs)
+	return fmt.Sprintf("(%v %c %v)", e.lhs, e.op, e.rhs)
 }
 
 func isInt(e Expr) bool {
@@ -62,30 +61,6 @@ func getInt(e Expr) int {
 	panic("not int")
 }
 
-func (e Var) display(mem map[string]Expr) string {
-	v, _ := mem[string(e)]
-	switch v.(type) {
-	case Var:
-		return "var " + string(v.(Var))
-	case Value:
-		v := v.(Value)
-		if v.d == 1 {
-			return fmt.Sprintf("%d", v.n)
-		} else {
-			return fmt.Sprintf("%d/%d", v.n, v.d)
-		}
-	case Op:
-		return fmt.Sprintf("(%v)", v.(Op).display(mem))
-	}
-	return ""
-}
-
-func (e Op) display(mem map[string]Expr) string {
-	lhs := e.lhs.(Var).display(mem)
-	rhs := e.rhs.(Var).display(mem)
-	return fmt.Sprintf("%v %c %v", lhs, e.Op, rhs)
-}
-
 func (e Value) simplify(mem map[string]Expr) Expr {
 	return e
 }
@@ -99,12 +74,13 @@ func (e Var) simplify(mem map[string]Expr) Expr {
 	return e
 }
 
-func GCDRemainderRecursive(a, b int) int {
+func pgcd(a, b int) int {
 	if b == 0 {
 		return a
 	}
-	return GCDRemainderRecursive(b, a%b)
+	return pgcd(b, a%b)
 }
+
 func (e Op) simplify(mem map[string]Expr) Expr {
 	lhs := e.lhs.simplify(mem)
 	rhs := e.rhs.simplify(mem)
@@ -115,7 +91,7 @@ func (e Op) simplify(mem map[string]Expr) Expr {
 		case Value:
 			rv := rhs.(Value)
 			var tmp Value
-			switch e.Op {
+			switch e.op {
 			case '+':
 				tmp = Value{lv.n*rv.d + rv.n*lv.d, lv.d * rv.d}
 			case '*':
@@ -125,13 +101,13 @@ func (e Op) simplify(mem map[string]Expr) Expr {
 			case '-':
 				tmp = Value{lv.n*rv.d - rv.n*lv.d, lv.d * rv.d}
 			default:
-				fmt.Printf("unknown op %c\n", e.Op)
+				fmt.Printf("unknown op %c\n", e.op)
 				panic("unknown op")
 			}
 			if isInt(tmp) {
 				return Value{getInt(tmp), 1}
 			}
-			gcd := GCDRemainderRecursive(tmp.n, tmp.d)
+			gcd := pgcd(tmp.n, tmp.d)
 			tmp.n /= gcd
 			tmp.d /= gcd
 			//fmt.Println("simplify ", e, " to ", tmp)
@@ -139,14 +115,12 @@ func (e Op) simplify(mem map[string]Expr) Expr {
 
 		}
 	}
-	return Op{Op: e.Op, lhs: lhs, rhs: rhs}
+	return Op{op: e.op, lhs: lhs, rhs: rhs}
 }
 
 func (e Op) solve(v Var, mem map[string]Expr) Expr {
-	//fmt.Println("solve e = ", e)
 	lhs := e.lhs.simplify(mem)
 	rhs := e.rhs.simplify(mem)
-	fmt.Println("solve", v, " in ", lhs, " = ", rhs)
 	if lhs.isValue() {
 		lhs, rhs = rhs, lhs
 	}
@@ -170,42 +144,42 @@ func (e Op) solve(v Var, mem map[string]Expr) Expr {
 		}
 		panic("lhs is not the correct var")
 	case Op:
-		// lhs is: a Op b
+		// lhs is: a op b
 		o := lhs.(Op)
 		a := o.lhs.simplify(mem)
 		b := o.rhs.simplify(mem)
-		//fmt.Printf("\ndo %c %v\n\n", inverse[o.Op], b.(Value))
+		//fmt.Printf("\ndo %c %v\n\n", inverse[o.op], b.(Value))
 		var newEq Op
-		if o.Op == '+' {
+		if o.op == '+' {
 			if !a.isValue() {
-				newEq = Op{Op: '=', lhs: a, rhs: Op{Op: '-', lhs: rhs, rhs: b}}
+				newEq = Op{op: '=', lhs: a, rhs: Op{op: '-', lhs: rhs, rhs: b}}
 			}
 			if !b.isValue() {
-				newEq = Op{Op: '=', lhs: b, rhs: Op{Op: '-', lhs: rhs, rhs: a}}
+				newEq = Op{op: '=', lhs: b, rhs: Op{op: '-', lhs: rhs, rhs: a}}
 			}
 		}
-		if o.Op == '*' {
+		if o.op == '*' {
 			if !a.isValue() {
-				newEq = Op{Op: '=', lhs: a, rhs: Op{Op: '/', lhs: rhs, rhs: b}}
+				newEq = Op{op: '=', lhs: a, rhs: Op{op: '/', lhs: rhs, rhs: b}}
 			}
 			if !b.isValue() {
-				newEq = Op{Op: '=', lhs: b, rhs: Op{Op: '/', lhs: rhs, rhs: a}}
+				newEq = Op{op: '=', lhs: b, rhs: Op{op: '/', lhs: rhs, rhs: a}}
 			}
 		}
-		if o.Op == '-' {
+		if o.op == '-' {
 			if !a.isValue() {
-				newEq = Op{Op: '=', lhs: a, rhs: Op{Op: '+', lhs: rhs, rhs: b}}
+				newEq = Op{op: '=', lhs: a, rhs: Op{op: '+', lhs: rhs, rhs: b}}
 			}
 			if !b.isValue() {
-				newEq = Op{Op: '=', lhs: b, rhs: Op{Op: '-', lhs: a, rhs: rhs}}
+				newEq = Op{op: '=', lhs: b, rhs: Op{op: '-', lhs: a, rhs: rhs}}
 			}
 		}
-		if o.Op == '/' {
+		if o.op == '/' {
 			if !a.isValue() {
-				newEq = Op{Op: '=', lhs: a, rhs: Op{Op: '*', lhs: rhs, rhs: b}}
+				newEq = Op{op: '=', lhs: a, rhs: Op{op: '*', lhs: rhs, rhs: b}}
 			}
 			if !b.isValue() {
-				newEq = Op{Op: '=', lhs: b, rhs: Op{Op: '/', lhs: a, rhs: rhs}}
+				newEq = Op{op: '=', lhs: b, rhs: Op{op: '/', lhs: a, rhs: rhs}}
 			}
 		}
 
@@ -219,17 +193,15 @@ func parse(input string) map[string]Expr {
 	lines := strings.Split(input, "\n")
 
 	mem := make(map[string]Expr)
-	//cache = make(map[string]Value)
 	for _, line := range lines {
 		values := strings.Split(line, " ")
 		vname := strings.TrimSuffix(values[0], ":")
-		//fmt.Println(len(values), values)
 		if len(values) == 2 {
 			e, _ := strconv.Atoi(values[1])
 			mem[vname] = Value{e, 1}
 		} else if len(values) == 4 {
 			e := Op{
-				Op:  values[2][0],
+				op:  values[2][0],
 				lhs: Var(values[1]),
 				rhs: Var(values[3]),
 			}
@@ -241,22 +213,8 @@ func parse(input string) map[string]Expr {
 
 func Part1(input string) int {
 	mem := parse(input)
-
-	//for e := range mem {
-	//	fmt.Println(e, " := ", mem[e])
-	//}
-	res := 0
-	//res := Var("root").eval(mem)
-
-	rootExpr := mem["root"]
-	delete(mem, "root")
-	e := Op{
-		Op:  '=',
-		lhs: Var("root"),
-		rhs: rootExpr,
-	}.solve("root", mem)
-	fmt.Println("solve", e)
-
+	v := mem["root"].simplify(mem).(Value)
+	res := v.n / v.d
 	return res
 }
 
@@ -264,20 +222,10 @@ func Part2(input string) int {
 	mem := parse(input)
 	delete(mem, "humn")
 	root := mem["root"].(Op)
-	root.Op = '='
-
-	eq := root.solve("humn", mem)
-	fmt.Println("humn", eq)
-
-	root.Op = '-'
-	fmt.Println("root", root.simplify(mem))
-	switch eq := eq.(type) {
-	case Value:
-		v := eq.n / eq.d
-		fmt.Println("v", v)
-		return v
-	}
-	return 0
+	root.op = '='
+	v := root.solve("humn", mem).(Value)
+	res := v.n / v.d
+	return res
 }
 
 func main() {

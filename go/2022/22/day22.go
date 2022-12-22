@@ -18,22 +18,20 @@ type Pos struct {
 }
 
 type Topology struct {
-	rockByY map[int]utils.Set[Pos]
-	rockByX map[int]utils.Set[Pos]
-	row     map[int]utils.Interval
-	column  map[int]utils.Interval
-	grid    map[Pos]uint8
+	row    map[int]utils.Interval
+	column map[int]utils.Interval
+	grid   map[Pos]uint8
 }
 
 type State struct {
 	Pos
-	Dir  int //0 for right (>), 1 for down (v), 2 for left (<), and 3 for up (^)
-	Grid *Topology
+	dir  int //0 for right (>), 1 for down (v), 2 for left (<), and 3 for up (^)
+	grid *Topology
 }
 
 func (s State) String() string {
 	dir := []string{">", "v", "<", "^"}
-	return fmt.Sprintf("%d,%d  %s", s.Pos.Y+1, s.Pos.X+1, dir[s.Dir])
+	return fmt.Sprintf("%d,%d  %s", s.Pos.Y+1, s.Pos.X+1, dir[s.dir])
 }
 
 func parse(input string) (topology *Topology, path string) {
@@ -42,33 +40,21 @@ func parse(input string) (topology *Topology, path string) {
 	lines := strings.Split(parts[0], "\n")
 
 	grid := make(map[Pos]uint8)
-	rockByY := make(map[int]utils.Set[Pos])
-	rockByX := make(map[int]utils.Set[Pos])
 	row := make(map[int]utils.Interval)
 	column := make(map[int]utils.Interval)
 
 	for j, line := range lines {
-		if _, ok := rockByX[j]; !ok {
-			rockByX[j] = utils.BuildSet[Pos]()
-		}
 		ymin := math.MaxInt
 		ymax := 0
 		xmin := math.MaxInt
 		xmax := 0
 		for i, c := range line {
-			if _, ok := rockByY[i]; !ok {
-				rockByY[i] = utils.BuildSet[Pos]()
-			}
 			if _, ok := column[i]; !ok {
 				column[i] = utils.Interval{math.MaxInt, 0}
 			}
 			if c == '#' || c == '.' {
 				p := Pos{i, j}
 				grid[p] = uint8(c)
-				if c == '#' {
-					rockByY[i].Add(p)
-					rockByX[j].Add(p)
-				}
 				xmin = utils.Min(xmin, i)
 				xmax = utils.Max(xmax, i)
 				ymin = utils.Min(column[i].Min, j)
@@ -79,48 +65,48 @@ func parse(input string) (topology *Topology, path string) {
 		row[j] = utils.Interval{xmin, xmax}
 	}
 
-	return &Topology{rockByY, rockByX, row, column, grid}, parts[1]
+	return &Topology{row, column, grid}, parts[1]
 }
 
 func step(state *State, order string) {
 	//fmt.Println("order", order)
 	switch order {
 	case "L":
-		state.Dir = (state.Dir + 3) % 4
+		state.dir = (state.dir + 3) % 4
 	case "R":
-		state.Dir = (state.Dir + 1) % 4
+		state.dir = (state.dir + 1) % 4
 	default:
 		nbSteps, _ := strconv.Atoi(order)
 		for i := 0; i < nbSteps; i++ {
 			X, Y := state.Pos.X, state.Pos.Y
 			var nextX, nextY int
-			switch state.Dir {
+			switch state.dir {
 			case 0:
 				nextX = X + 1
 				nextY = Y
-				if nextX > state.Grid.row[Y].Max {
-					nextX = state.Grid.row[Y].Min
+				if nextX > state.grid.row[Y].Max {
+					nextX = state.grid.row[Y].Min
 				}
 			case 1:
 				nextX = X
 				nextY = Y + 1
-				if nextY > state.Grid.column[X].Max {
-					nextY = state.Grid.column[X].Min
+				if nextY > state.grid.column[X].Max {
+					nextY = state.grid.column[X].Min
 				}
 			case 2:
 				nextX = X - 1
 				nextY = Y
-				if nextX < state.Grid.row[Y].Min {
-					nextX = state.Grid.row[Y].Max
+				if nextX < state.grid.row[Y].Min {
+					nextX = state.grid.row[Y].Max
 				}
 			case 3:
 				nextX = X
 				nextY = Y - 1
-				if nextY < state.Grid.column[X].Min {
-					nextY = state.Grid.column[X].Max
+				if nextY < state.grid.column[X].Min {
+					nextY = state.grid.column[X].Max
 				}
 			}
-			if c, ok := state.Grid.grid[Pos{nextX, nextY}]; ok && c == '.' {
+			if c, ok := state.grid.grid[Pos{nextX, nextY}]; ok && c == '.' {
 				state.Pos.X = nextX
 				state.Pos.Y = nextY
 			} else {
@@ -139,10 +125,9 @@ func Part1(input string) int {
 	orders := strings.Split(path, " ")
 	for _, order := range orders {
 		step(&state, order)
-		//fmt.Printf("state: %v\n", state)
 	}
 
-	res := 1000*(state.Pos.Y+1) + 4*(state.Pos.X+1) + state.Dir
+	res := 1000*(state.Pos.Y+1) + 4*(state.Pos.X+1) + state.dir
 	return res
 }
 
@@ -220,7 +205,6 @@ func (s *State3D) move(cube *Cube, transitionTable [6][4]struct{ face, rot int }
 }
 
 // 0 for right (>), 1 for down (v), 2 for left (<), and 3 for up (^)
-
 type TransitionTable [6][4]struct{ face, rot int }
 
 func step3D(s *State3D, cube *Cube, order string, transitionTable TransitionTable) {

@@ -31,6 +31,10 @@ func (i Interval) Sub(b Interval) Interval {
 	}
 }
 
+func (i Interval) Contains(x int) bool {
+	return i.Min <= x && x <= i.Max
+}
+
 func minmax(a, b, c, d int) (int, int) {
 	var min1, max1, min2, max2 int
 	if a <= b {

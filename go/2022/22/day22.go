@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-//go:embed input.txt
+//go:embed input_test.txt
 var input_day string
 
 type Pos struct {
@@ -163,7 +163,87 @@ type State3D struct {
 	dir  int //0 for right (>), 1 for down (v), 2 for left (<), and 3 for up (^)
 }
 
-func step3D(s *State3D, cube *Cube, order string) {
+func (s State3D) String() string {
+	dir := []string{">", "v", "<", "^"}
+	return fmt.Sprintf("face %d -- %d,%d  %s", s.face+1, s.pos.Y+1, s.pos.X+1, dir[s.dir])
+}
+
+func (s *State3D) rotateRight() {
+	s.dir = (s.dir + 1) % 4
+	s.pos.X = s.N - s.pos.Y - 1
+	s.pos.Y = s.pos.X
+}
+
+func (s *State3D) rotateLeft() {
+	s.dir = (s.dir + 3) % 4
+	s.pos.X = s.pos.Y
+	s.pos.Y = s.N - s.pos.X - 1
+}
+
+func (s *State3D) rotate180() {
+	s.dir = (s.dir + 2) % 4
+	s.pos.X = s.N - s.pos.X - 1
+	s.pos.Y = s.N - s.pos.Y - 1
+}
+
+func (s *State3D) move(cube *Cube, transitionTable [6][4]struct{ face, rot int }) bool {
+	start := *s
+	switch s.dir {
+	case 0:
+		s.pos.X++
+	case 1:
+		s.pos.Y++
+	case 2:
+		s.pos.X--
+	case 3:
+		s.pos.Y--
+	}
+	if s.pos.X >= 0 && s.pos.X < s.N && s.pos.Y >= 0 && s.pos.Y < s.N {
+		if cube.grid[s.face][s.pos] == '#' {
+			*s = start
+			return false
+		}
+		return true
+	}
+
+	if s.pos.X < 0 {
+		s.pos.X = s.N - 1
+	}
+	if s.pos.X >= s.N {
+		s.pos.X = 0
+	}
+	if s.pos.Y < 0 {
+		s.pos.Y = s.N - 1
+	}
+	if s.pos.Y >= s.N {
+		s.pos.Y = 0
+	}
+	//fmt.Println("transition", s.face, s.dir, transitionTable[s.face][s.dir])
+	s.face = transitionTable[start.face][start.dir].face
+	switch transitionTable[start.face][start.dir].rot {
+	case 90:
+		fmt.Println("rotate 90")
+		s.rotateLeft()
+	case 180:
+		fmt.Println("rotate 180")
+		s.rotate180()
+	case 270:
+		fmt.Println("rotate 270")
+		s.rotateRight()
+	}
+	if cube.grid[s.face][s.pos] == '#' {
+		*s = start
+		return false
+	}
+	return true
+}
+
+// 0 for right (>), 1 for down (v), 2 for left (<), and 3 for up (^)
+
+type TransitionTable [6][4]struct{ face, rot int }
+
+func step3D(s *State3D, cube *Cube, order string, transitionTable TransitionTable) {
+	fmt.Println("order", order)
 	switch order {
 	case "L":
 		s.dir = (s.dir + 3) % 4
@@ -172,60 +252,24 @@ func step3D(s *State3D, cube *Cube, order string) {
 	default:
 		nbSteps, _ := strconv.Atoi(order)
 		for i := 0; i < nbSteps; i++ {
-			X, Y := s.pos.X, s.pos.Y
-			var nextX, nextY int
-			switch s.dir {
-			case 0:
-				nextX = X + 1
-				nextY = Y
-				if nextX >= cube.N {
-
-				}
-			}
-			if c, ok := cube.grid[s.face][Pos{nextX, nextY}]; ok && c == '.' {
-				s.pos.X = nextX
-				s.pos.Y = nextY
-			} else {
+			before := *s
+			ok := s.move(cube, transitionTable)
+			if !ok {
 				break
 			}
+			fmt.Println("step", i+1, "move", before, "to", *s)
 		}
 
 	}
-}
-
-// 0 for right (>), 1 for down (v), 2 for left (<), and 3 for up (^)
-func transition(s *State3D) {
-	X, Y, N := s.pos.X, s.pos.Y, s.N
-
-	switch s.face {
-	case 0:
-		switch s.dir {
-		case 0:
-			s.face = 5
-			s.dir = 1
-			s.pos = Pos{N - 1, N - 1 - Y}
-		case 1:
-			s.face = 3
-			s.pos = Pos{X, 0}
-		case 2:
-			s.face = 2
-			s.dir = 2
-			s.pos = Pos{Y, 0}
-		case 3:
-			s.face = 1
-			s.dir = 1
-			s.pos = Pos{N - 1 - X, 0}
-
-		}
-	}
-
 }
 
 func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	parts := strings.Split(input, "\n\n")
 	lines := strings.Split(parts[0], "\n")
+	path := parts[1]
 
+	N := 4
 	faces := [6]struct {
 		X utils.Interval
 		Y utils.Interval
@@ -238,7 +282,15 @@ func Part2(input string) int {
 		{X: utils.Interval{12, 15}, Y: utils.Interval{8, 11}},
 	}
 
-	N := 4
+	transition := TransitionTable{
+		{{face: 6 - 1, rot: 180}, {face: 4 - 1, rot: 0}, {face: 3 - 1, rot: 90}, {face: 2 - 1, rot: 180}},
+		{{face: 3 - 1, rot: 0}, {face: 5 - 1, rot: 180}, {face: 6 - 1, rot: 270}, {face: 1 - 1, rot: 180}},
+		{{face: 4 - 1, rot: 0}, {face: 5 - 1, rot: 90}, {face: 2 - 1, rot: 0}, {face: 1 - 1, rot: 270}},
+		{{face: 6 - 1, rot: 270}, {face: 5 - 1, rot: 0}, {face: 3 - 1, rot: 0}, {face: 1 - 1, rot: 0}},
+		{{face: 6 - 1, rot: 0}, {face: 2 - 1, rot: 180}, {face: 3 - 1, rot: 270}, {face: 4 - 1, rot: 0}},
+		{{face: 1 - 1, rot: 180}, {face: 2 - 1, rot: 90}, {face: 5 - 1, rot: 0}, {face: 4 - 1, rot: 90}},
+	}
+
 	cube := Cube{N: N}
 	for i := 0; i < 6; i++ {
 		cube.grid[i] = make(map[Pos]uint8)
@@ -252,15 +304,26 @@ func Part2(input string) int {
 			}
 		}
 	}
+	path = strings.ReplaceAll(path, "L", " L ")
+	path = strings.ReplaceAll(path, "R", " R ")
+	orders := strings.Split(path, " ")
 
-	return 0
+	state := State3D{N: N, face: 0, pos: Pos{0, 0}, dir: 0}
+	fmt.Printf("start from state: %v\n", state)
+	for _, order := range orders {
+		step3D(&state, &cube, order, transition)
+		fmt.Printf("state: %v\n", state)
+	}
+	res := 1000*(state.pos.Y+1) + 4*(state.pos.X+1) + state.dir
+
+	return res
 
 }
 
 func main() {
 	fmt.Println("--2022 day 22 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
+	//fmt.Println("part1: ", Part1(input_day))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()

@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"strconv"
 	"strings"
 	"time"
@@ -74,13 +75,6 @@ func (e Var) simplify(mem map[string]Expr) Expr {
 	return e
 }
 
-func pgcd(a, b int) int {
-	if b == 0 {
-		return a
-	}
-	return pgcd(b, a%b)
-}
-
 func (e Op) simplify(mem map[string]Expr) Expr {
 	lhs := e.lhs.simplify(mem)
 	rhs := e.rhs.simplify(mem)
@@ -107,7 +101,7 @@ func (e Op) simplify(mem map[string]Expr) Expr {
 			if isInt(tmp) {
 				return Value{getInt(tmp), 1}
 			}
-			gcd := pgcd(tmp.n, tmp.d)
+			gcd := utils.GCD(tmp.n, tmp.d)
 			tmp.n /= gcd
 			tmp.d /= gcd
 			//fmt.Println("simplify ", e, " to ", tmp)

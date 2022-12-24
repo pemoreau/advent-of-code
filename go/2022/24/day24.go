@@ -8,16 +8,10 @@ import (
 	"time"
 )
 
-//go:embed input_test.txt
+//go:embed input.txt
 var input_day string
 
-const (
-	DIR = 4
-	X   = 6
-	Y   = 4
-)
-
-type Blizzard [DIR][][]bool
+type Blizzard [4][][]bool
 
 func newBlizzard(minX, maxX, minY, maxY int) *Blizzard {
 	b := Blizzard{}
@@ -115,48 +109,8 @@ type State struct {
 }
 
 func (s State) String() string {
-	return fmt.Sprintf("%v", s.pos)
+	return fmt.Sprintf("== time: %d == pos: %v", s.time, s.pos)
 }
-
-//func solve(s State, neighbors func(s State) []State, goal func(s State) bool) int {
-//	todo := []State{s}
-//
-//	var min int = math.MaxInt
-//	for len(todo) > 0 {
-//		s = todo[0]
-//
-//		todo = todo[1:]
-//		next := neighbors(s)
-//
-//		fmt.Printf("time = %d -- neighborsF (%v) --> %v\n", s.time, s.pos, next)
-//		s.blizzard.display(s.pos)
-//		fmt.Println("len(todo) = ", len(todo))
-//
-//		//for len(todo) > 0 && todo[0].time == s.time {
-//		//	s = todo[0]
-//		//	todo = todo[1:]
-//		//	next = append(next, neighbors(s)...)
-//		//}
-//		//fmt.Println("len(next) = ", len(next))
-//		//
-//		//if len(todo) > 0 {
-//		//	panic("should not happen")
-//		//}
-//
-//		//next = removeDuplicates(next)
-//
-//		for _, n := range next {
-//			if goal(n) {
-//				if n.time < min {
-//					min = n.time
-//				}
-//			} else {
-//				todo = append(todo, n)
-//			}
-//		}
-//	}
-//	return int(min)
-//}
 
 func neighbors(s State, blizzards []Blizzard) []State {
 	i, j := s.pos.X, s.pos.Y
@@ -164,10 +118,12 @@ func neighbors(s State, blizzards []Blizzard) []State {
 	res := []State{}
 	newTime := s.time + 1
 	b := blizzards[newTime%len(blizzards)]
-	start := utils.Pos{0, -1}
-	goal := utils.Pos{X: len(b[2]) - 1, Y: len(b[0]) - 1 + 1}
+
+	exit1 := utils.Pos{0, -1}
+	exit2 := utils.Pos{X: len(b[2]) - 1, Y: len(b[0]) - 1 + 1}
+
 	for _, p := range explore {
-		if p == start || p == goal {
+		if p == exit1 || p == exit2 {
 			res = append(res, State{p, newTime})
 			continue
 		}
@@ -179,20 +135,15 @@ func neighbors(s State, blizzards []Blizzard) []State {
 		}
 		res = append(res, State{p, newTime})
 	}
-	//fmt.Printf("time = %d -- neighborsF (%d,%d) --> %v\n", s.time, i, j, res)
-	//newB.display(p)
 	return res
 }
 
-func Part1(input string) int {
+func parse(input string) ([]Blizzard, utils.Pos, utils.Pos) {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 	grid := utils.BuildGrid(lines)
 
-	//utils.DisplayMap(grid, '.')
 	minX, maxX, minY, maxY := utils.GridBounds(grid)
-	//fmt.Println(maxX-minX-1, maxY-minY-1)
-
 	b := newBlizzard(minX, maxX, minY, maxY)
 	for p, v := range grid {
 		if v == '^' || v == 'v' || v == '<' || v == '>' {
@@ -204,46 +155,51 @@ func Part1(input string) int {
 	lenX := maxX - minX - 1
 	lenY := maxY - minY - 1
 
-	b.display(utils.Pos{0, -1})
-	for i := 0; i < utils.LCM(lenX, lenY); i++ {
-		//fmt.Println("step", i)
+	//fmt.Println("step", 0)
+	//b.display(utils.Pos{0, -1})
+	for i := 1; i < utils.LCM(lenX, lenY); i++ {
 		b = b.step()
 		blizzards = append(blizzards, *b)
+		//fmt.Println("step", i)
 		//b.display(utils.Pos{0, -1})
 	}
 
 	start := utils.Pos{0, -1}
 	goal := utils.Pos{maxX - minX - 2, maxY - minY - 1}
+	return blizzards, start, goal
+}
 
-	neighborsF := func(s State) []State {
-		return neighbors(s, blizzards)
-	}
+func Part1(input string) int {
+	blizzards, start, goal := parse(input)
 
-	goalF := func(s State) bool {
-		return s.pos == goal
-	}
+	neighborsF := func(s State) []State { return neighbors(s, blizzards) }
+	costF := func(from, to State) int { return 1 }
+	goalF := func(s State) bool { return s.pos == goal }
+	heuristicF := func(s State) int { return utils.ManhattanDistance(s.pos, goal) }
 
+	_, cost := utils.Astar[State](State{start, 0}, goalF, neighborsF, costF, heuristicF)
+	return cost
+}
+
+func Part2(input string) int {
+	blizzards, start, goal := parse(input)
+
+	neighborsF := func(s State) []State { return neighbors(s, blizzards) }
 	costF := func(from, to State) int {
 		return 1
 	}
 
-	heuristicF := func(s State) int {
-		return utils.ManhattanDistance(s.pos, goal)
-	}
+	goal1 := func(s State) bool { return s.pos == goal }
+	goal2 := func(s State) bool { return s.pos == start }
 
-	path, cost := utils.Path[State](State{start, 0}, goalF, neighborsF, costF, heuristicF)
-	//res := solve(State{start, *b, 0}, neighborsF, goalF)
-	//fmt.Println(res)
-	fmt.Println("path", path)
-	fmt.Println("cost", cost)
-	return 0
-}
+	heuristic1 := func(s State) int { return utils.ManhattanDistance(s.pos, goal) }
+	heuristic2 := func(s State) int { return utils.ManhattanDistance(s.pos, start) }
 
-func Part2(input string) int {
-	// input = strings.TrimSuffix(input, "\n")
-	// lines := strings.Split(input, "\n")
-	return 0
+	_, cost1 := utils.Astar[State](State{start, 0}, goal1, neighborsF, costF, heuristic1)
+	_, cost2 := utils.Astar[State](State{goal, cost1}, goal2, neighborsF, costF, heuristic2)
+	_, cost3 := utils.Astar[State](State{start, cost1 + cost2}, goal1, neighborsF, costF, heuristic1)
 
+	return cost1 + cost2 + cost3
 }
 
 func main() {

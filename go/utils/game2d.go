@@ -12,6 +12,18 @@ func (p Pos) String() string {
 	return fmt.Sprintf("(%d, %d)", p.X, p.Y)
 }
 
+func ManhattanDistance(from, to Pos) int {
+	absX := from.X - to.X
+	if absX < 0 {
+		absX = -absX
+	}
+	absY := from.Y - to.Y
+	if absY < 0 {
+		absY = -absY
+	}
+	return absX + absY
+}
+
 // ---------------------
 // Matrix Representation
 // ---------------------
@@ -101,4 +113,15 @@ func DisplayMap(grid map[Pos]uint8, empty uint8) {
 		fmt.Println()
 	}
 
+}
+
+func GridBounds(grid map[Pos]uint8) (minX, maxX, minY, maxY int) {
+	minX, minY, maxX, maxY = math.MaxInt, math.MaxInt, math.MinInt, math.MinInt
+	for p := range grid {
+		minX = Min(p.X, minX)
+		minY = Min(p.Y, minY)
+		maxX = Max(p.X, maxX)
+		maxY = Max(p.Y, maxY)
+	}
+	return minX, maxX, minY, maxY
 }

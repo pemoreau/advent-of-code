@@ -11,11 +11,6 @@ import (
 //go:embed input.txt
 var input_day string
 
-//	type State struct {
-//		pos utils.Pos
-//	}
-//type State utils.Pos
-
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	m := utils.BuildIntMatrix(lines)
@@ -47,6 +42,7 @@ func Part2(input string) int {
 	goalF := func(s utils.Pos) bool { return s == to }
 	heuristicF := func(s utils.Pos) int { return m[to.Y][to.X] - m[from.Y][from.X] }
 	_, cost := utils.Astar[utils.Pos](from, goalF, neighborsF, costF, heuristicF)
+
 	return cost
 }
 

@@ -11,6 +11,11 @@ import (
 //go:embed input.txt
 var input_day string
 
+//	type State struct {
+//		pos utils.Pos
+//	}
+//type State utils.Pos
+
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	m := utils.BuildIntMatrix(lines)
@@ -18,7 +23,13 @@ func Part1(input string) int {
 	to := search('E', m)
 	m[from.Y][from.X] = 'a'
 	m[to.Y][to.X] = 'z'
-	_, cost := utils.Path(from, to, m, neighbors, cost, heuristic)
+
+	neighborsF := func(s utils.Pos) []utils.Pos { return neighbors(m, s.X, s.Y) }
+	costF := func(from, to utils.Pos) int { return 1 }
+	goalF := func(s utils.Pos) bool { return s == to }
+	heuristicF := func(s utils.Pos) int { return m[to.Y][to.X] - m[from.Y][from.X] }
+	_, cost := utils.Astar[utils.Pos](from, goalF, neighborsF, costF, heuristicF)
+
 	return cost
 }
 
@@ -30,7 +41,12 @@ func Part2(input string) int {
 	to := search('E', m)
 	m[from.Y][from.X] = 'a'
 	m[to.Y][to.X] = 'z'
-	_, cost := utils.Path(from, to, m, neighbors2, cost2, heuristic2)
+
+	neighborsF := func(s utils.Pos) []utils.Pos { return neighbors2(m, s.X, s.Y) }
+	costF := func(from, to utils.Pos) int { return cost2(from, to, m) }
+	goalF := func(s utils.Pos) bool { return s == to }
+	heuristicF := func(s utils.Pos) int { return m[to.Y][to.X] - m[from.Y][from.X] }
+	_, cost := utils.Astar[utils.Pos](from, goalF, neighborsF, costF, heuristicF)
 	return cost
 }
 
@@ -71,15 +87,6 @@ func neighbors(m utils.IntMatrix, i, j int) []utils.Pos {
 	return res
 }
 
-func cost(from, to utils.Pos, m utils.IntMatrix) int {
-	return 1
-}
-
-func heuristic(from, to utils.Pos, m utils.IntMatrix) int {
-	//return manhattanDistance(from, to)
-	return m[to.Y][to.X] - m[from.Y][from.X]
-}
-
 func neighbors2(m utils.IntMatrix, i, j int) []utils.Pos {
 	n := neighbors(m, i, j)
 	if m[j][i] == 'a' {
@@ -94,8 +101,4 @@ func cost2(from, to utils.Pos, m utils.IntMatrix) int {
 		return 0
 	}
 	return 1
-}
-
-func heuristic2(from, to utils.Pos, m utils.IntMatrix) int {
-	return m[to.Y][to.X] - m[from.Y][from.X]
 }

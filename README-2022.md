@@ -345,68 +345,131 @@ Example of input:
 ### [Go](./go/2022/19/day19.go)
 
 
-## [Day 20: ](https://adventofcode.com/2022/day/20)
+## [Day 20: Grove Positioning System](https://adventofcode.com/2022/day/20)
 
 Example of input:
 
 ```
-
+1
+2
+-3
+3
+-2
+0
+4
 ```
 
 ### [Go](./go/2022/20/day20.go)
 
+Used `container/ring`
 
-## [Day 21: ](https://adventofcode.com/2022/day/21)
+## [Day 21: Monkey Math](https://adventofcode.com/2022/day/21)
 
 Example of input:
 
 ```
-
+root: pppw + sjmn
+dbpl: 5
+cczh: sllz + lgvd
+zczc: 2
+ptdq: humn - dvpt
+dvpt: 3
+lfqf: 4
+humn: 5
+ljgn: 2
+sjmn: drzm * dbpl
+sllz: 4
+pppw: cczh / lfqf
+lgvd: ljgn * ptdq
+drzm: hmdt - zczc
+hmdt: 32
 ```
 
 ### [Go](./go/2022/21/day21.go)
 
 
-## [Day 22: ](https://adventofcode.com/2022/day/22)
+## [Day 22: Monkey Map](https://adventofcode.com/2022/day/22)
 
 Example of input:
 
 ```
+        ...#
+        .#..
+        #...
+        ....
+...#.......#
+........#...
+..#....#....
+..........#.
+        ...#....
+        .....#..
+        .#......
+        ......#.
 
+10R5L5R10L4R5L5
 ```
 
 ### [Go](./go/2022/22/day22.go)
 
 
-## [Day 23: ](https://adventofcode.com/2022/day/23)
+## [Day 23: Unstable Diffusion](https://adventofcode.com/2022/day/23)
 
 Example of input:
 
 ```
-
+....#..
+..###.#
+#...#.#
+.#...##
+#.###..
+##.#.##
+.#..#..
 ```
 
 ### [Go](./go/2022/23/day23.go)
 
 
-## [Day 24: ](https://adventofcode.com/2022/day/24)
+
+## [Day 24: Blizzard Basin](https://adventofcode.com/2022/day/24)
 
 Example of input:
 
 ```
-
+#.######
+#>>.<^<#
+#.<..<<#
+#>v.><>#
+#<^v^^>#
+######.#
 ```
 
 ### [Go](./go/2022/24/day24.go)
+Quite interesting.
 
+Used a generic A* (using Go generics)
 
-## [Day 25: ](https://adventofcode.com/2022/day/25)
+Blizzards are precalculated since they repeat every LCM(height,width) steps
+
+## [Day 25: Full of Hot Air](https://adventofcode.com/2022/day/25)
 
 Example of input:
 
 ```
-
+1=-0-2
+12111
+2=0=
+21
+2=01
+111
+20012
+112
+1=-1=
+1-12
+12
+1=
+122
 ```
 
 ### [Go](./go/2022/25/day25.go)
 
+Funny

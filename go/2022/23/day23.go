@@ -31,10 +31,10 @@ func step(g utils.Grid, s *State) (utils.Grid, int) {
 		}
 		if move {
 			explore := map[string][]utils.Pos{
-				"N": {utils.Pos{p.X, p.Y - 1}, utils.Pos{p.X + 1, p.Y - 1}, utils.Pos{p.X - 1, p.Y - 1}},
-				"S": {utils.Pos{p.X, p.Y + 1}, utils.Pos{p.X + 1, p.Y + 1}, utils.Pos{p.X - 1, p.Y + 1}},
-				"W": {utils.Pos{p.X - 1, p.Y}, utils.Pos{p.X - 1, p.Y - 1}, utils.Pos{p.X - 1, p.Y + 1}},
-				"E": {utils.Pos{p.X + 1, p.Y}, utils.Pos{p.X + 1, p.Y - 1}, utils.Pos{p.X + 1, p.Y + 1}},
+				"N": {{p.X, p.Y - 1}, {p.X + 1, p.Y - 1}, {p.X - 1, p.Y - 1}},
+				"S": {{p.X, p.Y + 1}, {p.X + 1, p.Y + 1}, {p.X - 1, p.Y + 1}},
+				"W": {{p.X - 1, p.Y}, {p.X - 1, p.Y - 1}, {p.X - 1, p.Y + 1}},
+				"E": {{p.X + 1, p.Y}, {p.X + 1, p.Y - 1}, {p.X + 1, p.Y + 1}},
 			}
 			for _, d := range s.directions {
 				move = false

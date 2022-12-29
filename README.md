@@ -19,6 +19,8 @@ Mostly written in Rust and Go
 
 # [Year 2022](README-2022.md)
 
+<a href="https://adventofcode.com"><img src="assets/calendar_2022.png" width="80%" /></a>
+
 | Go                              | part A       | part B        |
 |---------------------------------|--------------|---------------|
 | [day 01](./go/2022/01/day01.go) | ` 0.092 ms`  | ` 0.098 ms`   |

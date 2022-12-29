@@ -21,6 +21,10 @@ type Valve struct {
 	cost map[int]int
 }
 
+func (v *Valve) String() string {
+	return fmt.Sprintf("%d(%d) cost:%v", v.name, v.rate, v.cost)
+}
+
 type Network map[int]*Valve
 
 func neighbors(network Network, s State, maxTime int) []State {
@@ -46,7 +50,6 @@ func neighbors(network Network, s State, maxTime int) []State {
 func parse(input string) (Network, Network, int) {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-
 	valves := make(map[int]*Valve)
 
 	toint := map[string]int{"AA": 0}
@@ -88,54 +91,48 @@ func parse(input string) (Network, Network, int) {
 		}
 	}
 
+	// Floyd–Warshall algorithm
+	dist := [128][128]int{}
+
+	//fmt.Println("len", len(valves))
+	for v := range valves {
+		for w := range valves {
+			dist[v][w] = math.MaxInt16
+		}
+	}
+	for _, v := range valves {
+		for _, d := range v.dest {
+			dist[v.name][d] = 1
+		}
+	}
+	for v := range valves {
+		dist[v][v] = 0
+	}
+	for k := range valves {
+		for i := range valves {
+			for j := range valves {
+				if dist[i][j] > dist[i][k]+dist[k][j] {
+					dist[i][j] = dist[i][k] + dist[k][j]
+				}
+			}
+		}
+	}
+
 	activesValves := make(map[int]*Valve)
 	for _, v := range valves {
-		name := v.name
 		if v.rate > 0 || v.name == 0 {
 			activeValve := Valve{name: v.name, rate: v.rate, cost: make(map[int]int)}
 			for d := range valves {
-				if d != name && valves[d].rate > 0 {
+				if d != v.name && valves[d].rate > 0 {
 					activeValve.dest = append(activeValve.dest, d)
-					activeValve.cost[d] = len(distance(name, d, valves, []int{}))
+					activeValve.cost[d] = dist[v.name][d] + 1
 				}
 			}
-			//fmt.Println(name, activeValve.cost)
-			activesValves[name] = &activeValve
+			activesValves[v.name] = &activeValve
 		}
 	}
+
 	return valves, activesValves, toint["AA"]
-}
-
-func listContains(list []int, name int) bool {
-	for _, n := range list {
-		if n == name {
-			return true
-		}
-	}
-	return false
-}
-
-func distance(start, end int, network Network, path []int) []int {
-	path = append(path, start)
-	if start == end {
-		return path
-	}
-	if _, ok := network[start]; !ok {
-		//fmt.Println("not found", start)
-		return []int{}
-	}
-	shortest := []int{}
-	for _, n := range network[start].dest {
-		if !listContains(path, n) {
-			newpath := distance(n, end, network, path)
-			if len(newpath) > 0 {
-				if len(shortest) == 0 || len(newpath) < len(shortest) {
-					shortest = newpath
-				}
-			}
-		}
-	}
-	return shortest
 }
 
 type State struct {

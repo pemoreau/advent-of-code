@@ -17,6 +17,7 @@ const (
 	CLAY     = 1
 	OBSIDIAN = 2
 	GEODE    = 3
+	NBROBOT  = 3
 )
 
 type State struct {
@@ -26,7 +27,7 @@ type State struct {
 }
 
 type Product [4]int16
-type Robot [4]int8
+type Robot [NBROBOT]int8
 type Condition [4][3]int16 // needed ORE, CLAY, OBSIDIAN
 
 func (s State) String() string {
@@ -35,18 +36,20 @@ func (s State) String() string {
 
 func neighbors(s State, condition Condition, maxTime int8) []State {
 	res := []State{}
+	remainingTime := int16(maxTime - s.time)
 
 	if s.product[ORE] >= condition[GEODE][ORE] && s.product[CLAY] >= condition[GEODE][CLAY] && s.product[OBSIDIAN] >= condition[GEODE][OBSIDIAN] {
 		// if we can build a GEODE we do it
 		newState := s
 		newState.time += 1
-		for j := 0; j < 4; j++ {
+		for j := 0; j < NBROBOT; j++ {
 			newState.product[j] += int16(s.robot[j])
 		}
 		newState.product[0] -= condition[GEODE][0]
 		newState.product[1] -= condition[GEODE][1]
 		newState.product[2] -= condition[GEODE][2]
-		newState.robot[GEODE] += 1
+		//newState.robot[GEODE] += 1
+		newState.product[GEODE] += remainingTime - 1 // we consider production until the end
 		res = append(res, newState)
 		return res
 	}
@@ -54,17 +57,17 @@ func neighbors(s State, condition Condition, maxTime int8) []State {
 	// generate products
 	newState := s
 	newState.time += 1
-	for i := 0; i < 4; i++ {
+	for i := 0; i < NBROBOT; i++ {
 		newState.product[i] += int16(s.robot[i])
 	}
 	res = append(res, newState)
 
-	if s.time+1 == maxTime {
+	if remainingTime == 1 {
 		// remaining time is not enough to build anything
 		return res
 	}
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < NBROBOT; i++ {
 		// build new robots
 		prod := int16(s.robot[i])
 		if prod > condition[0][i] && prod > condition[1][i] && prod > condition[2][i] && prod > condition[3][i] {
@@ -73,19 +76,18 @@ func neighbors(s State, condition Condition, maxTime int8) []State {
 		}
 
 		//For any resource R that's not geode:
-		//  if you already have X robots creating resource R, a current stock of Y for that resource, T minutes left,
+		//  if you already have X robots creating resource R, a current stock of Y for that resource, remainingTime minutes left,
 		//   and no robot requires more than Z of resource R to build,
-		//   and X * T+Y >= T * Z, then you never need to build another robot mining R anymore.
-		T := int16(maxTime - s.time)
+		//   and X * remainingTime+Y >= remainingTime * Z, then you never need to build another robot mining R anymore.
 		Z := utils.Max(utils.Max(condition[0][i], condition[1][i]), utils.Max(condition[2][i], condition[3][i]))
-		if int16(s.robot[i])*T+s.product[i] >= T*Z {
+		if int16(s.robot[i])*remainingTime+s.product[i] >= remainingTime*Z {
 			continue
 		}
 
 		if s.product[ORE] >= condition[i][ORE] && s.product[CLAY] >= condition[i][CLAY] && s.product[OBSIDIAN] >= condition[i][OBSIDIAN] {
 			newState := s
 			newState.time += 1
-			for j := 0; j < 4; j++ {
+			for j := 0; j < NBROBOT; j++ {
 				newState.product[j] += int16(s.robot[j])
 			}
 			newState.product[0] -= condition[i][0]
@@ -122,13 +124,13 @@ func removeDuplicates(states []State) []State {
 	if len(states) == 0 {
 		return states
 	}
-	time := states[0].time
+	t := states[0].time
 	robotToProduct := map[Robot]Product{}
 	bag := utils.Set[State]{}
 	// compute max product for a given robot configuration
 	for _, s := range states {
 		bag.Add(s)
-		if s.time != time {
+		if s.time != t {
 			panic("should not happen")
 		}
 		oldProduct, ok := robotToProduct[s.robot]
@@ -148,7 +150,7 @@ func removeDuplicates(states []State) []State {
 		}
 	}
 
-	//fmt.Println("removeDuplicates time", time, len(states), "->", len(res))
+	//fmt.Println("removeDuplicates t", t, len(states), "->", len(res))
 	return res
 
 }
@@ -249,7 +251,8 @@ func parse(input string) ([]State, []Condition) {
 		s := State{
 			time:    0,
 			product: Product{0, 0, 0, 0},
-			robot:   Robot{1, 0, 0, 0},
+			//robot:   Robot{1, 0, 0, 0},
+			robot: Robot{1, 0, 0},
 		}
 		states = append(states, s)
 		conditions = append(conditions, condition)

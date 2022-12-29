@@ -12,42 +12,46 @@ import (
 //go:embed input.txt
 var input_day string
 
+const (
+	ORE      = 0
+	CLAY     = 1
+	OBSIDIAN = 2
+	GEODE    = 3
+)
+
 type State struct {
 	time    int8
 	product Product
 	robot   Robot
-	//condition [4][3]int16 // needed ORE, CLAY, OBSIDIAN
 }
 
 type Product [4]int16
 type Robot [4]int8
-type Condition [4][3]int16
-type Production struct {
-	time    int8
-	product [4]int16
-}
+type Condition [4][3]int16 // needed ORE, CLAY, OBSIDIAN
 
 func (s State) String() string {
 	return fmt.Sprintf("time: %d, product: %v, robot: %v\n", s.time, s.product, s.robot)
 }
 
-func neighbors(s State, condition Condition) []State {
+func neighbors(s State, condition Condition, maxTime int8) []State {
 	res := []State{}
 
-	if s.product[0] >= condition[3][0] && s.product[1] >= condition[3][1] && s.product[2] >= condition[3][2] {
+	if s.product[ORE] >= condition[GEODE][ORE] && s.product[CLAY] >= condition[GEODE][CLAY] && s.product[OBSIDIAN] >= condition[GEODE][OBSIDIAN] {
+		// if we can build a GEODE we do it
 		newState := s
 		newState.time += 1
 		for j := 0; j < 4; j++ {
 			newState.product[j] += int16(s.robot[j])
 		}
-		newState.product[0] -= condition[3][0]
-		newState.product[1] -= condition[3][1]
-		newState.product[2] -= condition[3][2]
-		newState.robot[3] += 1
+		newState.product[0] -= condition[GEODE][0]
+		newState.product[1] -= condition[GEODE][1]
+		newState.product[2] -= condition[GEODE][2]
+		newState.robot[GEODE] += 1
 		res = append(res, newState)
 		return res
 	}
 
+	// generate products
 	newState := s
 	newState.time += 1
 	for i := 0; i < 4; i++ {
@@ -55,8 +59,30 @@ func neighbors(s State, condition Condition) []State {
 	}
 	res = append(res, newState)
 
-	for i := 0; i < 4; i++ {
-		if s.product[0] >= condition[i][0] && s.product[1] >= condition[i][1] && s.product[2] >= condition[i][2] {
+	if s.time+1 == maxTime {
+		// remaining time is not enough to build anything
+		return res
+	}
+
+	for i := 0; i < 3; i++ {
+		// build new robots
+		prod := int16(s.robot[i])
+		if prod > condition[0][i] && prod > condition[1][i] && prod > condition[2][i] && prod > condition[3][i] {
+			// do not product a new robot if the production is higher than needed
+			continue
+		}
+
+		//For any resource R that's not geode:
+		//  if you already have X robots creating resource R, a current stock of Y for that resource, T minutes left,
+		//   and no robot requires more than Z of resource R to build,
+		//   and X * T+Y >= T * Z, then you never need to build another robot mining R anymore.
+		T := int16(maxTime - s.time)
+		Z := utils.Max(utils.Max(condition[0][i], condition[1][i]), utils.Max(condition[2][i], condition[3][i]))
+		if int16(s.robot[i])*T+s.product[i] >= T*Z {
+			continue
+		}
+
+		if s.product[ORE] >= condition[i][ORE] && s.product[CLAY] >= condition[i][CLAY] && s.product[OBSIDIAN] >= condition[i][OBSIDIAN] {
 			newState := s
 			newState.time += 1
 			for j := 0; j < 4; j++ {
@@ -73,13 +99,13 @@ func neighbors(s State, condition Condition) []State {
 }
 
 func smaller(a, b Product) bool {
-	if a[3] < b[3] {
+	if a[GEODE] < b[GEODE] {
 		return true
 	}
 	// not sure this is correct for any input, but it works for my input
-	if a[3] == b[3] && a[2] < b[2] {
-		return true
-	}
+	//if a[3] == b[3] && a[2] < b[2] {
+	//	return true
+	//}
 	// sure this is not correct, but it works for my input
 	//if a[3] == b[3] && a[2] == b[2] && a[1]+3 < b[1] {
 	//	return true
@@ -110,13 +136,6 @@ func removeDuplicates(states []State) []State {
 			robotToProduct[s.robot] = s.product
 		}
 	}
-	//fmt.Println("robotToProduct", robotToProduct)
-
-	//if len(bag) != len(states) {
-	//	fmt.Println(len(states))
-	//	fmt.Println(len(bag))
-	//	//panic("should not happen")
-	//}
 
 	res := []State{}
 	//for _, s := range states {
@@ -162,22 +181,6 @@ func removeDuplicates2(states []State) []State {
 		byRobot[robot] = other
 	}
 
-	//for robot := range byRobot {
-	//	max := [4]int{0, 0, 0, 0}
-	//	other := byRobot[robot]
-	//	for a := range other {
-	//		if smaller(max, a.product) {
-	//			max = a.product
-	//		}
-	//	}
-	//	for a := range byRobot[robot] {
-	//		if smaller(a.product, max) {
-	//			other.Remove(a)
-	//		}
-	//	}
-	//	byRobot[robot] = other
-	//}
-
 	res := []State{}
 	for robot := range byRobot {
 		for s := range byRobot[robot] {
@@ -192,45 +195,28 @@ func removeDuplicates2(states []State) []State {
 
 func solve(s State, condition Condition, maxTime int8) int {
 	todo := []State{s}
-	//seen := map[State]Production{}
-
 	var max int16 = 0
 	for len(todo) > 0 {
 		s = todo[0]
 		todo = todo[1:]
-		next := neighbors(s, condition)
+		next := neighbors(s, condition, maxTime)
 
 		for len(todo) > 0 && todo[0].time == s.time {
 			s = todo[0]
 			todo = todo[1:]
-			next = append(next, neighbors(s, condition)...)
+			next = append(next, neighbors(s, condition, maxTime)...)
 		}
 
 		if len(todo) > 0 {
 			panic("should not happen")
 		}
 
-		next = removeDuplicates(next)
+		next = removeDuplicates2(next)
 
 		for _, n := range next {
 			if n.time < maxTime {
-
-				//if oldProduct, ok := seen[n]; ok {
-				//	if oldProduct.time <= n.time {
-				//		if smaller(n.product, oldProduct.product) || n.product == oldProduct.product {
-				//			//fmt.Println("seen", oldProduct, "skip", n)
-				//			continue
-				//		} else if smaller(oldProduct.product, n.product) {
-				//			seen[n] = Production{n.time, n.product}
-				//			//fmt.Println("seen", oldProduct, "replace by", n)
-				//		}
-				//	}
-				//}
-				//seen[n] = Production{n.time, n.product}
-
 				todo = append(todo, n)
 			} else if n.product[3] > max {
-				//fmt.Println("new max", n)
 				max = n.product[3]
 
 			}
@@ -276,7 +262,6 @@ func Part1(input string) int {
 	res := 0
 	for i := 0; i < len(states); i++ {
 		max := solve(states[i], conditions[i], 24)
-		//fmt.Println("input", i+1, " --> ", max)
 		res = res + (max * (i + 1))
 	}
 	return res
@@ -287,11 +272,9 @@ func Part2(input string) int {
 	res := 1
 	for i := 0; i < utils.Min(3, len(states)); i++ {
 		max := solve(states[i], conditions[i], 32)
-		//fmt.Println("input", i+1, " --> ", max)
 		res = res * max
 	}
 	return res
-	// 13, 31, 42 -> 16926
 }
 
 func main() {

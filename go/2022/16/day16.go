@@ -12,6 +12,8 @@ import (
 //go:embed input.txt
 var input_day string
 
+const NBVALVES = 16
+
 type Valve struct {
 	name int
 	rate int
@@ -21,19 +23,19 @@ type Valve struct {
 
 type Network map[int]*Valve
 
-func neighbors(network Network, s State) []State {
+func neighbors(network Network, s State, maxTime int) []State {
 	res := []State{}
 	for name := range network {
 		candidate := network[name]
 		cost := network[s.name].cost[name]
-		if candidate.rate > 0 && !s.path[candidate.name] && s.time+cost <= 30 {
+		if candidate.rate > 0 && !s.path[candidate.name] && s.time+cost <= maxTime {
 			newPath := s.path
 			newPath[candidate.name] = true
 			res = append(res, State{
 				name: candidate.name,
 				time: s.time + cost,
 				path: newPath,
-				prod: s.prod + (30-(s.time+cost))*candidate.rate,
+				prod: s.prod + (maxTime-(s.time+cost))*candidate.rate,
 			})
 
 		}
@@ -114,9 +116,7 @@ func listContains(list []int, name int) bool {
 }
 
 func distance(start, end int, network Network, path []int) []int {
-	//fmt.Println("start", start, "end", end, "path", path)
 	path = append(path, start)
-	//fmt.Println("path", path)
 	if start == end {
 		return path
 	}
@@ -126,7 +126,6 @@ func distance(start, end int, network Network, path []int) []int {
 	}
 	shortest := []int{}
 	for _, n := range network[start].dest {
-		//fmt.Println("n", n)
 		if !listContains(path, n) {
 			newpath := distance(n, end, network, path)
 			if len(newpath) > 0 {
@@ -142,24 +141,25 @@ func distance(start, end int, network Network, path []int) []int {
 type State struct {
 	name int
 	time int
-	path [64]bool
+	path [NBVALVES]bool
 	prod int
 }
 
-func findMaxProduction(network Network, start State) int {
+func allPath(network Network, start State, maxTime int) map[[NBVALVES]bool]int {
+	res := make(map[[NBVALVES]bool]int)
 	queue := []State{start}
-	maxProd := math.MinInt
 	for len(queue) > 0 {
 		current := queue[0]
 		queue = queue[1:]
-		//fmt.Println("current", current)
-		maxProd = utils.Max(maxProd, current.prod)
-		n := neighbors(network, current)
+		if max, ok := res[current.path]; !ok || max < current.prod {
+			res[current.path] = current.prod
+		}
+		n := neighbors(network, current, maxTime)
 		for _, s := range n {
 			queue = append(queue, s)
 		}
 	}
-	return maxProd
+	return res
 }
 
 func Part1(input string) int {
@@ -168,29 +168,46 @@ func Part1(input string) int {
 		name: name,
 		time: 0,
 		prod: 0,
-		path: [64]bool{},
+		path: [NBVALVES]bool{},
 	}
 
-	res := findMaxProduction(actives, start)
-	return res
-}
+	paths := allPath(actives, start, 30)
 
-// var keys []int
-var space map[State3]int
+	max := math.MinInt
+	for _, p := range paths {
+		max = utils.Max(max, p)
+	}
+	return max
+}
 
 func Part2(input string) int {
 	_, actives, name := parse(input)
-	start := State2{
-		name1: name,
-		name2: name,
-		time1: 0,
-		time2: 0,
-		prod:  0,
-		path:  [64]bool{},
+
+	res := math.MinInt
+
+	start := State{
+		name: name,
+		time: 0,
+		prod: 0,
+		path: [NBVALVES]bool{},
 	}
 
-	space = make(map[State3]int)
-	res := findMaxProduction2(actives, start)
+	paths := allPath(actives, start, 26)
+	for p, max1 := range paths {
+		for q, max2 := range paths {
+			intersect := false
+			for i := 0; i < len(actives); i++ {
+				if p[i] && q[i] {
+					intersect = true
+					break
+				}
+			}
+			if !intersect {
+				res = utils.Max(res, max1+max2)
+			}
+		}
+	}
+
 	return res
 }
 
@@ -203,107 +220,4 @@ func main() {
 	start = time.Now()
 	fmt.Println("part2: ", Part2(input_day))
 	fmt.Println(time.Since(start))
-}
-
-type State2 struct {
-	name1 int
-	name2 int
-	time1 int
-	time2 int
-	path  [64]bool
-	prod  int
-}
-
-func (s State2) String() string {
-	bits := 0
-	for i := 0; i < len(s.path); i++ {
-		if s.path[i] {
-			bits++
-		}
-	}
-	return fmt.Sprintf("%d %d t1=%d t2=%d [%d] prod=%d", s.name1, s.name2, s.time1, s.time2, bits, s.prod)
-}
-
-func (s State3) String() string {
-	return fmt.Sprintf("%d %d t1=%d t2=%d", s.name1, s.name2, s.time1, s.time2)
-}
-
-type State3 struct {
-	name1 int
-	name2 int
-	time1 int
-	time2 int
-	path  [64]bool
-}
-
-func neighbors2(actives Network, s State2) []State2 {
-	res := []State2{}
-	for name1 := 1; name1 < len(actives); name1++ {
-		offset := 0
-		if s.name1 == 0 && s.name2 == 0 {
-			offset = name1
-		}
-		for name2 := 1 + offset; name2 < len(actives); name2++ {
-			if name1 == name2 {
-				continue
-			}
-			candidate1 := actives[name1]
-			candidate2 := actives[name2]
-			cost1 := actives[s.name1].cost[name1]
-			cost2 := actives[s.name2].cost[name2]
-			notVisited := !s.path[candidate1.name] && !s.path[candidate2.name]
-			if notVisited && s.time1+cost1 <= 26 && s.time2+cost2 <= 26 {
-				prod1 := (26 - (s.time1 + cost1)) * candidate1.rate
-				prod2 := (26 - (s.time2 + cost2)) * candidate2.rate
-				newPath := s.path
-				newPath[candidate1.name] = true
-				newPath[candidate2.name] = true
-				newProd := s.prod + prod1 + prod2
-				s3 := State3{
-					name1: candidate1.name,
-					name2: candidate2.name,
-					//time1: s.time1 + cost1,
-					//time2: s.time2 + cost2,
-					path: newPath,
-				}
-				if oldProd, ok := space[s3]; ok && newProd <= oldProd {
-					// do nothing
-					//fmt.Println("skip", s3, newProd, oldProd)
-				} else {
-					space[s3] = newProd
-					res = append(res, State2{
-						name1: candidate1.name,
-						name2: candidate2.name,
-						time1: s.time1 + cost1,
-						time2: s.time2 + cost2,
-						path:  newPath,
-						prod:  newProd,
-					})
-				}
-
-			}
-		}
-	}
-	return res
-}
-
-func findMaxProduction2(network Network, start State2) int {
-	queue := []State2{start}
-	maxProd := math.MinInt
-	cpt := 0
-	for len(queue) > 0 {
-		current := queue[0]
-		queue = queue[1:]
-
-		maxProd = utils.Max(maxProd, current.prod)
-		n := neighbors2(network, current)
-		for _, s := range n {
-			queue = append(queue, s)
-		}
-		cpt++
-		if cpt%100000 == 0 {
-			fmt.Println("cpt", cpt, "len", len(queue))
-		}
-	}
-	return maxProd
 }

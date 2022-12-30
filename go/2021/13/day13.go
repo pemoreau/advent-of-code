@@ -24,7 +24,7 @@ type Instr struct {
 }
 
 func BuildPos(input string) utils.Set[Pos] {
-	res := utils.BuildSet[Pos]()
+	res := utils.NewSet[Pos]()
 	for _, l := range strings.Split(input, "\n") {
 		coords := strings.SplitN(l, ",", 2)
 		x, _ := strconv.Atoi(coords[0])

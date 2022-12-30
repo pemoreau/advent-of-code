@@ -140,7 +140,7 @@ func parse(input string) []sensor {
 func Part1(input string) int {
 	sensors := parse(input)
 	ty := 2000000
-	beacons := utils.BuildSet[beacon]()
+	beacons := utils.NewSet[beacon]()
 	for _, s := range sensors {
 		if s.beacon.y == ty {
 			beacons.Add(*s.beacon)

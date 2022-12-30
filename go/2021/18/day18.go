@@ -189,7 +189,7 @@ func PushMagnitude(s *utils.Stack[value], v value) {
 }
 
 func Magnitude(l flattree) int {
-	stack := utils.BuildStack[value]()
+	stack := utils.NewStack[value]()
 	for _, v := range l {
 		PushMagnitude(&stack, v)
 	}

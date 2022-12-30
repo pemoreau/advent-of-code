@@ -57,7 +57,7 @@ func step(env *Env) {
 }
 
 func terminates(env Env) (bool, int) {
-	visited := utils.BuildSet[int]()
+	visited := utils.NewSet[int]()
 	for !visited.Contains(env.pc) {
 		if env.pc >= len(env.prg) {
 			return true, env.acc

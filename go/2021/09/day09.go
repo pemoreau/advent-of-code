@@ -56,7 +56,7 @@ func explore(m matrix) []utils.Set[Pos] {
 			if m[i][j] == 9 {
 				// already visited: skip
 			} else {
-				newBasin := utils.BuildSet[Pos]()
+				newBasin := utils.NewSet[Pos]()
 				collectNeighbors(Pos{i, j}, m, newBasin)
 				collectedBasin = append(collectedBasin, newBasin)
 			}

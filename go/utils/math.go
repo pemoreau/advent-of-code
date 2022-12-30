@@ -33,11 +33,9 @@ func GCD(a, b int) int {
 }
 
 func LCM(a, b int, integers ...int) int {
-	result := a * b / GCD(a, b)
-
+	res := a * b / GCD(a, b)
 	for i := 0; i < len(integers); i++ {
-		result = LCM(result, integers[i])
+		res = LCM(res, integers[i])
 	}
-
-	return result
+	return res
 }

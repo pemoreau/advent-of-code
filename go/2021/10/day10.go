@@ -37,7 +37,7 @@ var autoScore = map[rune]int{
 func parseLine(line string) (corrupted int, auto int) {
 	corrupted = 0
 	auto = 0
-	stack := utils.BuildStack[rune]()
+	stack := utils.NewStack[rune]()
 	for _, c := range line {
 		if c == '(' || c == '[' || c == '{' || c == '<' {
 			stack.Push(c)

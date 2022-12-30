@@ -19,7 +19,7 @@ func BuildStacks(part0 string) []utils.Stack[uint8] {
 	// build stacks
 	stacks := make([]utils.Stack[uint8], 0)
 	for i := 1; i < len(axe); i += 4 {
-		stacks = append(stacks, utils.BuildStack[uint8]())
+		stacks = append(stacks, utils.NewStack[uint8]())
 	}
 
 	// parse stacks

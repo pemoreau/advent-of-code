@@ -26,7 +26,7 @@ func NewState(n int) *State {
 	res := &State{
 		n:    n,
 		rope: make([]Pos, n),
-		path: utils.BuildSet[Pos](),
+		path: utils.NewSet[Pos](),
 	}
 	res.path.Add(res.rope[n-1])
 	return res

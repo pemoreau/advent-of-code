@@ -4,7 +4,7 @@ import "errors"
 
 type Stack[T any] []T
 
-func BuildStack[T any]() Stack[T] {
+func NewStack[T any]() Stack[T] {
 	return make(Stack[T], 0)
 }
 

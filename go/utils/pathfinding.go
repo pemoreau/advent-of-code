@@ -25,7 +25,7 @@ func Astar[T comparable](start T, goal goalFunction[T], neighbors neighborsFunct
 		//fmt.Println("current", current, "priority", priority)
 		if goal(current) {
 			// Found a path to the goal.
-			path := []T{}
+			var path []T
 			curr := current
 			for curr != start {
 				path = append(path, curr)

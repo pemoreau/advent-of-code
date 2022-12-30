@@ -16,6 +16,7 @@ Mostly written in Rust and Go
 - `cd go/<n>` and `go run .`
 - `go test` to run unit tests
 - `go test -bench .` to run benchmarks
+- `go test ./...` to run unit tests in all subdirectories
 
 # [Year 2022](README-2022.md)
 

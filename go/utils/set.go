@@ -2,7 +2,7 @@ package utils
 
 type Set[T comparable] map[T]struct{}
 
-func BuildSet[T comparable]() Set[T] {
+func NewSet[T comparable]() Set[T] {
 	return make(Set[T])
 }
 
@@ -66,7 +66,7 @@ func (s Set[T]) Union(other Set[T]) Set[T] {
 }
 
 func (s Set[T]) Intersect(other Set[T]) Set[T] {
-	res := BuildSet[T]()
+	res := NewSet[T]()
 	if s.Len() < other.Len() {
 		for elem := range s {
 			if other.Contains(elem) {

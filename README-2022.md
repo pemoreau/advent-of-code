@@ -301,49 +301,125 @@ To solve part 2, the intervals are merged into a unique one for each `y`. When t
 
 Used go routines to speed up the computation :-)
 
-## [Day 16: ](https://adventofcode.com/2022/day/16)
+## [Day 16: Proboscidea Volcanium](https://adventofcode.com/2022/day/16)
 
 Example of input:
 
 ```
-
+Valve AA has flow rate=0; tunnels lead to valves DD, II, BB
+Valve BB has flow rate=13; tunnels lead to valves CC, AA
+Valve CC has flow rate=2; tunnels lead to valves DD, BB
+Valve DD has flow rate=20; tunnels lead to valves CC, AA, EE
+Valve EE has flow rate=3; tunnels lead to valves FF, DD
+Valve FF has flow rate=0; tunnels lead to valves EE, GG
+Valve GG has flow rate=0; tunnels lead to valves FF, HH
+Valve HH has flow rate=22; tunnel leads to valve GG
+Valve II has flow rate=0; tunnels lead to valves AA, JJ
+Valve JJ has flow rate=21; tunnel leads to valve II
 ```
 
 ### [Go](./go/2022/16/day16.go)
 
+The problem was quite difficult until finding a nice way to model it
 
-## [Day 17: ](https://adventofcode.com/2022/day/17)
+Used Floyd–Warshall algorithm to compute the shortest path between 
+each pair of active valves
+
+Then used a simple BFS to compute all possible paths
+
+For part 2, for each path found by part 1, I search another path which
+does not intersect with the first one. 
+The max is the sum of the two max
+
+## [Day 17: Pyroclastic Flow](https://adventofcode.com/2022/day/17)
 
 Example of input:
 
 ```
+####
 
+.#.
+###
+.#.
+
+..#
+..#
+###
+
+#
+#
+#
+#
+
+##
 ```
 
 ### [Go](./go/2022/17/day17.go)
 
+Fun Tetris problem!
 
-## [Day 18: ](https://adventofcode.com/2022/day/18)
+Part 1 is not too difficult, but part 2 is a bit tricky
+
+For part 2, we keep in a list, the difference of maximal height each time a rock reach the ground.
+
+Then, in this list of integers we look for a cycle, using a naive algorithm (but Floyd Tortoise algorithm should have
+been used instead)
+
+From that list, the result can be easily found
+
+## [Day 18: Boiling Boulders](https://adventofcode.com/2022/day/18)
 
 Example of input:
 
 ```
-
+2,2,2
+1,2,2
+3,2,2
+2,1,2
+2,3,2
+2,2,1
+2,2,3
+2,2,4
+2,2,6
+1,2,5
+3,2,5
+2,1,5
+2,3,5
 ```
 
 ### [Go](./go/2022/18/day18.go)
 
+Minecraft problem
 
-## [Day 19: ](https://adventofcode.com/2022/day/19)
+Not too difficult: collect free space of the bounding box
+then substract the number of rocks
+
+## [Day 19: Not Enough Minerals](https://adventofcode.com/2022/day/19)
 
 Example of input:
 
 ```
+Blueprint 1:
+  Each ore robot costs 4 ore.
+  Each clay robot costs 2 ore.
+  Each obsidian robot costs 3 ore and 14 clay.
+  Each geode robot costs 2 ore and 7 obsidian.
 
+Blueprint 2:
+  Each ore robot costs 2 ore.
+  Each clay robot costs 3 ore.
+  Each obsidian robot costs 3 ore and 8 clay.
+  Each geode robot costs 3 ore and 12 obsidian.
 ```
 
 ### [Go](./go/2022/19/day19.go)
 
+Another difficult problem.
+
+I have used an order to compare collected resources and removed redundant states.
+I.e. those who have the same amount of robots but fewer collected resources
+
+To be efficient, some smart tests have to be implemented to cut down the search space
 
 ## [Day 20: Grove Positioning System](https://adventofcode.com/2022/day/20)
 
@@ -387,6 +463,8 @@ hmdt: 32
 
 ### [Go](./go/2022/21/day21.go)
 
+I have used a full symbolic approach to compute the value of `root` 
+and to isolate the variable `humn`
 
 ## [Day 22: Monkey Map](https://adventofcode.com/2022/day/22)
 
@@ -411,6 +489,7 @@ Example of input:
 
 ### [Go](./go/2022/22/day22.go)
 
+Not too difficult but a bit boring
 
 ## [Day 23: Unstable Diffusion](https://adventofcode.com/2022/day/23)
 
@@ -428,7 +507,7 @@ Example of input:
 
 ### [Go](./go/2022/23/day23.go)
 
-
+Nothing special
 
 ## [Day 24: Blizzard Basin](https://adventofcode.com/2022/day/24)
 

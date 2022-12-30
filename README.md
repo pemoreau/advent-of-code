@@ -21,6 +21,10 @@ Mostly written in Rust and Go
 
 <a href="https://adventofcode.com"><img src="assets/calendar_2022.png" width="80%" /></a>
 
+Comments: [Here](README-2022.md)
+
+Execution time on an MacBook Air M2
+
 | Go                              | part A       | part B      |
 |---------------------------------|--------------|-------------|
 | [day 01](./go/2022/01/day01.go) | ` 0.092 ms`  | ` 0.098 ms` |
@@ -53,6 +57,7 @@ Mostly written in Rust and Go
 
 <a href="https://adventofcode.com"><img src="assets/calendar_2021.png" width="80%" /></a>
 
+Comments: [Here](README-2021.md)
 
 Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
@@ -85,6 +90,8 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                             |             |             | [day 25](./go/2021/25/day25.go)            | ` 98.00 ms` | ` 0.003 ms` |
 
 # [Year 2020](README-2020.md)
+
+Comments: [Here](README-2020.md)
 
 Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 

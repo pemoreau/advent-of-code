@@ -3,6 +3,8 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
+	"sort"
 	"strings"
 	"time"
 )
@@ -10,138 +12,81 @@ import (
 //go:embed input.txt
 var input_day string
 
-func fillIndex(list []string, index int32, mapIndex map[string]int32) int32 {
-	for _, a := range list {
-		if _, ok := mapIndex[a]; !ok {
-			mapIndex[a] = index
-			index++
-		}
-	}
-	return index
-}
-
-func display(n int, iConstraint []BitVec, aConstraint []BitVec) {
-	for i := 0; i < n; i++ {
-		//for e := range iConstraint[i] {
-		//	if iConstraint[i][e] {
-		//		fmt.Print("X")
-		//	} else {
-		//		fmt.Print(" ")
-		//	}
-		//}
-		//fmt.Print("|")
-		//for e := range aConstraint[i] {
-		//	if aConstraint[i][e] {
-		//		fmt.Print("X")
-		//	} else {
-		//		fmt.Print(" ")
-		//	}
-		//}
-		//fmt.Println()
-		fmt.Printf("%v|%v", iConstraint[i], aConstraint[i])
-		if iConstraint[i].Count() == 1 {
-			fmt.Printf("(%d)", iConstraint[i].Next(0))
-		}
-		fmt.Println()
-	}
-}
-
-type Constraints struct {
-	n            int
-	ingredrients []BitVec
-	allergens    []BitVec
-}
-
-func Part1(input string) int {
+func parse(input string) (allergens map[string]utils.Set[string], icount map[string]int) {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	allergenIndex := make(map[string]int32)
-	ingredientIndex := make(map[string]int32)
-	var aIndex int32 = 0
-	var iIndex int32 = 0
 
-	ingredients := make([][]string, 0, len(lines))
-	allergens := make([][]string, 0, len(lines))
+	icount = map[string]int{}
+	allergens = map[string]utils.Set[string]{} // allergen -> ingredients
+
 	for _, line := range lines {
+		ingredients := utils.Set[string]{}
+
 		parts := strings.Split(line, " (contains ")
 		iList := strings.Split(parts[0], " ")
 		parts[1] = strings.TrimSuffix(parts[1], ")")
 		aList := strings.Split(parts[1], ", ")
 
-		ingredients = append(ingredients, iList)
-		allergens = append(allergens, aList)
-
-		iIndex = fillIndex(iList, iIndex, ingredientIndex)
-		aIndex = fillIndex(aList, aIndex, allergenIndex)
-	}
-	//fmt.Println("ingredients", ingredients)
-	//fmt.Println("allergens", allergens)
-
-	iConstraint := make([]BitVec, len(lines))
-	aConstraint := make([]BitVec, len(lines))
-	for line := 0; line < len(lines); line++ {
-		iConstraint[line] = New(iIndex)
-		aConstraint[line] = New(aIndex)
-		for _, i := range ingredients[line] {
-			iConstraint[line].Set(ingredientIndex[i])
+		for _, i := range iList {
+			ingredients.Add(i)
+			icount[i]++
 		}
-		for _, a := range allergens[line] {
-			aConstraint[line].Set(allergenIndex[a])
-		}
-	}
 
-	display(len(lines), iConstraint, aConstraint)
-
-	for i := 0; i < len(lines); i++ {
-		if aConstraint[i].Count() == 1 {
-			// intersect with lines which have the same allergen
-			allergen := aConstraint[i].Next(0)
-			for j := 0; j < len(lines); j++ {
-				if aConstraint[j].Get(allergen) {
-					iConstraint[i].And(iConstraint[i], iConstraint[j])
+		for _, a := range aList {
+			if _, ok := allergens[a]; !ok {
+				allergens[a] = utils.Set[string]{}
+				for i := range ingredients {
+					allergens[a].Add(i)
+				}
+			} else {
+				for i := range allergens[a] {
+					if !ingredients.Contains(i) {
+						allergens[a].Remove(i)
+					}
 				}
 			}
 		}
 	}
-	fmt.Println("after intersection")
-	display(len(lines), iConstraint, aConstraint)
-
-	for i := 0; i < len(lines); i++ {
-		if aConstraint[i].Count() == 1 && iConstraint[i].Count() == 1 {
-			// propagate to other one-allergen lines
-			ingredient := iConstraint[i].Next(0)
-			for j := 0; j < len(lines); j++ {
-				if j != i && aConstraint[j].Count() == 1 && aConstraint[i].Next(0) != aConstraint[j].Next(0) {
-					iConstraint[j].Unset(ingredient)
-				}
-			}
-		}
-	}
-	fmt.Println("after propagation")
-	display(len(lines), iConstraint, aConstraint)
-
-	set := New(iIndex)
-	for i := 0; i < len(lines); i++ {
-		if aConstraint[i].Count() == 1 {
-			set.Or(set, iConstraint[i])
-		}
-	}
-	res := 0
-	for i := 0; i < iIndex; i++ {
-		for j := 0; j < len(lines); j++ {
-
-		}
-
-	}
-
-	return 0
+	return
 }
 
-func Part2(input string) int {
-	// input = strings.TrimSuffix(input, "\n")
-	// lines := strings.Split(input, "\n")
-	return 0
+func Part1(input string) int {
+	allergens, icount := parse(input)
+	res := 0
+next:
+	for i := range icount {
+		for _, aset := range allergens {
+			if aset.Contains(i) {
+				continue next
+			}
+		}
+		res += icount[i]
+	}
+	return res
+}
 
+func Part2(input string) string {
+	allergens, _ := parse(input)
+
+	containAllergen := map[string]string{} // ingredient -> allergen
+
+	ingredients := []string{}
+	for len(allergens) > 0 {
+		for a, aset := range allergens {
+			if len(aset) == 1 {
+				i := aset.Element()
+				for a := range allergens {
+					allergens[a].Remove(i)
+				}
+				delete(allergens, a)
+				containAllergen[i] = a
+				ingredients = append(ingredients, i)
+			}
+		}
+	}
+
+	sort.Slice(ingredients, func(i, j int) bool { return containAllergen[ingredients[i]] < containAllergen[ingredients[j]] })
+	return strings.Join(ingredients, ",")
 }
 
 func main() {

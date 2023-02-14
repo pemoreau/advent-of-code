@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//go:embed input_test.txt
+//go:embed input.txt
 var input_day string
 
 type Game struct {
@@ -18,6 +18,11 @@ type Game struct {
 	past1  utils.Set[int]
 	past2  utils.Set[int]
 	winner int
+	round  int
+}
+
+func (g Game) String() string {
+	return fmt.Sprintf("round: %d\ndeck1: %v\ndeck2: %v\n", g.round, g.deck1, g.deck2)
 }
 
 func endOfGame(g Game) bool {
@@ -68,7 +73,7 @@ func Part1(input string) int {
 		deck2 = append(deck2, num)
 	}
 
-	game := Game{deck1, deck2, utils.NewSet[int](), utils.NewSet[int](), 0}
+	game := Game{deck1, deck2, utils.NewSet[int](), utils.NewSet[int](), 0, 0}
 	for !endOfGame(game) {
 		game = playRound(game)
 	}
@@ -90,10 +95,17 @@ func hash(deck []int) int {
 }
 
 func playRound2(g Game) Game {
+	g.round++
 	h1 := hash(g.deck1)
 	h2 := hash(g.deck2)
+
+	//fmt.Println(g.round)
+
 	// rule 1
 	if g.past1.Contains(h1) && g.past2.Contains(h2) {
+		//fmt.Println("rule 1")
+		//fmt.Println("past1", g.past1)
+		//fmt.Println("past2", g.past2)
 		g.winner = 1
 		return g
 	}
@@ -111,17 +123,20 @@ func playRound2(g Game) Game {
 		newDeck2 := make([]int, card2)
 		copy(newDeck1, g.deck1[:card1])
 		copy(newDeck2, g.deck2[:card2])
-		newGame := Game{newDeck1, newDeck2, utils.NewSet[int](), utils.NewSet[int](), 0}
+		newGame := Game{newDeck1, newDeck2, utils.NewSet[int](), utils.NewSet[int](), 0, 0}
+		//fmt.Println("start recursive game")
 		for !endOfGame(newGame) {
 			newGame = playRound2(newGame)
 		}
-		if newGame.winner == 1 {
+		//fmt.Println("end recursive game, winner: ", newGame.winner)
+		if len(newGame.deck1) > 0 || newGame.winner == 1 {
 			//g.winner = 1
 			g.deck1 = append(g.deck1, card1, card2)
-		} else if newGame.winner == 2 {
+		} else if len(newGame.deck2) > 0 || newGame.winner == 2 {
 			//g.winner = 2
 			g.deck2 = append(g.deck2, card2, card1)
 		}
+		//fmt.Println("winner", newGame.winner)
 		return g
 	}
 
@@ -130,6 +145,8 @@ func playRound2(g Game) Game {
 	} else {
 		g.deck2 = append(g.deck2, card2, card1)
 	}
+	//fmt.Println("default case")
+	//fmt.Println(g)
 	return g
 }
 
@@ -150,7 +167,7 @@ func Part2(input string) int {
 		deck2 = append(deck2, num)
 	}
 
-	game := Game{deck1, deck2, utils.NewSet[int](), utils.NewSet[int](), 0}
+	game := Game{deck1, deck2, utils.NewSet[int](), utils.NewSet[int](), 0, 0}
 	for !endOfGame(game) {
 		game = playRound2(game)
 	}
@@ -158,7 +175,7 @@ func Part2(input string) int {
 }
 
 func main() {
-	fmt.Println("--2020 day 21 solution--")
+	fmt.Println("--2020 day 22 solution--")
 	start := time.Now()
 	fmt.Println("part1: ", Part1(input_day))
 	fmt.Println(time.Since(start))

@@ -4,8 +4,8 @@ import (
 	"testing"
 )
 
-var input_test = 389125467
-var input_day = 156794823
+var input_test = "389125467"
+var input_day = "156794823"
 
 func TestPart1(t *testing.T) {
 	result := Part1(input_test)

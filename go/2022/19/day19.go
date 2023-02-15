@@ -62,6 +62,11 @@ func neighbors(s State, condition Condition, maxTime int8) []State {
 	}
 	res = append(res, newState)
 
+	if remainingTime == 2 {
+		// remaining time is not enough to build anything,
+		// except a geode robot
+		return res
+	}
 	if remainingTime == 1 {
 		// remaining time is not enough to build anything
 		return res

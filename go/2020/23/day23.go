@@ -22,7 +22,7 @@ func displayRing(current, r *ring.Ring) {
 	fmt.Println()
 }
 
-func step(current, r *ring.Ring) (*ring.Ring, *ring.Ring) {
+func step(current, r *ring.Ring, index []*ring.Ring) (*ring.Ring, *ring.Ring) {
 	//fmt.Print("cups: ")
 	//displayRing(current, r)
 
@@ -36,37 +36,23 @@ func step(current, r *ring.Ring) (*ring.Ring, *ring.Ring) {
 	//displayRing(current, r)
 
 	destination := current.Value.(int) - 1
-	if destination == 0 {
-		destination = 9
-	}
 
-	r2 := removed
-	for {
-		found := false
-		for i := 0; i < r2.Len(); i++ {
-			if r2.Value.(int) == destination {
-				found = true
-				break
-			}
-			r2 = r2.Next()
-		}
-		if !found {
-			break
-		}
+	a := removed.Value.(int)
+	b := removed.Next().Value.(int)
+	c := removed.Next().Next().Value.(int)
+	if destination == 0 {
+		destination = len(index) - 1
+	}
+	for destination == a || destination == b || destination == c {
 		destination--
 		if destination == 0 {
-			destination = 9
+			destination = len(index) - 1
 		}
 	}
 	//fmt.Println("destination: ", destination)
 
 	// find destination
-	for i := 0; i < r.Len(); i++ {
-		if r.Value.(int) == destination {
-			break
-		}
-		r = r.Next()
-	}
+	r = index[destination]
 
 	//fmt.Println("before insertion: ", r.Value)
 	//displayRing(current, r)
@@ -101,11 +87,12 @@ func toResult(r *ring.Ring) string {
 
 func Part1(input string) int {
 	r := ring.New(len(input))
-
+	index := make([]*ring.Ring, len(input)+1)
 	var current = r
 	for _, c := range input {
 		n := int(c - '0')
 		r.Value = n
+		index[n] = r
 		r = r.Next()
 	}
 	//displayRing(current, r)
@@ -114,7 +101,7 @@ func Part1(input string) int {
 	for i := 0; i < 100; i++ {
 		//fmt.Println()
 		//fmt.Println("-- move ", i+1, " --")
-		current, r = step(current, r)
+		current, r = step(current, r, index)
 	}
 
 	//displayRing(current, r)
@@ -126,15 +113,18 @@ func Part1(input string) int {
 
 func Part2(input string) int {
 	r := ring.New(1000000)
+	index := make([]*ring.Ring, 1000000+1)
 
 	var current = r
 	for _, c := range input {
 		n := int(c - '0')
 		r.Value = n
+		index[n] = r
 		r = r.Next()
 	}
 	for i := len(input) + 1; i <= 1000000; i++ {
 		r.Value = i
+		index[i] = r
 		r = r.Next()
 	}
 
@@ -144,21 +134,21 @@ func Part2(input string) int {
 	for i := 0; i < 10000000; i++ {
 		//fmt.Println()
 		//fmt.Println("-- move ", i+1, " --")
-		current, r = step(current, r)
+		current, r = step(current, r, index)
 	}
 
 	//displayRing(current, r)
 	//fmt.Println("current: ", current.Value)
 
-	fmt.Println("len: ", r.Len())
-
-	return 0
+	a := index[1].Next().Value.(int)
+	b := index[1].Next().Next().Value.(int)
+	return a * b
 }
 
 func main() {
 	fmt.Println("--2020 day 23 solution--")
-	//input_day := "156794823"
-	input_day := "389125467" // test
+	input_day := "156794823"
+	//input_day := "389125467" // test
 	start := time.Now()
 	fmt.Println("part1: ", Part1(input_day))
 	fmt.Println(time.Since(start))

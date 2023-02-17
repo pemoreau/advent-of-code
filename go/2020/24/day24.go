@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"strings"
 	"time"
 )
@@ -40,57 +41,49 @@ func toDirections(s string) []int {
 	return res
 }
 
-func countBlack(tiles map[Hex]bool) int {
-	count := 0
-	for _, v := range tiles {
-		if v {
-			count++
-		}
-	}
-	return count
-}
-
-func Part1(input string) int {
+func parse(input string) utils.Set[Hex] {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
-	tiles := make(map[Hex]bool)
+	blackTiles := utils.Set[Hex]{}
 	for _, line := range lines {
 		hex := Hex{0, 0, 0}
 		for _, dir := range toDirections(line) {
 			hex = hexNeighbors(hex)[dir]
 		}
-		tiles[hex] = !tiles[hex]
-
-	}
-
-	return countBlack(tiles)
-}
-
-func step(tiles map[Hex]bool) map[Hex]bool {
-
-	// count black neighbors
-	neighbors := make(map[Hex]int)
-	for hex, isBlack := range tiles {
-		if isBlack {
-			for _, n := range hexNeighbors(hex) {
-				neighbors[n]++
-			}
+		if blackTiles.Contains(hex) {
+			blackTiles.Remove(hex)
+		} else {
+			blackTiles.Add(hex)
 		}
 	}
 
-	res := make(map[Hex]bool)
+	return blackTiles
+}
+
+func Part1(input string) int {
+	return len(parse(input))
+}
+
+func step(blackTiles utils.Set[Hex]) utils.Set[Hex] {
+	// number of black blackNeighbors
+	blackNeighbors := make(map[Hex]int)
+	for hex := range blackTiles {
+		for _, n := range hexNeighbors(hex) {
+			blackNeighbors[n]++
+		}
+	}
+
 	// apply rules
-	for hex := range neighbors {
-		if tiles[hex] {
-			if neighbors[hex] == 0 || neighbors[hex] > 2 {
-				res[hex] = false
-			} else {
-				res[hex] = true
+	res := utils.Set[Hex]{}
+	for hex := range blackNeighbors {
+		if blackTiles.Contains(hex) {
+			if !(blackNeighbors[hex] == 0 || blackNeighbors[hex] > 2) {
+				res.Add(hex)
 			}
 		} else {
-			if neighbors[hex] == 2 {
-				res[hex] = true
+			if blackNeighbors[hex] == 2 {
+				res.Add(hex)
 			}
 		}
 	}
@@ -99,27 +92,11 @@ func step(tiles map[Hex]bool) map[Hex]bool {
 }
 
 func Part2(input string) int {
-	input = strings.TrimSuffix(input, "\n")
-	lines := strings.Split(input, "\n")
-
-	tiles := make(map[Hex]bool)
-	for _, line := range lines {
-		hex := Hex{0, 0, 0}
-		for _, dir := range toDirections(line) {
-			hex = hexNeighbors(hex)[dir]
-		}
-		if _, ok := tiles[hex]; !ok {
-			tiles[hex] = true
-		} else {
-			delete(tiles, hex)
-		}
-	}
-
+	blackTiles := parse(input)
 	for i := 0; i < 100; i++ {
-		tiles = step(tiles)
-		//fmt.Println("day", i+1, ":", countBlack(tiles))
+		blackTiles = step(blackTiles)
 	}
-	return countBlack(tiles)
+	return blackTiles.Len()
 }
 
 func main() {

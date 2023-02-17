@@ -92,6 +92,8 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
 # [Year 2020](README-2020.md)
 
+<a href="https://adventofcode.com"><img src="assets/calendar_2020.png" width="80%" /></a>
+
 ## Comments: [Here](README-2020.md)
 
 Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5

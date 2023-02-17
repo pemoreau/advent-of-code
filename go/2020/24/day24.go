@@ -15,6 +15,7 @@ type Hex struct {
 	r, s, q int
 }
 
+// use axial coordinates (https://www.redblobgames.com/grids/hexagons/)
 func hexNeighbors(h Hex) []Hex {
 	// directions: sw, w, nw, ne, e, se
 	return []Hex{

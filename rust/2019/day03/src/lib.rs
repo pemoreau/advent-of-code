@@ -20,41 +20,38 @@ fn mark(grid: &mut std::collections::HashMap<(i64, i64), i64>, orders: &str) {
     }
 }
 
-pub fn part1(input: String) -> i64 {
+fn get_grids(
+    input: String,
+) -> (
+    std::collections::HashMap<(i64, i64), i64>,
+    std::collections::HashMap<(i64, i64), i64>,
+) {
     let mut grid1 = std::collections::HashMap::new();
     let mut grid2 = std::collections::HashMap::new();
-    let mut cross = std::collections::HashMap::new();
     let mut orders = input.split('\n');
     let order1 = orders.next().unwrap();
     let order2 = orders.next().unwrap();
 
     mark(&mut grid1, order1);
     mark(&mut grid2, order2);
+    (grid1, grid2)
+}
+
+pub fn part1(input: String) -> i64 {
+    let (grid1, grid2) = get_grids(input);
+    let mut cross = std::collections::HashMap::new();
     for (x, y) in grid1.keys() {
         if grid2.contains_key(&(*x, *y)) {
             cross.insert((x, y), 0);
         }
     }
-    let mut min = i64::MAX;
-    for (x, y) in cross.keys() {
-        let dist = x.abs() + y.abs();
-        if dist < min {
-            min = dist;
-        }
-    }
-    min
+
+    cross.keys().map(|(x, y)| x.abs() + y.abs()).min().unwrap()
 }
 
 pub fn part2(input: String) -> i64 {
-    let mut grid1 = std::collections::HashMap::new();
-    let mut grid2 = std::collections::HashMap::new();
+    let (grid1, grid2) = get_grids(input);
     let mut cross = std::collections::HashMap::new();
-    let mut orders = input.split('\n');
-    let order1 = orders.next().unwrap();
-    let order2 = orders.next().unwrap();
-
-    mark(&mut grid1, order1);
-    mark(&mut grid2, order2);
     for ((x, y), v1) in grid1 {
         if grid2.contains_key(&(x, y)) {
             let v2 = grid2.get(&(x, y)).unwrap();

@@ -17,11 +17,11 @@ fn check1(password: String) -> bool {
 fn check_contain_double(password: String) -> bool {
     let mut array6 = [1; 6];
     let mut last = 0;
-    for (i,c) in password.chars().enumerate() {
+    for (i, c) in password.chars().enumerate() {
         let digit = c.to_digit(10).unwrap();
         if digit == last {
-            array6[i]= array6[i-1]+1;
-            array6[i-1]=1;
+            array6[i] = array6[i - 1] + 1;
+            array6[i - 1] = 1;
         }
         last = digit;
     }

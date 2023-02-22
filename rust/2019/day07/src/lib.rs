@@ -15,7 +15,7 @@ struct Machine {
     input: Vec<i64>,
     output: Vec<i64>,
     state: State,
-    out: bool,
+    out: bool, // flag set to true immediately after output
 }
 
 impl Machine {
@@ -173,8 +173,8 @@ fn run_amplifiers(program: &Vec<i64>, phases: Vec<&i64>) -> i64 {
     let mut last_output = 0;
     for phase in phases {
         let code = program.clone();
-        let mut input = vec![*phase, last_output];
-        let mut output = Vec::new();
+        let input = vec![*phase, last_output];
+        let output = Vec::new();
         let mut amp = Machine::new(code, input, output);
         amp.run();
         last_output = amp.get_last_output()

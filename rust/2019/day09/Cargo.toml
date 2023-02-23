@@ -6,3 +6,4 @@ edition = "2021"
 
 [dependencies]
 utils = { path = "../../utils" }
+intcode = { path = "../intcode" }

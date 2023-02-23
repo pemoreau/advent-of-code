@@ -189,3 +189,56 @@ impl Machine {
         self.state = State::Running;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn day07_1() {
+        use super::*;
+        let code = vec![
+            3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31, 1106, 0, 36, 98, 0,
+            0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104, 999, 1105, 1, 46, 1101, 1000, 1, 20, 4,
+            20, 1105, 1, 46, 98, 99,
+        ];
+        let mut machine = Machine::new(code.clone(), vec![7]);
+        machine.run();
+        assert_eq!(machine.get_last_output(), 999);
+
+        let mut machine = Machine::new(code.clone(), vec![8]);
+        machine.run();
+        assert_eq!(machine.get_last_output(), 1000);
+
+        let mut machine = Machine::new(code, vec![9]);
+        machine.run();
+        assert_eq!(machine.get_last_output(), 1001);
+    }
+
+    #[test]
+    fn day09_1() {
+        use super::*;
+        let code = vec![
+            109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99,
+        ];
+        let mut machine = Machine::new(code.clone(), vec![]);
+        let output = machine.run();
+        assert_eq!(output, code);
+    }
+
+    #[test]
+    fn day09_2() {
+        use super::*;
+        let code = vec![1102, 34915192, 34915192, 7, 4, 7, 99, 0];
+        let mut machine = Machine::new(code, vec![]);
+        machine.run();
+        assert_eq!(machine.get_last_output(), 1219070632396864);
+    }
+
+    #[test]
+    fn day09_3() {
+        use super::*;
+        let code = vec![104, 1125899906842624, 99];
+        let mut machine = Machine::new(code, vec![]);
+        machine.run();
+        assert_eq!(machine.get_last_output(), 1125899906842624);
+    }
+}

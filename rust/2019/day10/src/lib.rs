@@ -1,28 +1,9 @@
-use std::cmp::Ordering;
 use std::collections::HashSet;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 struct Pos {
     x: i64,
     y: i64,
-}
-
-impl Ord for Pos {
-    fn cmp(&self, other: &Self) -> Ordering {
-        if self == other {
-            return Ordering::Equal;
-        }
-
-        let angle1 = (self.y as f64).atan2(self.x as f64);
-        let angle2 = (other.y as f64).atan2(other.x as f64);
-        angle1.partial_cmp(&angle2).unwrap()
-    }
-}
-
-impl PartialOrd for Pos {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 fn gcd(mut n: i64, mut m: i64) -> i64 {
@@ -39,8 +20,6 @@ fn gcd(mut n: i64, mut m: i64) -> i64 {
 }
 
 fn can_be_seen(station: Pos, grid: &mut HashSet<Pos>, maxx: i64, maxy: i64) -> i64 {
-    // println!("pos: {:?} maxx: {} maxy: {}", station, maxx, maxy);
-
     let mut concentric = Vec::new();
     for i in 1..maxx.max(maxy) {
         for x in -i..=i {
@@ -68,12 +47,8 @@ fn can_be_seen(station: Pos, grid: &mut HashSet<Pos>, maxx: i64, maxy: i64) -> i
         pos.x >= 0 && pos.x <= maxx && pos.y >= 0 && pos.y <= maxy && pos != &station
     });
 
-    // println!("concentric: {:?}", concentric);
-    // println!("len: {}", concentric.len());
-
     let mut res = 0;
     for neighbor in concentric {
-        // println!("neighbor: {:?} ", neighbor);
         if grid.contains(&neighbor) {
             res += 1;
             grid.remove(&neighbor);
@@ -89,10 +64,8 @@ fn can_be_seen(station: Pos, grid: &mut HashSet<Pos>, maxx: i64, maxy: i64) -> i
                 if new_pos.x < 0 || new_pos.x > maxx || new_pos.y < 0 || new_pos.y > maxy {
                     break;
                 }
-                // println!("new_pos: {:?}", new_pos);
                 if grid.contains(&new_pos) {
                     grid.remove(&new_pos);
-                    // println!("removed: {:?}", new_pos);
                 }
             }
         }
@@ -114,24 +87,19 @@ pub fn part1(input: String) -> i64 {
     }
     let maxx = (input.lines().next().unwrap().len() - 1) as i64;
     let maxy = (input.lines().count() - 1) as i64;
-    // grid.iter()
-    //     .map(|pos| can_be_seen(pos.clone(), &mut grid.clone(), maxx, maxy))
-    //     .max()
-    //     .unwrap()
 
     let mut max = 0;
     for pos in grid.clone() {
         let res = can_be_seen(pos.clone(), &mut grid.clone(), maxx, maxy);
         if res > max {
             max = res;
-            println!("pos: {:?} res: {}", pos, res);
         }
     }
 
     max
 }
 
-fn angles(grid: &HashSet<Pos>, station: &Pos) -> Vec<(Pos)> {
+fn angles(grid: &HashSet<Pos>, station: &Pos) -> Vec<(Pos, f64)> {
     let mut angles = Vec::new();
     for pos in grid {
         if pos == station {
@@ -144,11 +112,10 @@ fn angles(grid: &HashSet<Pos>, station: &Pos) -> Vec<(Pos)> {
             x: diff_x / gcd,
             y: -diff_y / gcd,
         };
-        // println!("pos: {:?}, p: {:?}, angle: {}", pos, p, to_angle(p.clone()));
 
-        angles.push(p);
+        angles.push((p.clone(), to_angle(p)));
     }
-    angles.sort_by_key(|pos| to_angle(pos.clone()) as i64);
+    angles.sort_by(|(_, angle1), (_, angle2)| angle1.partial_cmp(angle2).unwrap());
     angles.dedup();
 
     angles
@@ -157,14 +124,25 @@ fn angles(grid: &HashSet<Pos>, station: &Pos) -> Vec<(Pos)> {
 fn to_angle(pos: Pos) -> f64 {
     let alpha = (pos.x as f64).atan2(pos.y as f64);
     let degree = alpha * 180.0 / std::f64::consts::PI;
-    (degree + 360.0) % 360.0
+    let res = degree + 360.0;
+    if res >= 360.0 {
+        res - 360.0
+    } else {
+        res
+    }
 }
 
-fn search(grid: &HashSet<Pos>, station: &Pos, angle: &Pos, maxx: i64, maxy: i64) -> Option<Pos> {
+fn search(
+    grid: &HashSet<Pos>,
+    station: &Pos,
+    angle: &(Pos, f64),
+    maxx: i64,
+    maxy: i64,
+) -> Option<Pos> {
     for i in 1.. {
         let pos = Pos {
-            x: station.x + angle.x * i,
-            y: station.y - angle.y * i,
+            x: station.x + angle.0.x * i,
+            y: station.y - angle.0.y * i,
         };
         if pos.x < 0 || pos.x > maxx || pos.y < 0 || pos.y > maxy {
             return None;
@@ -192,13 +170,11 @@ pub fn part2(input: String) -> i64 {
     let maxy = (input.lines().count() - 1) as i64;
     let station = Pos { x: 20, y: 19 };
     let angles = angles(&grid, &station);
-    println!("angles: {:?}", angles);
     let mut last_removed = 0;
     for i in 1..200 {
         let angle = &angles[i];
         if let Some(pos) = search(&grid, &station, &angle, maxx, maxy) {
             grid.remove(&pos);
-            // println!("{}: removed {:?}", i + 1, pos);
             last_removed = pos.x * 100 + pos.y;
         }
     }

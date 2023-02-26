@@ -11,8 +11,9 @@ pub struct Machine {
     memory: Vec<i64>,
     input: Vec<i64>,
     output: Vec<i64>,
-    pub state: State,
+    state: State,
     pub out: bool, // flag set to true immediately after output
+    last_output: usize,
     relative_base: usize,
 }
 
@@ -25,13 +26,14 @@ impl Machine {
             memory,
             input,
             output: vec![],
+            last_output: 0,
             state: State::Running,
             out: false,
             relative_base: 0,
         }
     }
 
-    pub fn run(&mut self) -> Vec<i64> {
+    pub fn run(&mut self) {
         loop {
             self.step();
             match self.state {
@@ -40,15 +42,24 @@ impl Machine {
                 State::Suspended => break,
             }
         }
-        self.output.clone()
+    }
+
+    pub fn is_halted(&self) -> bool {
+        self.state == State::Halted
     }
 
     pub fn run_one_step(&mut self) {
         self.step();
     }
 
-    pub fn get_last_output(&self) -> i64 {
-        self.output.last().unwrap().clone()
+    pub fn get_output(&self) -> Vec<i64> {
+        self.output.clone()
+    }
+
+    pub fn get_last_output(&mut self) -> Vec<i64> {
+        let res = self.output[self.last_output..].to_vec();
+        self.last_output = self.output.len();
+        res
     }
 
     pub fn put_input(&mut self, input: i64) {
@@ -62,10 +73,14 @@ impl Machine {
 
     fn decode_arg(&self, n: usize) -> i64 {
         let instr = self.memory[self.pc];
-        // println!("instr: {}", instr);
-        let mode = (instr / (10 as i64).pow((n + 1) as u32)) % 10;
         let a = self.memory[self.pc + n];
-        // println!("mode: {}, a: {}, base: {}", mode, a, self.relative_base);
+
+        let mode = match n {
+            1 => (instr / 100) % 10,
+            2 => (instr / 1000) % 10,
+            3 => (instr / 10000) % 10,
+            _ => panic!("Invalid argument"),
+        };
         let arg = match mode {
             0 => self.memory[a as usize],
             1 => a as i64,
@@ -76,8 +91,13 @@ impl Machine {
     }
     fn decode_dest(&self, n: usize) -> i64 {
         let instr = self.memory[self.pc];
-        let mode = (instr / (10 as i64).pow((n + 1) as u32)) % 10;
         let a = self.memory[self.pc + n];
+        let mode = match n {
+            1 => (instr / 100) % 10,
+            2 => (instr / 1000) % 10,
+            3 => (instr / 10000) % 10,
+            _ => panic!("Invalid argument"),
+        };
         let arg = match mode {
             0 => a as i64,
             1 => a as i64,
@@ -202,15 +222,15 @@ mod tests {
         ];
         let mut machine = Machine::new(code.clone(), vec![7]);
         machine.run();
-        assert_eq!(machine.get_last_output(), 999);
+        assert_eq!(machine.get_last_output().last().unwrap().clone(), 999);
 
         let mut machine = Machine::new(code.clone(), vec![8]);
         machine.run();
-        assert_eq!(machine.get_last_output(), 1000);
+        assert_eq!(machine.get_last_output().last().unwrap().clone(), 1000);
 
         let mut machine = Machine::new(code, vec![9]);
         machine.run();
-        assert_eq!(machine.get_last_output(), 1001);
+        assert_eq!(machine.get_last_output().last().unwrap().clone(), 1001);
     }
 
     #[test]
@@ -220,7 +240,8 @@ mod tests {
             109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99,
         ];
         let mut machine = Machine::new(code.clone(), vec![]);
-        let output = machine.run();
+        machine.run();
+        let output = machine.get_output();
         assert_eq!(output, code);
     }
 
@@ -230,7 +251,8 @@ mod tests {
         let code = vec![1102, 34915192, 34915192, 7, 4, 7, 99, 0];
         let mut machine = Machine::new(code, vec![]);
         machine.run();
-        assert_eq!(machine.get_last_output(), 1219070632396864);
+        let output = machine.get_last_output().last().unwrap().clone();
+        assert_eq!(output, 1219070632396864);
     }
 
     #[test]
@@ -239,6 +261,7 @@ mod tests {
         let code = vec![104, 1125899906842624, 99];
         let mut machine = Machine::new(code, vec![]);
         machine.run();
-        assert_eq!(machine.get_last_output(), 1125899906842624);
+        let output = machine.get_last_output().last().unwrap().clone();
+        assert_eq!(output, 1125899906842624);
     }
 }

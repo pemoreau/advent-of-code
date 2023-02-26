@@ -1,4 +1,4 @@
-use intcode::{Machine, State};
+use intcode::Machine;
 use itertools::Itertools;
 use utils::parsing::comma_separated_to_numbers;
 
@@ -9,7 +9,7 @@ fn run_amplifiers(program: &Vec<i64>, phases: Vec<&i64>) -> i64 {
         let input = vec![*phase, last_output];
         let mut amp = Machine::new(code, input);
         amp.run();
-        last_output = amp.get_last_output()
+        last_output = *amp.get_last_output().last().unwrap();
     }
     last_output
 }
@@ -27,14 +27,14 @@ fn run_amplifiers2(program: &Vec<i64>, phases: Vec<&i64>) -> i64 {
     amps[0].put_input(0);
 
     loop {
-        if amps[n - 1].state == State::Halted {
-            return amps[n - 1].get_last_output();
+        if amps[n - 1].is_halted() {
+            return *amps[n - 1].get_output().last().unwrap();
         }
 
         for i in 0..n {
             amps[i].run_one_step();
             if amps[i].out {
-                let output = amps[i].get_last_output();
+                let output = *amps[i].get_last_output().last().unwrap();
                 amps[(i + 1) % n].put_input(output);
             }
         }

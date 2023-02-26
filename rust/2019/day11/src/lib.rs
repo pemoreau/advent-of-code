@@ -50,10 +50,11 @@ fn run_robot(code: Vec<i64>, start_color: i64) -> HashMap<Pos, i64> {
     loop {
         let color = grid.entry(robot.pos.clone()).or_insert(0);
         machine.put_input(*color);
-        let output = machine.run();
-        if machine.state == intcode::State::Halted {
+        machine.run();
+        if machine.is_halted() {
             break;
         }
+        let output = machine.get_last_output();
         *color = output[output.len() - 2];
         let dir = output[output.len() - 1];
         robot.turn(dir);

@@ -1,7 +1,8 @@
 #[macro_use]
 use std::collections::HashMap;
+use num::integer::lcm;
 
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq, Copy)]
 struct Pos {
     x: i64,
     y: i64,
@@ -83,12 +84,6 @@ pub fn part1(input: String) -> i64 {
         build_moon(2, -7, 3),
         build_moon(9, -8, -3),
     ];
-    /*
-        <x=-13, y=14, z=-7>
-    <x=-18, y=9, z=0>
-    <x=0, y=-3, z=-3>
-    <x=-15, y=3, z=-13>
-         */
     let mut moons = vec![
         build_moon(-13, 14, -7),
         build_moon(-18, 9, 0),
@@ -103,6 +98,49 @@ pub fn part1(input: String) -> i64 {
     moons.iter().map(|m| energy(m)).sum()
 }
 
-pub fn part2(input: String) -> i64 {
+fn find_cycle(moons: Vec<Moon>, f: fn(Pos) -> i64) -> i64 {
+    let mut moons = moons;
+    let mut map: HashMap<String, i64> = HashMap::new();
+    for i in 0.. {
+        let signature = moons
+            .iter()
+            .map(|m| format!("{},{} ", f(m.pos), f(m.vel)))
+            .collect::<Vec<String>>()
+            .join(",");
+        let n = map.get(&signature);
+        if n.is_some() {
+            return i - n.unwrap();
+        } else {
+            map.insert(signature.clone(), i);
+        }
+        apply_gravity(&mut moons);
+        apply_velocity(&mut moons);
+    }
     0
+}
+
+pub fn part2(input: String) -> i64 {
+    let moons = vec![
+        build_moon(-1, 0, 2),
+        build_moon(2, -10, -7),
+        build_moon(4, -8, 8),
+        build_moon(3, 5, -1),
+    ];
+    let moons = vec![
+        build_moon(-8, -10, 0),
+        build_moon(5, 5, 10),
+        build_moon(2, -7, 3),
+        build_moon(9, -8, -3),
+    ];
+    let moons = vec![
+        build_moon(-13, 14, -7),
+        build_moon(-18, 9, 0),
+        build_moon(0, -3, -3),
+        build_moon(-15, 3, -13),
+    ];
+    let cycle_x = find_cycle(moons.clone(), |p| p.x);
+    let cycle_y = find_cycle(moons.clone(), |p| p.y);
+    let cycle_z = find_cycle(moons.clone(), |p| p.z);
+
+    lcm(lcm(cycle_x, cycle_y), cycle_z)
 }

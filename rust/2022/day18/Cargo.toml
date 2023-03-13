@@ -1,0 +1,9 @@
+[package]
+name = "day18"
+version = "0.1.0"
+authors = ["PEM"]
+edition = "2021"
+
+[dependencies]
+utils = { path = "../../utils" }
+

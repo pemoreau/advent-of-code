@@ -1,6 +1,5 @@
-#[macro_use]
-use std::collections::HashMap;
 use num::integer::lcm;
+use std::collections::HashMap;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Copy)]
 struct Pos {
@@ -71,19 +70,7 @@ fn energy(moon: &Moon) -> i64 {
     pot * kin
 }
 
-pub fn part1(input: String) -> i64 {
-    let mut moons = vec![
-        build_moon(-1, 0, 2),
-        build_moon(2, -10, -7),
-        build_moon(4, -8, 8),
-        build_moon(3, 5, -1),
-    ];
-    let mut moons = vec![
-        build_moon(-8, -10, 0),
-        build_moon(5, 5, 10),
-        build_moon(2, -7, 3),
-        build_moon(9, -8, -3),
-    ];
+pub fn part1() -> i64 {
     let mut moons = vec![
         build_moon(-13, 14, -7),
         build_moon(-18, 9, 0),
@@ -119,19 +106,7 @@ fn find_cycle(moons: Vec<Moon>, f: fn(Pos) -> i64) -> i64 {
     0
 }
 
-pub fn part2(input: String) -> i64 {
-    let moons = vec![
-        build_moon(-1, 0, 2),
-        build_moon(2, -10, -7),
-        build_moon(4, -8, 8),
-        build_moon(3, 5, -1),
-    ];
-    let moons = vec![
-        build_moon(-8, -10, 0),
-        build_moon(5, 5, 10),
-        build_moon(2, -7, 3),
-        build_moon(9, -8, -3),
-    ];
+pub fn part2() -> i64 {
     let moons = vec![
         build_moon(-13, 14, -7),
         build_moon(-18, 9, 0),

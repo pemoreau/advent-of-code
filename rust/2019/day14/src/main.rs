@@ -7,7 +7,7 @@ fn main() {
 
     println!(
         "Part 1: {} in {} ms",
-        part1(include_str!("../input.txt").to_string(),),
+        part1(include_str!("../input_test.txt").to_string(),),
         now.elapsed().as_micros() as f64 / 1000.0
     );
 

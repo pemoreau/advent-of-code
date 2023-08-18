@@ -1,5 +1,6 @@
-use intcode::Machine;
 use std::collections::{HashMap, HashSet};
+
+use intcode::Machine;
 use utils::parsing::comma_separated_to_numbers;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq, Copy)]
@@ -96,21 +97,6 @@ impl Droid {
         pos
     }
 
-    fn left_pos(&mut self) -> Pos {
-        self.turn_left();
-        let pos = self.front_pos();
-        self.turn_right();
-        pos
-    }
-
-    // fn back_pos(&mut self) -> Pos {
-    //     self.turn_right();
-    //     self.turn_right();
-    //     let pos = self.front_pos();
-    //     self.turn_right();
-    //     self.turn_right();
-    //     pos
-    // }
 
     fn check_right(&mut self) -> i64 {
         self.turn_right();
@@ -124,20 +110,6 @@ impl Droid {
             self.turn_right();
         }
         right
-    }
-
-    fn check_left(&mut self) -> i64 {
-        self.turn_left();
-        let left = self.move_forward();
-        if left == WALL {
-            self.turn_right();
-        } else {
-            self.turn_left();
-            self.turn_left();
-            self.move_forward();
-            self.turn_left();
-        }
-        left
     }
 }
 
@@ -178,8 +150,8 @@ impl Cabinet {
         let mut visited = HashSet::new();
         visited.insert(self.droid.pos);
         let mut cpt = 0;
-        while self.oxygen.is_none() {
-        // while cpt == 0 || self.droid.pos != (Pos { x: 0, y: 0 }) {
+        // while self.oxygen.is_none() {
+        while cpt == 0 || self.droid.pos != (Pos { x: 0, y: 0 }) {
             let old_pos = self.droid.pos;
             if self.droid.check_right() != WALL {
                 self.droid.turn_right();
@@ -191,8 +163,7 @@ impl Cabinet {
                     self.droid.turn_left()
                 }
             }
-            self.display();
-            if self.droid.pos != old_pos {
+            if self.droid.pos != old_pos && self.oxygen.is_none() {
                 if visited.contains(&self.droid.pos) {
                     cpt -= 1;
                 } else {
@@ -201,76 +172,48 @@ impl Cabinet {
                 }
             }
         }
-        cpt
+        cpt + 1
     }
 
-    fn explore_left_hand(&mut self) -> i64 {
-        let mut visited = HashSet::new();
-        visited.insert(self.droid.pos);
+    fn neighbors(&self, pos: Pos) -> Vec<Pos> {
+        let mut res = vec![];
+        let Pos { x, y } = pos;
+        res.push(Pos { x: x + 1, y });
+        res.push(Pos { x: x - 1, y });
+        res.push(Pos { x, y: y + 1 });
+        res.push(Pos { x, y: y - 1 });
+        res.iter().filter(|p| self.grid.get(p) == Some(&'.')).cloned().collect()
+    }
+
+
+    fn flood(&mut self) -> i64 {
         let mut cpt = 0;
-        while self.oxygen.is_none() {
-            let old_pos = self.droid.pos;
-
-            if self.droid.check_left() != WALL {
-                self.droid.turn_left();
-                self.move_forward();
-            } else {
-                self.grid.insert(self.droid.left_pos(), '#');
-                let front = self.move_forward();
-                if front == WALL {
-                    self.droid.turn_right()
+        let mut visited = HashSet::new();
+        let mut todo = vec![];
+        todo.push(self.oxygen.unwrap());
+        let mut spread = true;
+        while spread {
+            spread = false;
+            let mut to_visit = todo.clone();
+            todo.clear();
+            while let Some(elt) = to_visit.pop() {
+                for c in self.neighbors(elt) {
+                    if !visited.contains(&c) {
+                        visited.insert(c.clone());
+                        self.grid.insert(c, 'O');
+                        todo.push(c);
+                        spread = true;
+                    }
                 }
             }
-            self.display();
-            if self.droid.pos != old_pos {
-                if visited.contains(&self.droid.pos) {
-                    cpt -= 1;
-                } else {
-                    visited.insert(self.droid.pos);
-                    cpt += 1;
-                }
+            if spread {
+                cpt += 1;
+                // println!("step: {}", cpt);
+                // self.display();
             }
         }
         cpt
     }
-    // fn neighbors(&self, pos: Pos) -> Vec<Pos> {
-    //     let mut res = vec![];
-    //     let Pos { x, y } = pos;
-    //     res.push(Pos { x: x + 1, y });
-    //     res.push(Pos { x: x - 1, y });
-    //     res.push(Pos { x, y: y + 1 });
-    //     res.push(Pos { x, y: y - 1 });
-    //     res.iter().filter(|p| self.grid.get(p) == Some(&'.')).cloned().collect()
-    // }
-
-    // fn find_shortest_path(&mut self) -> i64 {
-    //     let mut cpt = 0;
-    //     let mut visited = HashSet::new();
-    //     let mut todo = vec![];
-    //     todo.push(Pos { x: 0, y: 0 });
-    //     while let Some(elt) = todo.pop() {
-    //         for c in neighbors(elt) {
-    //             let Cube { x, y, z } = c;
-    //             if !grid.contains(&c)
-    //                 && !exterior.contains(&c)
-    //                 && x >= x_min
-    //                 && x <= x_max
-    //                 && y >= y_min
-    //                 && y <= y_max
-    //                 && z >= z_min
-    //                 && z <= z_max
-    //             {
-    //                 exterior.insert(c.clone());
-    //                 todo.push(c);
-    //             }
-    //         }
-    //     }
-    //
-    //
-    //     cpt
-    // }
-
-
 
 
     fn display(&self) {
@@ -313,16 +256,15 @@ impl Cabinet {
 
 pub fn part1(input: String) -> i64 {
     let code = comma_separated_to_numbers(input);
-    let mut game = Cabinet::new(code.clone());
-    let cpt1 = game.explore_right_hand();
-    game = Cabinet::new(code);
-    let cpt2 = game.explore_left_hand();
-    println!("{:?}", cpt1);
-    println!("{:?}", cpt2);
-
-    0
+    let mut game = Cabinet::new(code);
+    let cpt = game.explore_right_hand();
+    cpt
 }
 
 pub fn part2(input: String) -> i64 {
-    0
+    let code = comma_separated_to_numbers(input);
+    let mut game = Cabinet::new(code);
+    game.explore_right_hand();
+    // game.display();
+    game.flood()
 }

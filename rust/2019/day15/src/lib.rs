@@ -8,64 +8,11 @@ struct Pos {
     y: i64,
 }
 
-#[derive(Debug)]
-struct Droid {
-    machine: Machine,
-}
-
-impl Droid {
-    fn new(code: Vec<i64>) -> Self {
-        Self {
-            machine: Machine::new(code, vec![]),
-        }
-    }
-
-    fn explore(&mut self, dir: i64) -> i64 {
-        self.machine.put_input(dir);
-        self.machine.run();
-        let output = self.machine.get_last_output();
-        output[0]
-    }
-}
-
-type Grid = HashMap<Pos, char>;
-
-#[derive(Debug)]
-struct Cabinet {
-    grid: Grid,
-    bot: Pos,
-    dir: i64,
-    oxygen: Option<Pos>,
-    droid: Droid,
-}
-
 // north (1), south (2), west (3), and east (4)
 const NORTH: i64 = 1;
 const SOUTH: i64 = 2;
 const WEST: i64 = 3;
 const EAST: i64 = 4;
-
-
-fn neighbor(p: Pos, d: i64) -> Pos {
-    let Pos { x, y } = p;
-    match d {
-        NORTH => { Pos { x, y: y + 1 } }
-        SOUTH => { Pos { x, y: y - 1 } }
-        WEST => { Pos { x: x - 1, y } }
-        EAST => { Pos { x: x + 1, y } }
-        _ => { panic!("invalid direction") }
-    }
-}
-
-fn dir_right(d: i64) -> i64 {
-    match d {
-        NORTH => { EAST }
-        SOUTH => { WEST }
-        WEST => { NORTH }
-        EAST => { SOUTH }
-        _ => { panic!("invalid direction") }
-    }
-}
 
 // 0: The repair droid hit a wall. Its position has not changed.
 // 1: The repair droid has moved one step in the requested direction.
@@ -74,19 +21,42 @@ const WALL: i64 = 0;
 const MOVED: i64 = 1;
 const OXYGEN: i64 = 2;
 
-impl Cabinet {
+#[derive(Debug)]
+struct Droid {
+    machine: Machine,
+    dir: i64,
+    pos: Pos,
+}
+
+impl Droid {
     fn new(code: Vec<i64>) -> Self {
         Self {
-            grid: HashMap::new(),
-            bot: Pos { x: 0, y: 0 },
+            machine: Machine::new(code, vec![]),
             dir: NORTH,
-            oxygen: None,
-            droid: Droid::new(code),
+            pos: Pos { x: 0, y: 0 },
         }
     }
 
+    fn move_forward(&mut self) -> i64 {
+        self.machine.put_input(self.dir);
+        self.machine.run();
+        let output = self.machine.get_last_output();
+        if output[0] != WALL {
+            self.pos = self.front_pos();
+        }
+        output[0]
+    }
+
     fn turn_right(&mut self) {
-        self.dir = dir_right(self.dir);
+        self.dir = match self.dir {
+            NORTH => EAST,
+            SOUTH => WEST,
+            WEST => NORTH,
+            EAST => SOUTH,
+            _ => {
+                panic!("invalid direction")
+            }
+        }
     }
 
     fn turn_left(&mut self) {
@@ -95,51 +65,213 @@ impl Cabinet {
         self.turn_right();
     }
 
-    fn move_forward(&mut self) -> i64 {
-        let front = self.droid.explore(self.dir);
-        let next = neighbor(self.bot, self.dir);
-        if front == WALL {
-            self.grid.insert(next.clone(), '#');
-        } else {
-            self.grid.insert(next.clone(), '.');
-            self.bot = next.clone();
-            if front == OXYGEN {
-                self.oxygen = Some(next.clone());
+    fn front_pos(&mut self) -> Pos {
+        match self.dir {
+            NORTH => Pos {
+                x: self.pos.x,
+                y: self.pos.y + 1,
+            },
+            SOUTH => Pos {
+                x: self.pos.x,
+                y: self.pos.y - 1,
+            },
+            WEST => Pos {
+                x: self.pos.x - 1,
+                y: self.pos.y,
+            },
+            EAST => Pos {
+                x: self.pos.x + 1,
+                y: self.pos.y,
+            },
+            _ => {
+                panic!("invalid direction")
             }
         }
-        front
     }
+
+    fn right_pos(&mut self) -> Pos {
+        self.turn_right();
+        let pos = self.front_pos();
+        self.turn_left();
+        pos
+    }
+
+    fn left_pos(&mut self) -> Pos {
+        self.turn_left();
+        let pos = self.front_pos();
+        self.turn_right();
+        pos
+    }
+
+    // fn back_pos(&mut self) -> Pos {
+    //     self.turn_right();
+    //     self.turn_right();
+    //     let pos = self.front_pos();
+    //     self.turn_right();
+    //     self.turn_right();
+    //     pos
+    // }
 
     fn check_right(&mut self) -> i64 {
         self.turn_right();
-        let right = self.droid.explore(self.dir);
+        let right = self.move_forward();
         if right == WALL {
             self.turn_left();
         } else {
             self.turn_right();
             self.turn_right();
-            self.droid.explore(self.dir);
-            self.turn_right();
+            self.move_forward();
             self.turn_right();
         }
         right
     }
 
+    fn check_left(&mut self) -> i64 {
+        self.turn_left();
+        let left = self.move_forward();
+        if left == WALL {
+            self.turn_right();
+        } else {
+            self.turn_left();
+            self.turn_left();
+            self.move_forward();
+            self.turn_left();
+        }
+        left
+    }
+}
 
-    fn explore(&mut self) {
+type Grid = HashMap<Pos, char>;
+
+#[derive(Debug)]
+struct Cabinet {
+    grid: Grid,
+    oxygen: Option<Pos>,
+    droid: Droid,
+}
+
+impl Cabinet {
+    fn new(code: Vec<i64>) -> Self {
+        let mut res = Self {
+            grid: HashMap::new(),
+            oxygen: None,
+            droid: Droid::new(code),
+        };
+        res.grid.insert(res.droid.pos, 'o');
+        res
+    }
+
+    fn move_forward(&mut self) -> i64 {
+        let front = self.droid.move_forward();
+        if front == WALL {
+            self.grid.insert(self.droid.front_pos(), '#');
+        } else {
+            self.grid.insert(self.droid.pos, '.');
+            if front == OXYGEN {
+                self.oxygen = Some(self.droid.pos);
+            }
+        }
+        front
+    }
+
+    fn explore_right_hand(&mut self) -> i64 {
+        let mut visited = HashSet::new();
+        visited.insert(self.droid.pos);
+        let mut cpt = 0;
         while self.oxygen.is_none() {
-            if self.check_right() != 0 {
-                self.turn_right();
+        // while cpt == 0 || self.droid.pos != (Pos { x: 0, y: 0 }) {
+            let old_pos = self.droid.pos;
+            if self.droid.check_right() != WALL {
+                self.droid.turn_right();
                 self.move_forward();
             } else {
+                self.grid.insert(self.droid.right_pos(), '#');
                 let front = self.move_forward();
                 if front == WALL {
-                    self.turn_left()
+                    self.droid.turn_left()
                 }
             }
             self.display();
+            if self.droid.pos != old_pos {
+                if visited.contains(&self.droid.pos) {
+                    cpt -= 1;
+                } else {
+                    visited.insert(self.droid.pos);
+                    cpt += 1;
+                }
+            }
         }
+        cpt
     }
+
+    fn explore_left_hand(&mut self) -> i64 {
+        let mut visited = HashSet::new();
+        visited.insert(self.droid.pos);
+        let mut cpt = 0;
+        while self.oxygen.is_none() {
+            let old_pos = self.droid.pos;
+
+            if self.droid.check_left() != WALL {
+                self.droid.turn_left();
+                self.move_forward();
+            } else {
+                self.grid.insert(self.droid.left_pos(), '#');
+                let front = self.move_forward();
+                if front == WALL {
+                    self.droid.turn_right()
+                }
+            }
+            self.display();
+            if self.droid.pos != old_pos {
+                if visited.contains(&self.droid.pos) {
+                    cpt -= 1;
+                } else {
+                    visited.insert(self.droid.pos);
+                    cpt += 1;
+                }
+            }
+        }
+        cpt
+    }
+    // fn neighbors(&self, pos: Pos) -> Vec<Pos> {
+    //     let mut res = vec![];
+    //     let Pos { x, y } = pos;
+    //     res.push(Pos { x: x + 1, y });
+    //     res.push(Pos { x: x - 1, y });
+    //     res.push(Pos { x, y: y + 1 });
+    //     res.push(Pos { x, y: y - 1 });
+    //     res.iter().filter(|p| self.grid.get(p) == Some(&'.')).cloned().collect()
+    // }
+
+    // fn find_shortest_path(&mut self) -> i64 {
+    //     let mut cpt = 0;
+    //     let mut visited = HashSet::new();
+    //     let mut todo = vec![];
+    //     todo.push(Pos { x: 0, y: 0 });
+    //     while let Some(elt) = todo.pop() {
+    //         for c in neighbors(elt) {
+    //             let Cube { x, y, z } = c;
+    //             if !grid.contains(&c)
+    //                 && !exterior.contains(&c)
+    //                 && x >= x_min
+    //                 && x <= x_max
+    //                 && y >= y_min
+    //                 && y <= y_max
+    //                 && z >= z_min
+    //                 && z <= z_max
+    //             {
+    //                 exterior.insert(c.clone());
+    //                 todo.push(c);
+    //             }
+    //         }
+    //     }
+    //
+    //
+    //     cpt
+    // }
+
+
+
 
     fn display(&self) {
         if self.grid.is_empty() {
@@ -151,16 +283,23 @@ impl Cabinet {
         let max_y = self.grid.keys().map(|p| p.y).max().unwrap();
         for y in (min_y..=max_y).rev() {
             for x in min_x..=max_x {
-                if x == self.bot.x && y == self.bot.y {
-                    if self.dir == NORTH {
+                if x == self.droid.pos.x && y == self.droid.pos.y {
+                    if self.droid.dir == NORTH {
                         print!("^");
-                    } else if self.dir == SOUTH {
+                    } else if self.droid.dir == SOUTH {
                         print!("v");
-                    } else if self.dir == WEST {
+                    } else if self.droid.dir == WEST {
                         print!("<");
-                    } else if self.dir == EAST {
+                    } else if self.droid.dir == EAST {
                         print!(">");
                     }
+                    continue;
+                }
+                if self.oxygen.is_some()
+                    && x == self.oxygen.unwrap().x
+                    && y == self.oxygen.unwrap().y
+                {
+                    print!("O");
                     continue;
                 }
                 let tile = self.grid.get(&Pos { x, y }).unwrap_or(&' ');
@@ -174,8 +313,12 @@ impl Cabinet {
 
 pub fn part1(input: String) -> i64 {
     let code = comma_separated_to_numbers(input);
-    let mut game = Cabinet::new(code);
-    game.explore();
+    let mut game = Cabinet::new(code.clone());
+    let cpt1 = game.explore_right_hand();
+    game = Cabinet::new(code);
+    let cpt2 = game.explore_left_hand();
+    println!("{:?}", cpt1);
+    println!("{:?}", cpt2);
 
     0
 }

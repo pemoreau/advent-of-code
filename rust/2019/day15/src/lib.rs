@@ -150,7 +150,6 @@ impl Cabinet {
         let mut visited = HashSet::new();
         visited.insert(self.droid.pos);
         let mut cpt = 0;
-        // while self.oxygen.is_none() {
         while cpt == 0 || self.droid.pos != (Pos { x: 0, y: 0 }) {
             let old_pos = self.droid.pos;
             if self.droid.check_right() != WALL {
@@ -189,24 +188,16 @@ impl Cabinet {
     fn flood(&mut self) -> i64 {
         let mut cpt = 0;
         let mut visited = HashSet::new();
-        let mut todo = vec![];
-        todo.push(self.oxygen.unwrap());
-        let mut spread = true;
-        while spread {
-            spread = false;
-            let mut to_visit = todo.clone();
-            todo.clear();
-            while let Some(elt) = to_visit.pop() {
-                for c in self.neighbors(elt) {
-                    if !visited.contains(&c) {
-                        visited.insert(c.clone());
-                        self.grid.insert(c, 'O');
-                        todo.push(c);
-                        spread = true;
-                    }
-                }
+        let mut todo = vec![self.oxygen.unwrap()];
+        while todo.len() > 0 {
+            let to_visit: Vec<Pos> = todo.iter().flat_map(|p| self.neighbors(*p)).collect();
+            todo = to_visit.iter().filter(|p| !visited.contains(*p)).cloned().collect();
+            for c in &todo {
+                visited.insert(c.clone());
+                self.grid.insert(*c, 'O');
             }
-            if spread {
+
+            if todo.len() > 0 {
                 cpt += 1;
                 // println!("step: {}", cpt);
                 // self.display();

@@ -51,9 +51,9 @@ pub fn part1(input: String) -> i64 {
     output.iter().take(8).fold(0, |acc, x| acc * 10 + x) as i64
 }
 
-
 pub fn part2(input: String) -> i64 {
-    let input: Vec<i32> = input.repeat(10000)
+    let input: Vec<i32> = input
+        .repeat(10000)
         .chars()
         .map(|c| c.to_digit(10).unwrap() as i32)
         .collect();

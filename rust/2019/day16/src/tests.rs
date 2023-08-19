@@ -1,5 +1,6 @@
 mod tests {
-    use crate::{part1, part2};
+    use crate::part1;
+    use crate::part2;
 
 // #[test]
     // fn test_part1_1() {
@@ -26,8 +27,23 @@ mod tests {
         assert_eq!(67481260, part1(include_str!("../input.txt").to_string()));
     }
 
-    // #[test]
-    // fn test_input_part2() {
-    //     assert_eq!(404, part2(include_str!("../input.txt").to_string()));
-    // }
+    #[test]
+    fn test_part2_1() {
+        assert_eq!(84462026, part2("03036732577212944063491565474664".to_string()));
+    }
+
+    #[test]
+    fn test_part2_2() {
+        assert_eq!(78725270, part2("02935109699940807407585447034323".to_string()));
+    }
+
+    #[test]
+    fn test_part2_3() {
+        assert_eq!(53553731, part2("03081770884921959731165446850517".to_string()));
+    }
+
+    #[test]
+    fn test_input_part2() {
+        assert_eq!(42178738, part2(include_str!("../input.txt").to_string()));
+    }
 }

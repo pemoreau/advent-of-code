@@ -3,7 +3,7 @@ mod tests {
 
     #[test]
     fn test_input_part1() {
-        assert_eq!(0, part1(include_str!("../input.txt").to_string()));
+        assert_eq!(6672, part1(include_str!("../input.txt").to_string()));
     }
 
     #[test]

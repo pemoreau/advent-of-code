@@ -50,27 +50,25 @@ fn neighbors(pos: Pos) -> Vec<Pos> {
     ]
 }
 
-pub fn part1(input: String) -> i64 {
-    let code = comma_separated_to_numbers(input);
-    let mut machine = Machine::new(code, vec![]);
-    machine.run();
-    let output = machine.get_last_output();
-    println!("{:?}", output);
+fn to_grid(s: &Vec<i64>) -> Grid {
     let mut grid = Grid::new();
     let mut x = 0;
     let mut y = 0;
-    for c in output {
-        if c == 10 {
+    for c in s {
+        if c == &10 {
             y += 1;
             x = 0;
             continue;
         }
-        grid.insert(Pos { x, y }, c as u8 as char);
+        grid.insert(Pos { x, y: -y }, *c as u8 as char);
         x += 1;
     }
-    display(&grid);
+    grid
+}
+
+fn get_intersections(grid: &Grid) -> Vec<&Pos> {
     let mut intersections = vec![];
-    for (pos, tile) in &grid {
+    for (pos, tile) in grid {
         if *tile == '#' {
             let mut is_intersection = true;
             for n in neighbors(*pos) {
@@ -84,10 +82,32 @@ pub fn part1(input: String) -> i64 {
             }
         }
     }
-    println!("{:?}", intersections);
-    intersections.iter().map(|p| p.x * p.y).sum()
+    intersections
+}
+
+pub fn part1(input: String) -> i64 {
+    let code = comma_separated_to_numbers(input);
+    let mut machine = Machine::new(code, vec![]);
+    machine.run();
+    let output = machine.get_last_output();
+    let grid = to_grid(&output);
+    let intersections = get_intersections(&grid);
+    intersections.iter().map(|p| p.x * -p.y).sum()
+}
+
+fn to_ascii(s: &str) -> Vec<i64> {
+    s.chars().map(|c| c as u8 as i64).collect()
 }
 
 pub fn part2(input: String) -> i64 {
-    0
+    let mut code = comma_separated_to_numbers(input);
+    code[0] = 2;
+    let program =
+        to_ascii("A,B,B,C,C,A,A,B,B,C\nL,12,R,4,R,4\nR,12,R,4,L,12\nR,12,R,4,L,6,L,8,L,8\nn\n");
+    let mut machine = Machine::new(code, program);
+    machine.run();
+    let output = machine.get_last_output();
+    // let grid = to_grid(&output);
+    // display(&grid);
+    output[output.len() - 1]
 }

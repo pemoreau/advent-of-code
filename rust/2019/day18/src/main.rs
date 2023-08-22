@@ -1,9 +1,9 @@
 use std::time::Instant;
 
-use day16::{part1, part2};
+use day18::{part1, part2};
 
 fn main() {
-    println!("--2019 day 16 solution--");
+    println!("--2019 day 18 solution--");
     let now = Instant::now();
 
     println!(

@@ -36,31 +36,28 @@ type Graph = HashMap<Node, Vec<Edge>>;
 
 fn neighboors(graph: &Graph, state: &State) -> Vec<State> {
     let mut neighboors = Vec::new();
-    let mut path = state.path.clone();
     for Edge { to, distance } in graph.get(&state.current).unwrap() {
+        let mut path = state.path.clone();
+        path.push(to.name);
         if to.name.is_ascii_lowercase() {
             let mut keys = state.keys.clone();
             if !keys.contains(&to.name) {
                 keys.push(to.name);
                 keys.sort();
             }
-            path.push(to.name);
             neighboors.push(State {
                 current: to.clone(),
                 keys: keys,
-                path: path.clone(),
+                path: path,
                 cost: state.cost + distance,
             });
         } else if state.keys.contains(&to.name.to_ascii_lowercase())
             || !to.name.is_ascii_uppercase()
         {
-            if to.name.is_ascii_uppercase() {
-                path.push(to.name);
-            }
             neighboors.push(State {
                 current: to.clone(),
                 keys: state.keys.clone(),
-                path: path.clone(),
+                path: path,
                 cost: state.cost + distance,
             });
         }
@@ -90,6 +87,8 @@ fn bfs(graph: &Graph, start: Node, number_of_keys: usize) -> u32 {
                 continue;
             }
         }
+        visited.insert((state.current.clone(), state.keys.clone()), state.cost);
+
         if state.keys.len() == number_of_keys {
             if state.cost < min_cost {
                 println!("Found all keys: {:?}", state);
@@ -98,9 +97,8 @@ fn bfs(graph: &Graph, start: Node, number_of_keys: usize) -> u32 {
             continue;
         }
 
-        visited.insert((state.current.clone(), state.keys.clone()), state.cost);
         let neighboors = neighboors(graph, &state);
-        println!("neighboors {:?}", neighboors);
+        // println!("neighboors {:?}", neighboors);
         for neighboor in neighboors {
             println!("add {:?}", neighboor);
             queue.push(neighboor);

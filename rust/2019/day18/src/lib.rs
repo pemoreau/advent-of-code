@@ -1,12 +1,12 @@
 use std::collections::{HashMap, HashSet};
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 struct Pos {
     x: i64,
     y: i64,
 }
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 struct Node {
     pos: Pos,
     name: char,
@@ -77,20 +77,20 @@ fn bfs(graph: &Graph, start: Node, number_of_keys: usize) -> u32 {
     });
     while !queue.is_empty() {
         let state = queue.remove(0);
-        println!("{:?}", state);
+        // println!("{:?}", state);
         if visited.contains_key(&(state.current.clone(), state.keys.clone())) {
             let cost = visited
                 .get(&(state.current.clone(), state.keys.clone()))
                 .unwrap();
-            if state.cost >= *cost {
-                println!("skip {:?} {:?}", state, cost);
+            if state.cost > *cost {
+                // println!("skip {:?} {:?}", state, cost);
                 continue;
             }
         }
         visited.insert((state.current.clone(), state.keys.clone()), state.cost);
 
         if state.keys.len() == number_of_keys {
-            if state.cost < min_cost {
+            if state.cost <= min_cost {
                 println!("Found all keys: {:?}", state);
                 min_cost = state.cost;
             }
@@ -100,7 +100,7 @@ fn bfs(graph: &Graph, start: Node, number_of_keys: usize) -> u32 {
         let neighboors = neighboors(graph, &state);
         // println!("neighboors {:?}", neighboors);
         for neighboor in neighboors {
-            println!("add {:?}", neighboor);
+            // println!("add {:?}", neighboor);
             queue.push(neighboor);
         }
     }
@@ -163,8 +163,10 @@ impl Grid {
             return false;
         }
 
-        let c = self.get(&pos).unwrap();
-        c.is_ascii() || self.neighboors(&pos).len() > 2
+        if let Some(&c) = self.get(&pos) {
+            return c.is_ascii() || self.neighboors(&pos).len() > 2;
+        }
+        false
     }
 
     fn number_of_keys(&self) -> usize {
@@ -176,8 +178,8 @@ impl Grid {
 }
 
 fn is_branch_position(grid: &Grid, pos: &Pos) -> bool {
-    let c = grid.get(&pos).unwrap();
-    if c == &'#' {
+    let &c = grid.get(&pos).unwrap();
+    if c == '#' {
         return false;
     }
 
@@ -215,17 +217,18 @@ pub fn part1(input: String) -> i64 {
         pos: grid.start_pos(),
         name: '@',
     };
-    queue.push((start.clone(), start.clone(), 0));
+    queue.push((start, start, 0));
     while !queue.is_empty() {
         let (cell, from, distance) = queue.remove(0);
-        if grid.is_wall(&cell.pos.clone()) {
+        let pos = cell.pos;
+        if grid.is_wall(&pos) {
             continue;
         }
-        if visited.contains(&cell.clone()) {
+        if visited.contains(&cell) {
             continue;
         }
-        visited.insert(cell.clone());
-        let new_from = if is_branch_position(&grid, &cell.pos.clone()) && cell != from {
+        visited.insert(cell);
+        let new_from = if is_branch_position(&grid, &pos) && cell != from {
             graph
                 .entry(from.clone())
                 .or_insert(Vec::new())

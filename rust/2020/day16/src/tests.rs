@@ -11,7 +11,7 @@ mod tests {
     // #[test]
     // fn test_part2() {
     //     let expected = 208;
-    //     let result = part2(include_str!("../input_test.txt").to_string());
+    //     let result = part2(include_str!("../input_test2.txt").to_string());
     //     assert_eq!(expected, result);
     // }
 

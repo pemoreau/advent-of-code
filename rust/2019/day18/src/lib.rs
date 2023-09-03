@@ -12,31 +12,94 @@ struct Node {
     name: char,
 }
 
-#[derive(Debug, Eq, PartialEq, Hash)]
-struct Edge {
-    to: Node,
-    distance: u32,
-}
-
-impl Edge {
-    fn new(to: Node, distance: u32) -> Self {
-        Self { to, distance }
-    }
-}
+// #[derive(Debug, Eq, PartialEq, Hash)]
+// struct Edge {
+//     to: Node,
+//     distance: u32,
+// }
+//
+// impl Edge {
+//     fn new(to: Node, distance: u32) -> Self {
+//         Self { to, distance }
+//     }
+// }
 
 #[derive(Debug)]
 struct State {
     current: Node,
     keys: Vec<char>,
     path: Vec<char>,
-    cost: u32,
+    cost: i32,
 }
 
-type Graph = HashMap<Node, HashSet<Edge>>;
+// type Graph = HashMap<Node, HashSet<Edge>>;
 
-fn neighboors(graph: &Graph, state: &State) -> Vec<State> {
-    let mut neighboors = Vec::new();
-    for Edge { to, distance } in graph.get(&state.current).unwrap() {
+#[derive(Debug)]
+struct Graph {
+    adjacency_table: HashMap<Node, Vec<(Node, i32)>>,
+}
+
+#[derive(Debug, Clone)]
+struct NodeNotInGraph;
+
+impl Graph {
+    fn new() -> Graph {
+        Graph {
+            adjacency_table: HashMap::new(),
+        }
+    }
+
+    fn add_node(&mut self, node: &Node) -> bool {
+        match self.adjacency_table.get(node) {
+            None => {
+                self.adjacency_table.insert(*node, Vec::new());
+                true
+            }
+            _ => false,
+        }
+    }
+
+    fn add_edge(&mut self, edge: (&Node, &Node, i32)) {
+        self.add_node(edge.0);
+        self.add_node(edge.1);
+
+        self.adjacency_table.entry(*edge.0).and_modify(|e| {
+            if !e.contains(&(*edge.1, edge.2)) {
+                e.push((*edge.1, edge.2));
+            }
+        });
+        self.adjacency_table.entry(*edge.1).and_modify(|e| {
+            if !e.contains(&(*edge.0, edge.2)) {
+                e.push((*edge.0, edge.2));
+            }
+        });
+    }
+
+    // fn nodes(&self) -> HashSet<&Node> {
+    //     self.adjacency_table.keys().collect()
+    // }
+    //
+    // fn edges(&self) -> Vec<(&Node, &Node, i32)> {
+    //     let mut edges = Vec::new();
+    //     for (from_node, from_node_neighbours) in self.adjacency_table {
+    //         for (to_node, weight) in from_node_neighbours {
+    //             edges.push((&from_node, &to_node, weight));
+    //         }
+    //     }
+    //     edges
+    // }
+
+    fn neighbours(&self, node: &Node) -> Result<&Vec<(Node, i32)>, NodeNotInGraph> {
+        match self.adjacency_table.get(node) {
+            None => Err(NodeNotInGraph),
+            Some(i) => Ok(i),
+        }
+    }
+}
+
+fn neighbours(graph: &Graph, state: &State) -> Vec<State> {
+    let mut neighbours = Vec::new();
+    for (to, distance) in graph.neighbours(&state.current).unwrap() {
         let mut path = state.path.clone();
         path.push(to.name);
         if to.name.is_ascii_lowercase() {
@@ -45,7 +108,7 @@ fn neighboors(graph: &Graph, state: &State) -> Vec<State> {
                 keys.push(to.name);
                 keys.sort();
             }
-            neighboors.push(State {
+            neighbours.push(State {
                 current: to.clone(),
                 keys: keys,
                 path: path,
@@ -54,7 +117,7 @@ fn neighboors(graph: &Graph, state: &State) -> Vec<State> {
         } else if state.keys.contains(&to.name.to_ascii_lowercase())
             || !to.name.is_ascii_uppercase()
         {
-            neighboors.push(State {
+            neighbours.push(State {
                 current: to.clone(),
                 keys: state.keys.clone(),
                 path: path,
@@ -62,13 +125,13 @@ fn neighboors(graph: &Graph, state: &State) -> Vec<State> {
             });
         }
     }
-    neighboors
+    neighbours
 }
 
-fn bfs(graph: &Graph, start: Node, number_of_keys: usize) -> u32 {
-    let mut min_cost = u32::MAX;
+fn bfs(graph: &Graph, start: Node, number_of_keys: usize) -> i32 {
+    let mut min_cost = i32::MAX;
     let mut queue = Vec::new();
-    let mut visited: HashMap<(Node, Vec<char>), u32> = HashMap::new();
+    let mut visited: HashMap<(Node, Vec<char>), i32> = HashMap::new();
     queue.push(State {
         current: start,
         keys: Vec::new(),
@@ -90,14 +153,14 @@ fn bfs(graph: &Graph, start: Node, number_of_keys: usize) -> u32 {
         visited.insert((state.current.clone(), state.keys.clone()), state.cost);
 
         if state.keys.len() == number_of_keys {
-            if state.cost <= min_cost {
+            if state.cost < min_cost {
                 println!("Found all keys: {:?}", state);
                 min_cost = state.cost;
             }
             continue;
         }
 
-        let neighboors = neighboors(graph, &state);
+        let neighboors = neighbours(graph, &state);
         // println!("neighboors {:?}", neighboors);
         for neighboor in neighboors {
             // println!("add {:?}", neighboor);
@@ -158,17 +221,6 @@ impl Grid {
         neighboors
     }
 
-    fn is_branching_position(&self, pos: &Pos) -> bool {
-        if self.is_wall(&pos) {
-            return false;
-        }
-
-        if let Some(&c) = self.get(&pos) {
-            return c.is_ascii() || self.neighboors(&pos).len() > 2;
-        }
-        false
-    }
-
     fn number_of_keys(&self) -> usize {
         self.grid
             .iter()
@@ -197,20 +249,8 @@ fn is_branch_position(grid: &Grid, pos: &Pos) -> bool {
     c.is_ascii_lowercase() || c.is_ascii_uppercase() || neighboors > 2
 }
 
-pub fn part1(input: String) -> i64 {
-    let mut grid = Grid::new();
-    for (y, line) in input.lines().enumerate() {
-        for (x, c) in line.chars().enumerate() {
-            grid.insert(
-                Pos {
-                    x: x as i64,
-                    y: y as i64,
-                },
-                c,
-            );
-        }
-    }
-    let mut graph = HashMap::new();
+fn build_graph(grid: &Grid) -> Graph {
+    let mut graph = Graph::new();
     let mut queue = Vec::new();
     let mut visited: HashSet<(Node, Node)> = HashSet::new();
     let start = Node {
@@ -229,17 +269,10 @@ pub fn part1(input: String) -> i64 {
         }
         visited.insert((cell, from));
         let new_from = if is_branch_position(&grid, &pos) && cell != from {
-            graph
-                .entry(from.clone())
-                .or_insert(HashSet::new())
-                .insert(Edge::new(cell.clone(), distance));
-            graph
-                .entry(cell.clone())
-                .or_insert(HashSet::new())
-                .insert(Edge::new(from.clone(), distance));
-            cell.clone()
+            graph.add_edge((&cell, &from, distance));
+            cell
         } else {
-            from.clone()
+            from
         };
 
         grid.neighboors(&cell.pos).iter().for_each(|neighboor| {
@@ -253,12 +286,32 @@ pub fn part1(input: String) -> i64 {
             ))
         });
     }
-    println!("graph {:?}", graph);
-    bfs(&graph, start, grid.number_of_keys()) as i64
+    graph
 }
 
-// 462 too low
-// 5410 too high
+pub fn part1(input: String) -> i64 {
+    let mut grid = Grid::new();
+    for (y, line) in input.lines().enumerate() {
+        for (x, c) in line.chars().enumerate() {
+            grid.insert(
+                Pos {
+                    x: x as i64,
+                    y: y as i64,
+                },
+                c,
+            );
+        }
+    }
+
+    let start = Node {
+        pos: grid.start_pos(),
+        name: '@',
+    };
+
+    let graph = build_graph(&grid);
+    // println!("graph {:?}", graph);
+    bfs(&graph, start, grid.number_of_keys()) as i64
+}
 
 pub fn part2(input: String) -> i64 {
     0

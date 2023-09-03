@@ -23,8 +23,13 @@ mod tests {
     }
 
     #[test]
+    fn test_part1_5() {
+        assert_eq!(13, part1(include_str!("../input_test5.txt").to_string()));
+    }
+
+    #[test]
     fn test_input_part1() {
-        assert_eq!(0, part1(include_str!("../input.txt").to_string()));
+        assert_eq!(5406, part1(include_str!("../input.txt").to_string()));
     }
 
     #[test]

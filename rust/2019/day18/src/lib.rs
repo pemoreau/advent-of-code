@@ -32,7 +32,7 @@ struct State {
     cost: u32,
 }
 
-type Graph = HashMap<Node, Vec<Edge>>;
+type Graph = HashMap<Node, HashSet<Edge>>;
 
 fn neighboors(graph: &Graph, state: &State) -> Vec<State> {
     let mut neighboors = Vec::new();
@@ -82,7 +82,7 @@ fn bfs(graph: &Graph, start: Node, number_of_keys: usize) -> u32 {
             let cost = visited
                 .get(&(state.current.clone(), state.keys.clone()))
                 .unwrap();
-            if state.cost > *cost {
+            if state.cost >= *cost {
                 // println!("skip {:?} {:?}", state, cost);
                 continue;
             }
@@ -212,7 +212,7 @@ pub fn part1(input: String) -> i64 {
     }
     let mut graph = HashMap::new();
     let mut queue = Vec::new();
-    let mut visited: HashSet<Node> = HashSet::new();
+    let mut visited: HashSet<(Node, Node)> = HashSet::new();
     let start = Node {
         pos: grid.start_pos(),
         name: '@',
@@ -224,19 +224,19 @@ pub fn part1(input: String) -> i64 {
         if grid.is_wall(&pos) {
             continue;
         }
-        if visited.contains(&cell) {
+        if visited.contains(&(cell, from)) {
             continue;
         }
-        visited.insert(cell);
+        visited.insert((cell, from));
         let new_from = if is_branch_position(&grid, &pos) && cell != from {
             graph
                 .entry(from.clone())
-                .or_insert(Vec::new())
-                .push(Edge::new(cell.clone(), distance));
+                .or_insert(HashSet::new())
+                .insert(Edge::new(cell.clone(), distance));
             graph
                 .entry(cell.clone())
-                .or_insert(Vec::new())
-                .push(Edge::new(from.clone(), distance));
+                .or_insert(HashSet::new())
+                .insert(Edge::new(from.clone(), distance));
             cell.clone()
         } else {
             from.clone()

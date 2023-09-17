@@ -12,18 +12,6 @@ struct Node {
     name: char,
 }
 
-// #[derive(Debug, Eq, PartialEq, Hash)]
-// struct Edge {
-//     to: Node,
-//     distance: u32,
-// }
-//
-// impl Edge {
-//     fn new(to: Node, distance: u32) -> Self {
-//         Self { to, distance }
-//     }
-// }
-
 #[derive(Debug)]
 struct State {
     current: Node,
@@ -32,7 +20,12 @@ struct State {
     cost: i32,
 }
 
-// type Graph = HashMap<Node, HashSet<Edge>>;
+#[derive(Debug)]
+struct State2 {
+    current: Vec<Node>,
+    keys: Vec<char>,
+    cost: i32,
+}
 
 #[derive(Debug)]
 struct Graph {
@@ -74,20 +67,6 @@ impl Graph {
             }
         });
     }
-
-    // fn nodes(&self) -> HashSet<&Node> {
-    //     self.adjacency_table.keys().collect()
-    // }
-    //
-    // fn edges(&self) -> Vec<(&Node, &Node, i32)> {
-    //     let mut edges = Vec::new();
-    //     for (from_node, from_node_neighbours) in self.adjacency_table {
-    //         for (to_node, weight) in from_node_neighbours {
-    //             edges.push((&from_node, &to_node, weight));
-    //         }
-    //     }
-    //     edges
-    // }
 
     fn neighbours(&self, node: &Node) -> Result<&Vec<(Node, i32)>, NodeNotInGraph> {
         match self.adjacency_table.get(node) {
@@ -154,7 +133,7 @@ fn bfs(graph: &Graph, start: Node, number_of_keys: usize) -> i32 {
 
         if state.keys.len() == number_of_keys {
             if state.cost < min_cost {
-                println!("Found all keys: {:?}", state);
+                // println!("Found all keys: {:?}", state);
                 min_cost = state.cost;
             }
             continue;
@@ -227,6 +206,38 @@ impl Grid {
             .filter(|(_, c)| c.is_ascii_lowercase())
             .count()
     }
+
+    fn display(&self) {
+        let mut min_x = i64::MAX;
+        let mut max_x = i64::MIN;
+        let mut min_y = i64::MAX;
+        let mut max_y = i64::MIN;
+        for (pos, _) in self.grid.iter() {
+            if pos.x < min_x {
+                min_x = pos.x;
+            }
+            if pos.x > max_x {
+                max_x = pos.x;
+            }
+            if pos.y < min_y {
+                min_y = pos.y;
+            }
+            if pos.y > max_y {
+                max_y = pos.y;
+            }
+        }
+        for y in min_y..=max_y {
+            for x in min_x..=max_x {
+                let pos = Pos { x, y };
+                if self.contains_key(&pos) {
+                    print!("{}", self.get(&pos).unwrap());
+                } else {
+                    print!(" ");
+                }
+            }
+            println!();
+        }
+    }
 }
 
 fn is_branch_position(grid: &Grid, pos: &Pos) -> bool {
@@ -249,15 +260,10 @@ fn is_branch_position(grid: &Grid, pos: &Pos) -> bool {
     c.is_ascii_lowercase() || c.is_ascii_uppercase() || neighboors > 2
 }
 
-fn build_graph(grid: &Grid) -> Graph {
-    let mut graph = Graph::new();
+fn extend_graph(graph: &mut Graph, grid: &Grid, start: &Node) {
     let mut queue = Vec::new();
     let mut visited: HashSet<(Node, Node)> = HashSet::new();
-    let start = Node {
-        pos: grid.start_pos(),
-        name: '@',
-    };
-    queue.push((start, start, 0));
+    queue.push((*start, *start, 0));
     while !queue.is_empty() {
         let (cell, from, distance) = queue.remove(0);
         let pos = cell.pos;
@@ -286,10 +292,9 @@ fn build_graph(grid: &Grid) -> Graph {
             ))
         });
     }
-    graph
 }
 
-pub fn part1(input: String) -> i64 {
+fn build_grid(input: String) -> Grid {
     let mut grid = Grid::new();
     for (y, line) in input.lines().enumerate() {
         for (x, c) in line.chars().enumerate() {
@@ -302,17 +307,145 @@ pub fn part1(input: String) -> i64 {
             );
         }
     }
+    grid
+}
 
+pub fn part1(input: String) -> i64 {
+    let grid = build_grid(input);
     let start = Node {
         pos: grid.start_pos(),
         name: '@',
     };
-
-    let graph = build_graph(&grid);
+    let mut graph = Graph::new();
+    extend_graph(&mut graph, &grid, &start);
     // println!("graph {:?}", graph);
     bfs(&graph, start, grid.number_of_keys()) as i64
 }
 
+fn neighbours2(graph: &Graph, state: &State2) -> Vec<State2> {
+    let mut neighbours = Vec::new();
+    for i in 0..state.current.len() {
+        let possible_destinations: Vec<&(Node, i32)> = graph
+            .neighbours(&state.current[i])
+            .unwrap()
+            .iter()
+            .filter(|(node, _)| state.current.iter().find(|n| n.pos == node.pos).is_none())
+            .collect();
+
+        for (to, distance) in possible_destinations {
+            if to.name.is_ascii_lowercase() {
+                let mut keys = state.keys.clone();
+                keys.push(to.name);
+                keys.sort();
+                keys.dedup();
+                let mut current = state.current.clone();
+                current[i] = to.clone();
+                neighbours.push(State2 {
+                    current: current,
+                    keys: keys,
+                    cost: state.cost + distance,
+                });
+            } else if state.keys.contains(&to.name.to_ascii_lowercase())
+                || !to.name.is_ascii_uppercase()
+            {
+                let mut current = state.current.clone();
+                current[i] = to.clone();
+                neighbours.push(State2 {
+                    current: current,
+                    keys: state.keys.clone(),
+                    cost: state.cost + distance,
+                });
+            }
+        }
+    }
+    neighbours
+}
+
+fn bfs2(graph: &Graph, start_nodes: Vec<Node>, number_of_keys: usize) -> i32 {
+    let mut min_cost = i32::MAX;
+    let mut queue = Vec::new();
+    let mut visited: HashMap<(Vec<Node>, Vec<char>), i32> = HashMap::new();
+    queue.push(State2 {
+        current: start_nodes,
+        keys: Vec::new(),
+        cost: 0,
+    });
+
+    while !queue.is_empty() {
+        let state = queue.remove(0);
+        // println!("{:?}", state);
+        if visited.contains_key(&(state.current.clone(), state.keys.clone())) {
+            let cost = visited
+                .get(&(state.current.clone(), state.keys.clone()))
+                .unwrap();
+            if state.cost >= *cost {
+                // println!("skip {:?} {:?}", state, cost);
+                continue;
+            }
+        }
+        visited.insert((state.current.clone(), state.keys.clone()), state.cost);
+
+        if state.keys.len() == number_of_keys {
+            if state.cost < min_cost {
+                // println!("Found all keys: {:?}", state);
+                min_cost = state.cost;
+            }
+            continue;
+        }
+
+        let neighboors = neighbours2(graph, &state);
+        // println!("neighboors {:?}", neighboors);
+        for neighboor in neighboors {
+            // println!("add {:?}", neighboor);
+            queue.push(neighboor);
+        }
+    }
+    min_cost
+}
+
 pub fn part2(input: String) -> i64 {
-    0
+    let mut grid = build_grid(input);
+    let center = grid.start_pos();
+    let neighbors = grid.neighboors(&center);
+    grid.insert(center, '#');
+    for n in neighbors {
+        grid.insert(n, '#');
+    }
+    let start_positions = vec![
+        Pos {
+            x: center.x - 1,
+            y: center.y - 1,
+        },
+        Pos {
+            x: center.x + 1,
+            y: center.y - 1,
+        },
+        Pos {
+            x: center.x - 1,
+            y: center.y + 1,
+        },
+        Pos {
+            x: center.x + 1,
+            y: center.y + 1,
+        },
+    ];
+    for pos in start_positions.clone() {
+        grid.insert(pos, '@');
+    }
+    // println!("graph {:?}", graph);
+    // grid.display();
+
+    let start_nodes = start_positions
+        .iter()
+        .map(|pos| Node {
+            pos: *pos,
+            name: '@',
+        })
+        .collect::<Vec<Node>>();
+    let mut graph = Graph::new();
+    for start in start_nodes.clone() {
+        extend_graph(&mut graph, &grid, &start);
+    }
+    // println!("graph {:?}", graph);
+    bfs2(&graph, start_nodes, grid.number_of_keys()) as i64
 }

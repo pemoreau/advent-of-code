@@ -28,12 +28,27 @@ mod tests {
     }
 
     #[test]
+    fn test_part2_6() {
+        assert_eq!(8, part2(include_str!("../input_test6.txt").to_string()));
+    }
+
+    #[test]
+    fn test_part2_7() {
+        assert_eq!(32, part2(include_str!("../input_test7.txt").to_string()));
+    }
+
+    #[test]
+    fn test_part2_8() {
+        assert_eq!(72, part2(include_str!("../input_test8.txt").to_string()));
+    }
+
+    #[test]
     fn test_input_part1() {
         assert_eq!(5406, part1(include_str!("../input.txt").to_string()));
     }
 
-    #[test]
-    fn test_input_part2() {
-        assert_eq!(0, part2(include_str!("../input.txt").to_string()));
-    }
+    // #[test]
+    // fn test_input_part2() {
+    //     assert_eq!(0, part2(include_str!("../input.txt").to_string()));
+    // }
 }

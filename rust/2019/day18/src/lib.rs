@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{BinaryHeap, HashMap, HashSet};
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 struct Pos {
@@ -20,11 +20,29 @@ struct State {
     cost: i32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq)]
 struct State2 {
     current: Vec<Node>,
     keys: Vec<char>,
     cost: i32,
+}
+
+impl PartialEq for State2 {
+    fn eq(&self, other: &Self) -> bool {
+        self.cost == other.cost && self.current == other.current
+    }
+}
+
+impl PartialOrd for State2 {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for State2 {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        other.cost.cmp(&self.cost)
+    }
 }
 
 #[derive(Debug)]
@@ -319,7 +337,8 @@ pub fn part1(input: String) -> i64 {
     let mut graph = Graph::new();
     extend_graph(&mut graph, &grid, &start);
     // println!("graph {:?}", graph);
-    bfs(&graph, start, grid.number_of_keys()) as i64
+    // bfs(&graph, start, grid.number_of_keys()) as i64
+    bfs2(&graph, vec![start], grid.number_of_keys()) as i64
 }
 
 fn neighbours2(graph: &Graph, state: &State2) -> Vec<State2> {
@@ -359,6 +378,34 @@ fn neighbours2(graph: &Graph, state: &State2) -> Vec<State2> {
         }
     }
     neighbours
+}
+
+fn dijkstra(graph: &Graph, start_nodes: Vec<Node>, number_of_keys: usize) -> i32 {
+    let mut frontier: BinaryHeap<State2> = BinaryHeap::new();
+    let mut costs: HashMap<Vec<Node>, i32> = HashMap::new();
+    frontier.push(State2 {
+        current: start_nodes.clone(),
+        keys: Vec::new(),
+        cost: 0,
+    });
+
+    costs.insert(start_nodes, 0);
+
+    while !frontier.is_empty() {
+        let state = frontier.pop().unwrap();
+
+        for next in neighbours2(graph, &state) {
+            let cost = next.cost - state.cost;
+            let new_cost = costs[&state.current] + cost;
+
+            let next_cost = costs.get(&next.current);
+            if next_cost.is_none() || new_cost < *next_cost.unwrap() {
+                costs.insert(next, new_cost);
+                frontier.push(Cell::new(next, new_cost));
+            }
+        }
+    }
+    0
 }
 
 fn bfs2(graph: &Graph, start_nodes: Vec<Node>, number_of_keys: usize) -> i32 {

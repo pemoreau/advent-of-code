@@ -20,28 +20,37 @@ struct State {
     cost: i32,
 }
 
-#[derive(Debug, Eq)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone)]
 struct State2 {
     current: Vec<Node>,
     keys: Vec<char>,
+}
+
+#[derive(Debug, Clone)]
+struct StateCost {
+    state: State2,
     cost: i32,
 }
 
-impl PartialEq for State2 {
+impl Eq for StateCost {}
+
+impl PartialEq for StateCost {
     fn eq(&self, other: &Self) -> bool {
-        self.cost == other.cost && self.current == other.current
+        self.cost == other.cost
+            && self.state.current == other.state.current
+            && self.state.keys == other.state.keys
     }
 }
 
-impl PartialOrd for State2 {
+impl PartialOrd for StateCost {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
+        Some(other.cmp(self))
     }
 }
 
-impl Ord for State2 {
+impl Ord for StateCost {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        other.cost.cmp(&self.cost)
+        self.cost.cmp(&other.cost)
     }
 }
 
@@ -338,11 +347,12 @@ pub fn part1(input: String) -> i64 {
     extend_graph(&mut graph, &grid, &start);
     // println!("graph {:?}", graph);
     // bfs(&graph, start, grid.number_of_keys()) as i64
-    bfs2(&graph, vec![start], grid.number_of_keys()) as i64
+    // bfs2(&graph, vec![start], grid.number_of_keys()) as i64
+    dijkstra(&graph, vec![start], grid.number_of_keys()) as i64
 }
 
-fn neighbours2(graph: &Graph, state: &State2) -> Vec<State2> {
-    let mut neighbours = Vec::new();
+fn neighbours2(graph: &Graph, state: &State2) -> Vec<(State2, i32)> {
+    let mut neighbours: Vec<(State2, i32)> = Vec::new();
     for i in 0..state.current.len() {
         let possible_destinations: Vec<&(Node, i32)> = graph
             .neighbours(&state.current[i])
@@ -359,21 +369,27 @@ fn neighbours2(graph: &Graph, state: &State2) -> Vec<State2> {
                 keys.dedup();
                 let mut current = state.current.clone();
                 current[i] = to.clone();
-                neighbours.push(State2 {
-                    current: current,
-                    keys: keys,
-                    cost: state.cost + distance,
-                });
+                neighbours.push((
+                    State2 {
+                        current: current,
+                        keys: keys,
+                        // cost: state.cost + distance,
+                    },
+                    *distance,
+                ));
             } else if state.keys.contains(&to.name.to_ascii_lowercase())
                 || !to.name.is_ascii_uppercase()
             {
                 let mut current = state.current.clone();
                 current[i] = to.clone();
-                neighbours.push(State2 {
-                    current: current,
-                    keys: state.keys.clone(),
-                    cost: state.cost + distance,
-                });
+                neighbours.push((
+                    State2 {
+                        current: current,
+                        keys: state.keys.clone(),
+                        // cost: state.cost + distance,
+                    },
+                    *distance,
+                ));
             }
         }
     }
@@ -381,74 +397,91 @@ fn neighbours2(graph: &Graph, state: &State2) -> Vec<State2> {
 }
 
 fn dijkstra(graph: &Graph, start_nodes: Vec<Node>, number_of_keys: usize) -> i32 {
-    let mut frontier: BinaryHeap<State2> = BinaryHeap::new();
-    let mut costs: HashMap<Vec<Node>, i32> = HashMap::new();
-    frontier.push(State2 {
+    let mut frontier: BinaryHeap<StateCost> = BinaryHeap::new();
+    let mut cost_so_far: HashMap<State2, i32> = HashMap::new();
+    let start = State2 {
         current: start_nodes.clone(),
         keys: Vec::new(),
+    };
+    frontier.push(StateCost {
+        state: start.clone(),
         cost: 0,
     });
-
-    costs.insert(start_nodes, 0);
+    cost_so_far.insert(start.clone(), 0);
 
     while !frontier.is_empty() {
-        let state = frontier.pop().unwrap();
-
-        for next in neighbours2(graph, &state) {
-            let cost = next.cost - state.cost;
-            let new_cost = costs[&state.current] + cost;
-
-            let next_cost = costs.get(&next.current);
+        let StateCost {
+            state: current,
+            cost,
+        } = frontier.pop().unwrap();
+        if current.keys.len() == number_of_keys {
+            println!("Found all keys: {:?}", current);
+            return cost_so_far[&current];
+        }
+        for (next, cost) in neighbours2(graph, &current) {
+            let current_cost = cost_so_far.get(&current);
+            // println!("cost_so_far {:?}", cost_so_far);
+            // println!("current {:?} current_cost {:?}", current, current_cost);
+            let new_cost = current_cost.unwrap() + cost;
+            let next_cost = cost_so_far.get(&next);
             if next_cost.is_none() || new_cost < *next_cost.unwrap() {
-                costs.insert(next, new_cost);
-                frontier.push(Cell::new(next, new_cost));
+                cost_so_far.insert(next.clone(), new_cost);
+                frontier.push(StateCost {
+                    state: next.clone(),
+                    cost: new_cost,
+                });
+                let len = frontier.len();
+                if len % 10000 == 0 {
+                    println!("len {:?}", len);
+                }
+                // println!("push {:?} {:?}", next, new_cost);
             }
         }
     }
     0
 }
 
-fn bfs2(graph: &Graph, start_nodes: Vec<Node>, number_of_keys: usize) -> i32 {
-    let mut min_cost = i32::MAX;
-    let mut queue = Vec::new();
-    let mut visited: HashMap<(Vec<Node>, Vec<char>), i32> = HashMap::new();
-    queue.push(State2 {
-        current: start_nodes,
-        keys: Vec::new(),
-        cost: 0,
-    });
-
-    while !queue.is_empty() {
-        let state = queue.remove(0);
-        // println!("{:?}", state);
-        if visited.contains_key(&(state.current.clone(), state.keys.clone())) {
-            let cost = visited
-                .get(&(state.current.clone(), state.keys.clone()))
-                .unwrap();
-            if state.cost >= *cost {
-                // println!("skip {:?} {:?}", state, cost);
-                continue;
-            }
-        }
-        visited.insert((state.current.clone(), state.keys.clone()), state.cost);
-
-        if state.keys.len() == number_of_keys {
-            if state.cost < min_cost {
-                // println!("Found all keys: {:?}", state);
-                min_cost = state.cost;
-            }
-            continue;
-        }
-
-        let neighboors = neighbours2(graph, &state);
-        // println!("neighboors {:?}", neighboors);
-        for neighboor in neighboors {
-            // println!("add {:?}", neighboor);
-            queue.push(neighboor);
-        }
-    }
-    min_cost
-}
+// fn bfs2(graph: &Graph, start_nodes: Vec<Node>, number_of_keys: usize) -> i32 {
+//     let mut min_cost = i32::MAX;
+//     let mut queue = Vec::new();
+//     let mut visited: HashMap<(Vec<Node>, Vec<char>), i32> = HashMap::new();
+//     queue.push(State2 {
+//         current: start_nodes,
+//         keys: Vec::new(),
+//         cost: 0,
+//     });
+//
+//     while !queue.is_empty() {
+//         let state = queue.remove(0);
+//         // println!("{:?}", state);
+//         if visited.contains_key(&(state.current.clone(), state.keys.clone())) {
+//             let cost = visited
+//                 .get(&(state.current.clone(), state.keys.clone()))
+//                 .unwrap();
+//             if state.cost >= *cost {
+//                 // println!("skip {:?} {:?}", state, cost);
+//                 continue;
+//             }
+//         }
+//         visited.insert((state.current.clone(), state.keys.clone()), state.cost);
+//
+//         if state.keys.len() == number_of_keys {
+//             if state.cost < min_cost {
+//                 // println!("Found all keys: {:?}", state);
+//                 min_cost = state.cost;
+//             }
+//             continue;
+//         }
+//
+//         let neighboors = neighbours2(graph, &state);
+//         // println!("neighboors {:?}", neighboors);
+//         for neighboor in neighboors {
+//             // println!("add {:?}", neighboor);
+//             queue.push(neighboor);
+//         }
+//     }
+//     min_cost
+// }
 
 pub fn part2(input: String) -> i64 {
     let mut grid = build_grid(input);
@@ -494,5 +527,6 @@ pub fn part2(input: String) -> i64 {
         extend_graph(&mut graph, &grid, &start);
     }
     // println!("graph {:?}", graph);
-    bfs2(&graph, start_nodes, grid.number_of_keys()) as i64
+    // bfs2(&graph, start_nodes, grid.number_of_keys()) as i64
+    dijkstra(&graph, start_nodes, grid.number_of_keys()) as i64
 }

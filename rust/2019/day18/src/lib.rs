@@ -414,27 +414,29 @@ fn dijkstra(graph: &Graph, start_nodes: Vec<Node>, number_of_keys: usize) -> i32
             state: current,
             cost,
         } = frontier.pop().unwrap();
+        // println!("pop {:?} {:?}", current, cost);
         if current.keys.len() == number_of_keys {
             println!("Found all keys: {:?}", current);
             return cost_so_far[&current];
         }
         for (next, cost) in neighbours2(graph, &current) {
-            let current_cost = cost_so_far.get(&current);
-            // println!("cost_so_far {:?}", cost_so_far);
-            // println!("current {:?} current_cost {:?}", current, current_cost);
-            let new_cost = current_cost.unwrap() + cost;
             let next_cost = cost_so_far.get(&next);
+            let current_cost = cost_so_far.get(&current).unwrap();
+            let new_cost = current_cost + cost;
+            // println!("next_cost {:?} new_cost {:?}", next_cost, new_cost);
             if next_cost.is_none() || new_cost < *next_cost.unwrap() {
                 cost_so_far.insert(next.clone(), new_cost);
                 frontier.push(StateCost {
                     state: next.clone(),
-                    cost: new_cost,
+                    cost: new_cost - next.keys.len() as i32,
+                    // cost: new_cost,
                 });
                 let len = frontier.len();
                 if len % 10000 == 0 {
                     println!("len {:?}", len);
                 }
                 // println!("push {:?} {:?}", next, new_cost);
+                // println!("frontier {:?}", frontier);
             }
         }
     }

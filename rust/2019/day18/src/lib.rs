@@ -6,6 +6,87 @@ struct Pos {
     y: i64,
 }
 
+struct Grid {
+    grid: HashMap<Pos, char>,
+}
+
+impl Grid {
+    fn new() -> Self {
+        Self {
+            grid: HashMap::new(),
+        }
+    }
+
+    fn build_grid(input: String) -> Self {
+        let mut grid = Grid::new();
+        for (y, line) in input.lines().enumerate() {
+            for (x, c) in line.chars().enumerate() {
+                grid.insert(
+                    Pos {
+                        x: x as i64,
+                        y: y as i64,
+                    },
+                    c,
+                );
+            }
+        }
+        grid
+    }
+
+    fn start_pos(&self) -> Pos {
+        self.grid
+            .iter()
+            .find(|(_, c)| **c == '@')
+            .map(|(pos, _)| *pos)
+            .unwrap()
+    }
+
+    fn insert(&mut self, pos: Pos, c: char) {
+        self.grid.insert(pos, c);
+    }
+
+    fn get(&self, pos: &Pos) -> Option<&char> {
+        self.grid.get(pos)
+    }
+
+    fn contains_key(&self, pos: &Pos) -> bool {
+        self.grid.contains_key(pos)
+    }
+
+    fn is_wall(&self, pos: &Pos) -> bool {
+        self.get(pos).unwrap() == &'#'
+    }
+
+    fn neighbours(&self, pos: &Pos) -> Vec<Pos> {
+        let mut neighboors = Vec::new();
+        for (dx, dy) in vec![(0, 1), (0, -1), (1, 0), (-1, 0)] {
+            let new_pos = Pos {
+                x: pos.x + dx,
+                y: pos.y + dy,
+            };
+            if self.contains_key(&new_pos) && !self.is_wall(&new_pos) {
+                neighboors.push(new_pos);
+            }
+        }
+        neighboors
+    }
+
+    fn number_of_keys(&self) -> usize {
+        self.grid
+            .iter()
+            .filter(|(_, c)| c.is_ascii_lowercase())
+            .count()
+    }
+
+    fn is_branch_position(&self, pos: &Pos) -> bool {
+        let &c = self.get(&pos).unwrap();
+        if c == '#' {
+            return false;
+        }
+        c.is_ascii_lowercase() || c.is_ascii_uppercase()
+    }
+}
+
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 struct Node {
     pos: Pos,
@@ -87,204 +168,72 @@ impl Graph {
         });
     }
 
-    fn neighbours(&self, node: &Node) -> Result<&Vec<(Node, i32)>, NodeNotInGraph> {
+    fn node_neighbours(&self, node: &Node) -> Result<&Vec<(Node, i32)>, NodeNotInGraph> {
         match self.adjacency_table.get(node) {
             None => Err(NodeNotInGraph),
             Some(i) => Ok(i),
         }
     }
-}
 
-struct Grid {
-    grid: HashMap<Pos, char>,
-}
+    fn neighbours(&self, state: &State) -> Vec<(State, i32)> {
+        let mut res: Vec<(State, i32)> = Vec::new();
+        for i in 0..state.current.len() {
+            let possible_destinations: Vec<&(Node, i32)> = self
+                .node_neighbours(&state.current[i])
+                .unwrap()
+                .iter()
+                .filter(|(node, _)| state.current.iter().find(|n| n.pos == node.pos).is_none())
+                .collect();
 
-impl Grid {
-    fn new() -> Self {
-        Self {
-            grid: HashMap::new(),
-        }
-    }
-
-    fn start_pos(&self) -> Pos {
-        self.grid
-            .iter()
-            .find(|(_, c)| **c == '@')
-            .map(|(pos, _)| *pos)
-            .unwrap()
-    }
-
-    fn insert(&mut self, pos: Pos, c: char) {
-        self.grid.insert(pos, c);
-    }
-
-    fn get(&self, pos: &Pos) -> Option<&char> {
-        self.grid.get(pos)
-    }
-
-    fn contains_key(&self, pos: &Pos) -> bool {
-        self.grid.contains_key(pos)
-    }
-
-    fn is_wall(&self, pos: &Pos) -> bool {
-        self.get(pos).unwrap() == &'#'
-    }
-
-    fn neighboors(&self, pos: &Pos) -> Vec<Pos> {
-        let mut neighboors = Vec::new();
-        for (dx, dy) in vec![(0, 1), (0, -1), (1, 0), (-1, 0)] {
-            let new_pos = Pos {
-                x: pos.x + dx,
-                y: pos.y + dy,
-            };
-            if self.contains_key(&new_pos) && !self.is_wall(&new_pos) {
-                neighboors.push(new_pos);
+            for (to, distance) in possible_destinations {
+                let mut s = state.clone();
+                s.current[i] = *to;
+                if to.name.is_ascii_uppercase()
+                    && !state.keys.contains(&to.name.to_ascii_lowercase())
+                {
+                    continue;
+                }
+                if to.name.is_ascii_lowercase() {
+                    s.keys.push(to.name);
+                    s.keys.sort();
+                    s.keys.dedup();
+                }
+                res.push((s, *distance));
             }
         }
-        neighboors
+        res
     }
 
-    fn number_of_keys(&self) -> usize {
-        self.grid
-            .iter()
-            .filter(|(_, c)| c.is_ascii_lowercase())
-            .count()
-    }
-
-    fn is_branch_position(&self, pos: &Pos) -> bool {
-        let &c = self.get(&pos).unwrap();
-        if c == '#' {
-            return false;
-        }
-        c.is_ascii_lowercase() || c.is_ascii_uppercase()
-    }
-}
-
-fn extend_graph(graph: &mut Graph, grid: &Grid, start: &Node) {
-    let mut queue: Vec<(Node, Node, i32)> = Vec::new();
-    let mut visited: HashSet<(Node, Node)> = HashSet::new();
-    queue.push((*start, *start, 0));
-    while !queue.is_empty() {
-        let (cell, from, distance) = queue.remove(0);
-        let pos = cell.pos;
-        if grid.is_wall(&pos) {
-            continue;
-        }
-        if visited.contains(&(cell, from)) {
-            continue;
-        }
-        visited.insert((cell, from));
-        let new_from = if grid.is_branch_position(&pos) && cell != from {
-            graph.add_edge((&cell, &from, distance));
-            cell
-        } else {
-            from
-        };
-
-        grid.neighboors(&cell.pos).iter().for_each(|p| {
-            let n = Node {
-                pos: *p,
-                name: *grid.get(p).unwrap(),
-            };
-            queue.push((n, new_from, if new_from == from { distance + 1 } else { 1 }))
-        });
-    }
-}
-
-fn build_grid(input: String) -> Grid {
-    let mut grid = Grid::new();
-    for (y, line) in input.lines().enumerate() {
-        for (x, c) in line.chars().enumerate() {
-            grid.insert(
-                Pos {
-                    x: x as i64,
-                    y: y as i64,
-                },
-                c,
-            );
-        }
-    }
-    grid
-}
-
-pub fn part1(input: String) -> i64 {
-    let grid = build_grid(input);
-    let start = Node {
-        pos: grid.start_pos(),
-        name: '@',
-    };
-    let mut graph = Graph::new();
-    extend_graph(&mut graph, &grid, &start);
-    dijkstra(&grid, &graph, vec![start]) as i64
-}
-
-fn neighbours(graph: &Graph, state: &State) -> Vec<(State, i32)> {
-    let mut res: Vec<(State, i32)> = Vec::new();
-    for i in 0..state.current.len() {
-        let possible_destinations: Vec<&(Node, i32)> = graph
-            .neighbours(&state.current[i])
-            .unwrap()
-            .iter()
-            .filter(|(node, _)| state.current.iter().find(|n| n.pos == node.pos).is_none())
-            .collect();
-
-        for (to, distance) in possible_destinations {
-            let mut s = state.clone();
-            s.current[i] = *to;
-            if to.name.is_ascii_uppercase() && !state.keys.contains(&to.name.to_ascii_lowercase()) {
+    fn extend_graph(&mut self, grid: &Grid, start: &Node) {
+        let mut queue: Vec<(Node, Node, i32)> = Vec::new();
+        let mut visited: HashSet<(Node, Node)> = HashSet::new();
+        queue.push((*start, *start, 0));
+        while !queue.is_empty() {
+            let (cell, from, distance) = queue.remove(0);
+            let pos = cell.pos;
+            if grid.is_wall(&pos) {
                 continue;
             }
-            if to.name.is_ascii_lowercase() {
-                s.keys.push(to.name);
-                s.keys.sort();
-                s.keys.dedup();
+            if visited.contains(&(cell, from)) {
+                continue;
             }
-            res.push((s, *distance));
-        }
-    }
-    res
-}
-
-fn display_state(grid: &Grid, state: &State) {
-    let mut min_x = i64::MAX;
-    let mut max_x = i64::MIN;
-    let mut min_y = i64::MAX;
-    let mut max_y = i64::MIN;
-    for (pos, _) in grid.grid.iter() {
-        if pos.x < min_x {
-            min_x = pos.x;
-        }
-        if pos.x > max_x {
-            max_x = pos.x;
-        }
-        if pos.y < min_y {
-            min_y = pos.y;
-        }
-        if pos.y > max_y {
-            max_y = pos.y;
-        }
-    }
-    for y in min_y..=max_y {
-        for x in min_x..=max_x {
-            let pos = Pos { x, y };
-            if state.current.iter().find(|n| n.pos == pos).is_some() {
-                print!("@");
+            visited.insert((cell, from));
+            let new_from = if grid.is_branch_position(&pos) && cell != from {
+                self.add_edge((&cell, &from, distance));
+                cell
             } else {
-                if grid.get(&pos).unwrap() == &'@' {
-                    print!(".");
-                } else if state
-                    .keys
-                    .contains(&grid.get(&pos).unwrap().to_ascii_lowercase())
-                {
-                    print!(".");
-                } else {
-                    print!("{}", grid.get(&pos).unwrap());
-                }
-            }
+                from
+            };
+
+            grid.neighbours(&cell.pos).iter().for_each(|p| {
+                let n = Node {
+                    pos: *p,
+                    name: *grid.get(p).unwrap(),
+                };
+                queue.push((n, new_from, if new_from == from { distance + 1 } else { 1 }))
+            });
         }
-        println!();
     }
-    println!("{:?}", state.keys);
 }
 
 fn dijkstra(grid: &Grid, graph: &Graph, start_nodes: Vec<Node>) -> i32 {
@@ -310,7 +259,7 @@ fn dijkstra(grid: &Grid, graph: &Graph, start_nodes: Vec<Node>) -> i32 {
             println!("Found all keys: {:?}", current);
             return cost_so_far[&current];
         }
-        for (next, cost) in neighbours(graph, &current) {
+        for (next, cost) in graph.neighbours(&current) {
             let next_cost = cost_so_far.get(&next);
             let current_cost = cost_so_far.get(&current).unwrap();
             let new_cost = current_cost + cost;
@@ -326,10 +275,21 @@ fn dijkstra(grid: &Grid, graph: &Graph, start_nodes: Vec<Node>) -> i32 {
     0
 }
 
+pub fn part1(input: String) -> i64 {
+    let grid = Grid::build_grid(input);
+    let start = Node {
+        pos: grid.start_pos(),
+        name: '@',
+    };
+    let mut graph = Graph::new();
+    graph.extend_graph(&grid, &start);
+    dijkstra(&grid, &graph, vec![start]) as i64
+}
+
 pub fn part2(input: String) -> i64 {
-    let mut grid = build_grid(input);
+    let mut grid = Grid::build_grid(input);
     let center = grid.start_pos();
-    let neighbors = grid.neighboors(&center);
+    let neighbors = grid.neighbours(&center);
     grid.insert(center, '#');
     for n in neighbors {
         grid.insert(n, '#');
@@ -365,7 +325,7 @@ pub fn part2(input: String) -> i64 {
         .collect::<Vec<Node>>();
     let mut graph = Graph::new();
     for start in start_nodes.iter() {
-        extend_graph(&mut graph, &grid, start);
+        graph.extend_graph(&grid, start);
     }
     dijkstra(&grid, &graph, start_nodes) as i64
 }

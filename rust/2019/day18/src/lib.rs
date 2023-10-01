@@ -284,7 +284,8 @@ fn is_branch_position(grid: &Grid, pos: &Pos) -> bool {
         }
     }
     // println!("branching {} {:?}", neighboors, pos);
-    c.is_ascii_lowercase() || c.is_ascii_uppercase() || neighboors > 2
+    // c.is_ascii_lowercase() || c.is_ascii_uppercase() || neighboors > 2
+    c.is_ascii_lowercase() || c.is_ascii_uppercase()
 }
 
 fn extend_graph(graph: &mut Graph, grid: &Grid, start: &Node) {
@@ -348,7 +349,7 @@ pub fn part1(input: String) -> i64 {
     // println!("graph {:?}", graph);
     // bfs(&graph, start, grid.number_of_keys()) as i64
     // bfs2(&graph, vec![start], grid.number_of_keys()) as i64
-    dijkstra(&graph, vec![start], grid.number_of_keys()) as i64
+    dijkstra(&grid, &graph, vec![start]) as i64
 }
 
 fn neighbours2(graph: &Graph, state: &State2) -> Vec<(State2, i32)> {
@@ -396,7 +397,84 @@ fn neighbours2(graph: &Graph, state: &State2) -> Vec<(State2, i32)> {
     neighbours
 }
 
-fn dijkstra(graph: &Graph, start_nodes: Vec<Node>, number_of_keys: usize) -> i32 {
+fn display(grid: &Grid, state: &State2) {
+    let mut min_x = i64::MAX;
+    let mut max_x = i64::MIN;
+    let mut min_y = i64::MAX;
+    let mut max_y = i64::MIN;
+    for node in state.current.iter() {
+        if node.pos.x < min_x {
+            min_x = node.pos.x;
+        }
+        if node.pos.x > max_x {
+            max_x = node.pos.x;
+        }
+        if node.pos.y < min_y {
+            min_y = node.pos.y;
+        }
+        if node.pos.y > max_y {
+            max_y = node.pos.y;
+        }
+    }
+    for y in min_y..=max_y {
+        for x in min_x..=max_x {
+            let pos = Pos { x, y };
+            if state.current.iter().find(|n| n.pos == pos).is_some() {
+                print!("@");
+            } else if grid.contains_key(&pos) {
+                print!("{}", grid.get(&pos).unwrap());
+            } else {
+                print!(" ");
+            }
+        }
+        println!();
+    }
+}
+
+fn display_state(grid: &Grid, state: &State2) {
+    let mut min_x = i64::MAX;
+    let mut max_x = i64::MIN;
+    let mut min_y = i64::MAX;
+    let mut max_y = i64::MIN;
+    for (pos, _) in grid.grid.iter() {
+        if pos.x < min_x {
+            min_x = pos.x;
+        }
+        if pos.x > max_x {
+            max_x = pos.x;
+        }
+        if pos.y < min_y {
+            min_y = pos.y;
+        }
+        if pos.y > max_y {
+            max_y = pos.y;
+        }
+    }
+    for y in min_y..=max_y {
+        for x in min_x..=max_x {
+            let pos = Pos { x, y };
+            if state.current.iter().find(|n| n.pos == pos).is_some() {
+                print!("@");
+            } else {
+                if grid.get(&pos).unwrap() == &'@' {
+                    print!(".");
+                } else if state
+                    .keys
+                    .contains(&grid.get(&pos).unwrap().to_ascii_lowercase())
+                {
+                    print!(".");
+                } else {
+                    print!("{}", grid.get(&pos).unwrap());
+                }
+            }
+        }
+        println!();
+    }
+    println!("{:?}", state.keys);
+}
+
+fn dijkstra(grid: &Grid, graph: &Graph, start_nodes: Vec<Node>) -> i32 {
+    let number_of_keys = grid.number_of_keys();
     let mut frontier: BinaryHeap<StateCost> = BinaryHeap::new();
     let mut cost_so_far: HashMap<State2, i32> = HashMap::new();
     let start = State2 {
@@ -415,6 +493,8 @@ fn dijkstra(graph: &Graph, start_nodes: Vec<Node>, number_of_keys: usize) -> i32
             cost,
         } = frontier.pop().unwrap();
         // println!("pop {:?} {:?}", current, cost);
+        // display_state(&grid, &current);
+        // println!("cost_so_far {:?}", cost_so_far.get(&current));
         if current.keys.len() == number_of_keys {
             println!("Found all keys: {:?}", current);
             return cost_so_far[&current];
@@ -428,8 +508,8 @@ fn dijkstra(graph: &Graph, start_nodes: Vec<Node>, number_of_keys: usize) -> i32
                 cost_so_far.insert(next.clone(), new_cost);
                 frontier.push(StateCost {
                     state: next.clone(),
-                    cost: new_cost - next.keys.len() as i32,
-                    // cost: new_cost,
+                    // cost: new_cost - next.keys.len() as i32,
+                    cost: new_cost,
                 });
                 let len = frontier.len();
                 if len % 10000 == 0 {
@@ -437,6 +517,8 @@ fn dijkstra(graph: &Graph, start_nodes: Vec<Node>, number_of_keys: usize) -> i32
                 }
                 // println!("push {:?} {:?}", next, new_cost);
                 // println!("frontier {:?}", frontier);
+            } else {
+                // println!("skip {:?} {:?}", next_cost, new_cost);
             }
         }
     }
@@ -530,5 +612,5 @@ pub fn part2(input: String) -> i64 {
     }
     // println!("graph {:?}", graph);
     // bfs2(&graph, start_nodes, grid.number_of_keys()) as i64
-    dijkstra(&graph, start_nodes, grid.number_of_keys()) as i64
+    dijkstra(&grid, &graph, start_nodes) as i64
 }

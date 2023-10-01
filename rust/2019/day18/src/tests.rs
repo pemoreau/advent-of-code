@@ -47,8 +47,8 @@ mod tests {
         assert_eq!(5406, part1(include_str!("../input.txt").to_string()));
     }
 
-    // #[test]
-    // fn test_input_part2() {
-    //     assert_eq!(0, part2(include_str!("../input.txt").to_string()));
-    // }
+    #[test]
+    fn test_input_part2() {
+        assert_eq!(1938, part2(include_str!("../input.txt").to_string()));
+    }
 }

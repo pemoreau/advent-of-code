@@ -99,20 +99,10 @@ struct State {
     keys: Vec<char>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 struct StateCost {
     state: State,
     cost: i32,
-}
-
-impl Eq for StateCost {}
-
-impl PartialEq for StateCost {
-    fn eq(&self, other: &Self) -> bool {
-        self.cost == other.cost
-            && self.state.current == other.state.current
-            && self.state.keys == other.state.keys
-    }
 }
 
 impl PartialOrd for StateCost {
@@ -250,11 +240,11 @@ fn dijkstra(grid: &Grid, graph: &Graph, start_nodes: Vec<Node>) -> i32 {
     });
     cost_so_far.insert(start, 0);
 
-    while !frontier.is_empty() {
-        let StateCost {
-            state: current,
-            cost,
-        } = frontier.pop().unwrap();
+    while let Some(StateCost {
+        state: current,
+        cost: _,
+    }) = frontier.pop()
+    {
         if current.keys.len() == number_of_keys {
             println!("Found all keys: {:?}", current);
             return cost_so_far[&current];
@@ -272,7 +262,7 @@ fn dijkstra(grid: &Grid, graph: &Graph, start_nodes: Vec<Node>) -> i32 {
             }
         }
     }
-    0
+    i32::MAX
 }
 
 pub fn part1(input: String) -> i64 {

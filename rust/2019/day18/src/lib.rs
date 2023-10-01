@@ -289,37 +289,24 @@ pub fn part1(input: String) -> i64 {
 pub fn part2(input: String) -> i64 {
     let mut grid = Grid::build_grid(input);
     let center = grid.start_pos();
-    let neighbors = grid.neighbours(&center);
     grid.insert(center, '#');
-    for n in neighbors {
+    for n in grid.neighbours(&center) {
         grid.insert(n, '#');
     }
-    let start_positions = vec![
-        Pos {
-            x: center.x - 1,
-            y: center.y - 1,
-        },
-        Pos {
-            x: center.x + 1,
-            y: center.y - 1,
-        },
-        Pos {
-            x: center.x - 1,
-            y: center.y + 1,
-        },
-        Pos {
-            x: center.x + 1,
-            y: center.y + 1,
-        },
-    ];
-    for pos in start_positions.iter() {
-        grid.insert(*pos, '@');
+    let start_positions = vec![(-1, -1), (1, -1), (-1, 1), (1, 1)]
+        .into_iter()
+        .map(|(dx, dy)| Pos {
+            x: center.x + dx,
+            y: center.y + dy,
+        });
+
+    for pos in start_positions.clone() {
+        grid.insert(pos, '@');
     }
 
     let start_nodes = start_positions
-        .iter()
         .map(|pos| Node {
-            pos: *pos,
+            pos: pos,
             name: '@',
         })
         .collect::<Vec<Node>>();

@@ -6,11 +6,11 @@ fn main() {
     println!("--2019 day 18 solution--");
     let now = Instant::now();
 
-    // println!(
-    //     "Part 1: {} in {} ms",
-    //     part1(include_str!("../input_test2.txt").to_string()),
-    //     now.elapsed().as_micros() as f64 / 1000.0
-    // );
+    println!(
+        "Part 1: {} in {} ms",
+        part1(include_str!("../input.txt").to_string()),
+        now.elapsed().as_micros() as f64 / 1000.0
+    );
 
     let now = Instant::now();
     println!(

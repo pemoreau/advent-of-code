@@ -58,17 +58,17 @@ impl Grid {
     }
 
     fn neighbours(&self, pos: &Pos) -> Vec<Pos> {
-        let mut neighboors = Vec::new();
+        let mut res = Vec::new();
         for (dx, dy) in vec![(0, 1), (0, -1), (1, 0), (-1, 0)] {
             let new_pos = Pos {
                 x: pos.x + dx,
                 y: pos.y + dy,
             };
             if self.contains_key(&new_pos) && !self.is_wall(&new_pos) {
-                neighboors.push(new_pos);
+                res.push(new_pos);
             }
         }
-        neighboors
+        res
     }
 
     fn number_of_keys(&self) -> usize {
@@ -305,10 +305,7 @@ pub fn part2(input: String) -> i64 {
     }
 
     let start_nodes = start_positions
-        .map(|pos| Node {
-            pos: pos,
-            name: '@',
-        })
+        .map(|pos| Node { pos, name: '@' })
         .collect::<Vec<Node>>();
     let mut graph = Graph::new();
     for start in start_nodes.iter() {

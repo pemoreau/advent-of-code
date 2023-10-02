@@ -1,4 +1,5 @@
 use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::ops::{Deref, DerefMut};
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 struct Pos {
@@ -10,16 +11,22 @@ struct Grid {
     grid: HashMap<Pos, char>,
 }
 
-impl Grid {
-    fn new() -> Self {
-        Self {
-            grid: HashMap::new(),
-        }
-    }
+impl Deref for Grid {
+    type Target = HashMap<Pos, char>;
 
-    fn build_grid(input: String) -> Self {
+    fn deref(&self) -> &Self::Target {
+        &self.grid
+    }
+}
+impl DerefMut for Grid {
+fn deref_mut(&mut self) -> &mut Self::Target {
+    &mut self.grid
+}
+}
+impl From<&str> for Grid {
+    fn from(value: &str) -> Self {
         let mut grid = Grid::new();
-        for (y, line) in input.lines().enumerate() {
+        for (y, line) in value.lines().enumerate() {
             for (x, c) in line.chars().enumerate() {
                 grid.insert(
                     Pos {
@@ -32,34 +39,29 @@ impl Grid {
         }
         grid
     }
+}
+
+impl Grid {
+    fn new() -> Self {
+        Self {
+            grid: HashMap::new(),
+        }
+    }
 
     fn start_pos(&self) -> Pos {
         self.grid
             .iter()
-            .find(|(_, c)| **c == '@')
-            .map(|(pos, _)| *pos)
+            .find_map(|(&pos, &c)| if c == '@' {Some(pos)} else {None})
             .unwrap()
     }
 
-    fn insert(&mut self, pos: Pos, c: char) {
-        self.grid.insert(pos, c);
-    }
-
-    fn get(&self, pos: &Pos) -> Option<&char> {
-        self.grid.get(pos)
-    }
-
-    fn contains_key(&self, pos: &Pos) -> bool {
-        self.grid.contains_key(pos)
-    }
-
     fn is_wall(&self, pos: &Pos) -> bool {
-        self.get(pos).unwrap() == &'#'
+        self.get(pos) == Some(&'#')
     }
 
     fn neighbours(&self, pos: &Pos) -> Vec<Pos> {
         let mut res = Vec::new();
-        for (dx, dy) in vec![(0, 1), (0, -1), (1, 0), (-1, 0)] {
+        for (dx, dy) in [(0, 1), (0, -1), (1, 0), (-1, 0)] {
             let new_pos = Pos {
                 x: pos.x + dx,
                 y: pos.y + dy,
@@ -132,19 +134,9 @@ impl Graph {
         }
     }
 
-    fn add_node(&mut self, node: &Node) -> bool {
-        match self.adjacency_table.get(node) {
-            None => {
-                self.adjacency_table.insert(*node, Vec::new());
-                true
-            }
-            _ => false,
-        }
-    }
-
     fn add_edge(&mut self, edge: (&Node, &Node, i32)) {
-        self.add_node(edge.0);
-        self.add_node(edge.1);
+        self.adjacency_table.entry(*edge.0).or_insert(Vec::new());
+        self.adjacency_table.entry(*edge.1).or_insert(Vec::new());
 
         self.adjacency_table.entry(*edge.0).and_modify(|e| {
             if !e.contains(&(*edge.1, edge.2)) {
@@ -159,12 +151,8 @@ impl Graph {
     }
 
     fn node_neighbours(&self, node: &Node) -> Result<&Vec<(Node, i32)>, NodeNotInGraph> {
-        match self.adjacency_table.get(node) {
-            None => Err(NodeNotInGraph),
-            Some(i) => Ok(i),
-        }
+        self.adjacency_table.get(node).ok_or(NodeNotInGraph)
     }
-
     fn neighbours(&self, state: &State) -> Vec<(State, i32)> {
         let mut res: Vec<(State, i32)> = Vec::new();
         for i in 0..state.current.len() {
@@ -266,7 +254,7 @@ fn dijkstra(grid: &Grid, graph: &Graph, start_nodes: Vec<Node>) -> i32 {
 }
 
 pub fn part1(input: String) -> i64 {
-    let grid = Grid::build_grid(input);
+    let grid = Grid::from(input.as_str());
     let start = Node {
         pos: grid.start_pos(),
         name: '@',
@@ -277,13 +265,13 @@ pub fn part1(input: String) -> i64 {
 }
 
 pub fn part2(input: String) -> i64 {
-    let mut grid = Grid::build_grid(input);
+    let mut grid = Grid::from(input.as_str());
     let center = grid.start_pos();
     grid.insert(center, '#');
     for n in grid.neighbours(&center) {
         grid.insert(n, '#');
     }
-    let start_positions = vec![(-1, -1), (1, -1), (-1, 1), (1, 1)]
+    let start_positions = [(-1, -1), (1, -1), (-1, 1), (1, 1)]
         .into_iter()
         .map(|(dx, dy)| Pos {
             x: center.x + dx,

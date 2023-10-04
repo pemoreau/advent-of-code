@@ -2,10 +2,7 @@ use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::ops::{Deref, DerefMut};
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
-struct Pos {
-    x: i64,
-    y: i64,
-}
+struct Pos(i64, i64);
 
 struct Grid {
     grid: HashMap<Pos, char>,
@@ -19,22 +16,16 @@ impl Deref for Grid {
     }
 }
 impl DerefMut for Grid {
-fn deref_mut(&mut self) -> &mut Self::Target {
-    &mut self.grid
-}
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.grid
+    }
 }
 impl From<&str> for Grid {
     fn from(value: &str) -> Self {
         let mut grid = Grid::new();
         for (y, line) in value.lines().enumerate() {
             for (x, c) in line.chars().enumerate() {
-                grid.insert(
-                    Pos {
-                        x: x as i64,
-                        y: y as i64,
-                    },
-                    c,
-                );
+                grid.insert(Pos(x as i64, y as i64), c);
             }
         }
         grid
@@ -51,7 +42,7 @@ impl Grid {
     fn start_pos(&self) -> Pos {
         self.grid
             .iter()
-            .find_map(|(&pos, &c)| if c == '@' {Some(pos)} else {None})
+            .find_map(|(&pos, &c)| if c == '@' { Some(pos) } else { None })
             .unwrap()
     }
 
@@ -59,14 +50,11 @@ impl Grid {
         self.get(pos) == Some(&'#')
     }
 
-    fn neighbours(&self, pos: &Pos) -> Vec<Pos> {
+    fn neighbours(&self, Pos(x, y): &Pos) -> Vec<Pos> {
         let mut res = Vec::new();
         for (dx, dy) in [(0, 1), (0, -1), (1, 0), (-1, 0)] {
-            let new_pos = Pos {
-                x: pos.x + dx,
-                y: pos.y + dy,
-            };
-            if self.contains_key(&new_pos) && !self.is_wall(&new_pos) {
+            let new_pos = Pos(x + dx, y + dy);
+            if !self.is_wall(&new_pos) && self.contains_key(&new_pos) {
                 res.push(new_pos);
             }
         }
@@ -81,11 +69,10 @@ impl Grid {
     }
 
     fn is_branch_position(&self, pos: &Pos) -> bool {
-        let &c = self.get(&pos).unwrap();
-        if c == '#' {
-            return false;
+        if let Some(c) = self.get(pos) {
+            return c.is_ascii_lowercase() || c.is_ascii_uppercase();
         }
-        c.is_ascii_lowercase() || c.is_ascii_uppercase()
+        false
     }
 }
 
@@ -153,6 +140,7 @@ impl Graph {
     fn node_neighbours(&self, node: &Node) -> Result<&Vec<(Node, i32)>, NodeNotInGraph> {
         self.adjacency_table.get(node).ok_or(NodeNotInGraph)
     }
+
     fn neighbours(&self, state: &State) -> Vec<(State, i32)> {
         let mut res: Vec<(State, i32)> = Vec::new();
         for i in 0..state.current.len() {
@@ -160,7 +148,6 @@ impl Graph {
                 .node_neighbours(&state.current[i])
                 .unwrap()
                 .iter()
-                .filter(|(node, _)| state.current.iter().find(|n| n.pos == node.pos).is_none())
                 .collect();
 
             for (to, distance) in possible_destinations {
@@ -267,16 +254,14 @@ pub fn part1(input: String) -> i64 {
 pub fn part2(input: String) -> i64 {
     let mut grid = Grid::from(input.as_str());
     let center = grid.start_pos();
+    let Pos(cx, cy) = center;
     grid.insert(center, '#');
     for n in grid.neighbours(&center) {
         grid.insert(n, '#');
     }
     let start_positions = [(-1, -1), (1, -1), (-1, 1), (1, 1)]
         .into_iter()
-        .map(|(dx, dy)| Pos {
-            x: center.x + dx,
-            y: center.y + dy,
-        });
+        .map(|(dx, dy)| Pos(cx + dx, cy + dy));
 
     for pos in start_positions.clone() {
         grid.insert(pos, '@');

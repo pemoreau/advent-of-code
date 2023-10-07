@@ -1,18 +1,11 @@
-use std::collections::{HashMap, HashSet};
-
 pub struct Card {
     pos: i64,
-    value: i64,
     size: i64,
 }
 
 impl Card {
     pub fn new(value: i64, size: i64) -> Card {
-        Card {
-            pos: value,
-            value,
-            size,
-        }
+        Card { pos: value, size }
     }
     pub fn new_stack(&mut self) {
         self.pos = self.size - self.pos - 1;

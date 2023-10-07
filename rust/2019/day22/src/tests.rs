@@ -4,7 +4,7 @@ mod tests {
     use day22::Card;
 
     #[test]
-    fn test_part1_1() {
+    fn test_input_1() {
         assert_eq!(1029498, part1("input_text.txt".to_string()));
     }
 

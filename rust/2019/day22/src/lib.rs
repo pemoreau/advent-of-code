@@ -71,6 +71,19 @@ fn mod_pow(mut base: i128, mut exp: i128, modulus: i128) -> i128 {
     result
 }
 
+pub fn mod_euclid(a: i128, b: u128) -> u128 {
+    const UPPER: u128 = i128::MAX as u128;
+    match b {
+        1..=UPPER => a.rem_euclid(b as i128) as u128,
+        _ if a >= 0 => a as u128,
+        // turn a from two's complement negative into it's
+        // equivalent positive value by adding u128::MAX
+        // essentialy calculating u128::MAX - |a|
+        _ => u128::MAX.wrapping_add_signed(a),
+        //_ => a as u128 - (a < 0) as u128,
+    }
+}
+
 fn step(a: i128, b: i128, size: i128, line: &str) -> (i128, i128) {
     if line == "deal into new stack" {
         return (-a + size, -b + size - 1);
@@ -83,6 +96,7 @@ fn step(a: i128, b: i128, size: i128, line: &str) -> (i128, i128) {
     }
     (a, b)
 }
+
 pub fn part2(input: String) -> i64 {
     let mut a = 1i128;
     let mut b = 0i128;
@@ -93,20 +107,19 @@ pub fn part2(input: String) -> i64 {
         (a, b) = step(a, b, size, line);
     }
 
-    println!("a={} b={}", a, b);
-
-    // x * a^n + b * (a^n - 1) / (a-1)
-    // let p = mod_pow(a, n, size);
-    // let q = (mod_pow(a, n, size) - 1) * mod_pow(a - 1, size - 2, size) % size;
-    // let res = (2020 * p + b * q) % size;
+    // println!("a={}\t\tb={}", a, b);
 
     // f^-1(x) = a^-1 * x -b * a^-1
-    let c = mod_pow(a, size - 2, size);
-    let res = (2020 * c - b * c) % size;
+    let aa = mod_pow(a, size - 2, size);
+    // let B = (-b * A) % size;
+    let bb = mod_euclid(-b * aa, size as u128) as i128;
+    // f^-n(x) = a^-n * x - b * a^-n
+    let p = mod_pow(aa, n, size);
+    let q = mod_euclid((p - 1) * mod_pow(aa - 1, size - 2, size), size as u128) as i128;
+    let res = (2020 * p + bb * q) % size;
 
-    // 5691574550498 too low
-    // 39485958529798 too low
-    // 107800053624821 too high
-    // 110057814880073
+    // println!("A={}\tB={}", aa, bb);
+    // println!("p={}\tq={}", p, q);
+
     res as i64
 }

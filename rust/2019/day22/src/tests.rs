@@ -1,12 +1,7 @@
 mod tests {
     use crate::part1;
-    // use crate::part2;
+    use crate::part2;
     use day22::Card;
-
-    #[test]
-    fn test_input_1() {
-        assert_eq!(1029498, part1("input_text.txt".to_string()));
-    }
 
     #[test]
     fn test_part1_1() {
@@ -64,8 +59,16 @@ mod tests {
         assert_eq!(9, card.get_pos());
     }
 
-    // #[test]
-    // fn test_input_part2() {
-    //     assert_eq!(42178738, part2(include_str!("../input.txt").to_string()));
-    // }
+    #[test]
+    fn test_input_part1() {
+        assert_eq!(3749, part1(include_str!("../input.txt").to_string()));
+    }
+
+    #[test]
+    fn test_input_part2() {
+        assert_eq!(
+            77225522112241,
+            part2(include_str!("../input.txt").to_string())
+        );
+    }
 }

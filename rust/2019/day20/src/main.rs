@@ -12,12 +12,12 @@ fn main() {
         now.elapsed().as_micros() as f64 / 1000.0
     );
 
-    // let now = Instant::now();
-    // println!(
-    //     "Part 2: {} in {} ms",
-    //     part2(include_str!("../input.txt").to_string()),
-    //     now.elapsed().as_micros() as f64 / 1000.0
-    // );
+    let now = Instant::now();
+    println!(
+        "Part 2: {} in {} ms",
+        part2(include_str!("../input.txt").to_string()),
+        now.elapsed().as_micros() as f64 / 1000.0
+    );
 }
 
 // 2147483647 too high

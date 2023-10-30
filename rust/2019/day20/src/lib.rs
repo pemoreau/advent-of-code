@@ -1,5 +1,6 @@
 use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::ops::{Deref, DerefMut};
+use std::thread::current;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 struct Pos(i64, i64);
@@ -86,18 +87,18 @@ struct State {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-struct StateCost {
-    state: State,
+struct StateCost<T> {
+    state: T,
     cost: i32,
 }
 
-impl PartialOrd for StateCost {
+impl<T: Eq> PartialOrd for StateCost<T> {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(other.cmp(self))
     }
 }
 
-impl Ord for StateCost {
+impl<T: Eq> Ord for StateCost<T> {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.cost.cmp(&other.cost)
     }
@@ -165,6 +166,50 @@ impl Graph {
         res
     }
 
+    fn neighbours2(&self, state: &State2) -> Vec<(State2, i32)> {
+        let mut res: Vec<(State2, i32)> = Vec::new();
+        let possible_destinations: Vec<&(Node, i32)> = self
+            .node_neighbours(&state.current)
+            .unwrap()
+            .iter()
+            .collect();
+
+        for (to, distance) in possible_destinations {
+            let from_name = state.current.name;
+            if state.level == 0 && (from_name.is_ascii_uppercase() || from_name == 'É') {
+                // at level 0 can only exit via 1
+                continue;
+            }
+            let mut level = state.level;
+            if from_name.is_ascii_uppercase()
+                && to.name.is_ascii_lowercase()
+                && from_name.to_ascii_lowercase() == to.name
+            {
+                // going from outside to inside port make level decrease
+                level -= 1;
+            } else if from_name.is_ascii_lowercase()
+                && to.name.is_ascii_uppercase()
+                && from_name.to_ascii_uppercase() == to.name
+            {
+                level += 1;
+            } else if from_name == 'é' && to.name == 'É' {
+                level += 1;
+            } else if from_name == 'É' && to.name == 'é' {
+                level -= 1;
+            }
+
+            res.push((
+                State2 {
+                    current: *to,
+                    level,
+                },
+                *distance,
+            ));
+        }
+
+        res
+    }
+
     fn extend_graph(&mut self, grid: &Grid, start_nodes: Vec<Node>) {
         let mut queue: Vec<(Node, Node, i32)> = Vec::new();
         let mut visited: HashSet<(Node, Node)> = HashSet::new();
@@ -225,7 +270,7 @@ impl Graph {
 }
 
 fn dijkstra(graph: &Graph, start_node: Node) -> i32 {
-    let mut frontier: BinaryHeap<StateCost> = BinaryHeap::new();
+    let mut frontier: BinaryHeap<StateCost<State>> = BinaryHeap::new();
     let mut cost_so_far: HashMap<State, i32> = HashMap::new();
     let start = State {
         current: start_node.clone(),
@@ -242,7 +287,7 @@ fn dijkstra(graph: &Graph, start_node: Node) -> i32 {
     }) = frontier.pop()
     {
         if current.current.name == '1' {
-            println!("found 1");
+            // println!("found 1");
             return cost_so_far[&current];
         }
         for (next, cost) in graph.neighbours(&current) {
@@ -284,6 +329,70 @@ pub fn part1(input: String) -> i64 {
     dijkstra(&graph, start) as i64
 }
 
+#[derive(Debug, Hash, Eq, PartialEq, Clone)]
+struct State2 {
+    current: Node,
+    level: i32,
+}
+
+fn dijkstra2(graph: &Graph, start_node: Node) -> i32 {
+    let mut frontier: BinaryHeap<StateCost<State2>> = BinaryHeap::new();
+    let mut cost_so_far: HashMap<State2, i32> = HashMap::new();
+    let start = State2 {
+        current: start_node.clone(),
+        level: 0,
+    };
+    frontier.push(StateCost {
+        state: start.clone(),
+        cost: 0,
+    });
+    cost_so_far.insert(start, 0);
+
+    while let Some(StateCost {
+        state: current,
+        cost: _,
+    }) = frontier.pop()
+    {
+        if current.current.name == '1' && current.level == 0 {
+            // println!("found 1");
+            return cost_so_far[&current];
+        }
+
+        for (next, cost) in graph.neighbours2(&current) {
+            let next_cost = cost_so_far.get(&next);
+            let current_cost = cost_so_far.get(&current).unwrap();
+            let new_cost = current_cost + cost;
+            if next_cost.is_none() || new_cost < *next_cost.unwrap() {
+                cost_so_far.insert(next.clone(), new_cost);
+                frontier.push(StateCost {
+                    state: next,
+                    cost: new_cost,
+                });
+            }
+        }
+    }
+    i32::MAX
+}
+
 pub fn part2(input: String) -> i64 {
-    0
+    let grid = Grid::from(input.as_str());
+
+    let mut graph = Graph::new();
+    let start_nodes: Vec<Node> = ('A'..='Z')
+        .chain('a'..='z')
+        .chain("01éÉ".chars())
+        .filter(|&start_char| grid.start_pos(start_char).is_some())
+        .map(|start_char| Node {
+            pos: grid.start_pos(start_char).unwrap(),
+            name: start_char,
+        })
+        .collect();
+    graph.extend_graph(&grid, start_nodes);
+    graph.add_tunnels();
+
+    let start = Node {
+        pos: grid.start_pos('0').unwrap(),
+        name: '0',
+    };
+    dijkstra2(&graph, start) as i64
 }

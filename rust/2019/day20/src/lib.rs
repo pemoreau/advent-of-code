@@ -1,7 +1,6 @@
 use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::hash::Hash;
 use std::ops::{Deref, DerefMut};
-use std::thread::current;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 struct Pos(i64, i64);
@@ -156,51 +155,30 @@ impl Graph {
     }
 
     fn neighbours(&self, state: &State) -> Vec<(State, i32)> {
-        let mut res: Vec<(State, i32)> = Vec::new();
-        let possible_destinations: Vec<&(Node, i32)> = self
-            .node_neighbours(&state.current)
-            .unwrap()
-            .iter()
-            .collect();
-
-        for (to, distance) in possible_destinations {
-            let mut s = state.clone();
-            s.current = *to;
-            res.push((s, *distance));
-        }
-        res
+        let possible_destinations = self.node_neighbours(&state.current).unwrap().iter();
+        possible_destinations
+            .map(|(to, distance)| (State { current: *to }, *distance))
+            .collect()
     }
 
     fn neighbours2(&self, state: &State2) -> Vec<(State2, i32)> {
         let mut res: Vec<(State2, i32)> = Vec::new();
-        let possible_destinations: Vec<&(Node, i32)> = self
-            .node_neighbours(&state.current)
-            .unwrap()
-            .iter()
-            .collect();
+        let possible_destinations = self.node_neighbours(&state.current).unwrap().iter();
 
         for (to, distance) in possible_destinations {
             let from_name = state.current.name;
-            if state.level == 0 && (from_name.is_ascii_uppercase() || from_name == 'É') {
+            let is_outer = |name: char| name.is_ascii_uppercase() || name == 'É';
+            let is_inner = |name: char| name.is_ascii_lowercase() || name == 'é';
+            if state.level == 0 && is_outer(from_name) {
                 // at level 0 can only exit via 1
                 continue;
             }
             let mut level = state.level;
-            if from_name.is_ascii_uppercase()
-                && to.name.is_ascii_lowercase()
-                && from_name.to_ascii_lowercase() == to.name
-            {
+            if is_outer(from_name) && distance == &1 {
                 // going from outside to inside port make level decrease
                 level -= 1;
-            } else if from_name.is_ascii_lowercase()
-                && to.name.is_ascii_uppercase()
-                && from_name.to_ascii_uppercase() == to.name
-            {
+            } else if is_inner(from_name) && distance == &1 {
                 level += 1;
-            } else if from_name == 'é' && to.name == 'É' {
-                level += 1;
-            } else if from_name == 'É' && to.name == 'é' {
-                level -= 1;
             }
 
             res.push((
@@ -313,9 +291,13 @@ fn dijkstra<S: Eq + Hash + Clone>(
     }
     i32::MAX
 }
-pub fn part1(input: String) -> i64 {
-    let grid = Grid::from(input.as_str());
 
+fn solve<S: Eq + Hash + Clone>(
+    grid: &Grid,
+    start: S,
+    neighbours: fn(graph: &Graph, state: &S) -> Vec<(S, i32)>,
+    goal: fn(state: &S) -> bool,
+) -> i64 {
     let mut graph = Graph::new();
     let start_nodes: Vec<Node> = ('A'..='Z')
         .chain('a'..='z')
@@ -328,45 +310,35 @@ pub fn part1(input: String) -> i64 {
         .collect();
     graph.extend_graph(&grid, start_nodes);
     graph.add_tunnels();
+    dijkstra(&graph, start, neighbours, goal) as i64
+}
 
-    let start = Node {
-        pos: grid.start_pos('0').unwrap(),
-        name: '0',
+pub fn part1(input: String) -> i64 {
+    let grid = Grid::from(input.as_str());
+
+    let start = State {
+        current: Node {
+            pos: grid.start_pos('0').unwrap(),
+            name: '0',
+        },
     };
+
     let neighbours = |graph: &Graph, state: &State| graph.neighbours(state);
     let goal = |state: &State| state.current.name == '1';
-    dijkstra(&graph, State { current: start }, neighbours, goal) as i64
+    solve(&grid, start, neighbours, goal)
 }
 
 pub fn part2(input: String) -> i64 {
     let grid = Grid::from(input.as_str());
 
-    let mut graph = Graph::new();
-    let start_nodes: Vec<Node> = ('A'..='Z')
-        .chain('a'..='z')
-        .chain("01éÉ".chars())
-        .filter(|&start_char| grid.start_pos(start_char).is_some())
-        .map(|start_char| Node {
-            pos: grid.start_pos(start_char).unwrap(),
-            name: start_char,
-        })
-        .collect();
-    graph.extend_graph(&grid, start_nodes);
-    graph.add_tunnels();
-
-    let start = Node {
-        pos: grid.start_pos('0').unwrap(),
-        name: '0',
+    let start = State2 {
+        current: Node {
+            pos: grid.start_pos('0').unwrap(),
+            name: '0',
+        },
+        level: 0,
     };
     let neighbours = |graph: &Graph, state: &State2| graph.neighbours2(state);
     let goal = |state: &State2| state.current.name == '1' && state.level == 0;
-    dijkstra(
-        &graph,
-        State2 {
-            current: start,
-            level: 0,
-        },
-        neighbours,
-        goal,
-    ) as i64
+    solve(&grid, start, neighbours, goal)
 }

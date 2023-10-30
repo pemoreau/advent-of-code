@@ -68,7 +68,7 @@ impl Grid {
 
     fn is_branch_position(&self, pos: &Pos) -> bool {
         if let Some(c) = self.get(pos) {
-            return c.is_ascii_lowercase() || c.is_ascii_uppercase();
+            return c.is_ascii_lowercase() || c.is_ascii_uppercase() || c == &'0' || c == &'1';
         }
         false
     }
@@ -103,7 +103,6 @@ impl Ord for StateCost {
     }
 }
 
-#[derive(Debug)]
 struct Graph {
     adjacency_table: HashMap<Node, Vec<(Node, i32)>>,
 }
@@ -116,6 +115,18 @@ impl Graph {
         Graph {
             adjacency_table: HashMap::new(),
         }
+    }
+
+    fn to_string(&self) -> String {
+        let mut res = String::new();
+        for (node, neighbours) in &self.adjacency_table {
+            res.push_str(&format!("{}: ", node.name));
+            for (neighbour, distance) in neighbours {
+                res.push_str(&format!("{}({}), ", neighbour.name, distance));
+            }
+            res.push('\n');
+        }
+        res
     }
 
     fn add_edge(&mut self, edge: (&Node, &Node, i32)) {
@@ -135,9 +146,6 @@ impl Graph {
     }
 
     fn node_neighbours(&self, node: &Node) -> Result<&Vec<(Node, i32)>, NodeNotInGraph> {
-        println!("node: {:?}", node);
-        println!("adjacency_table: {:?}", self.adjacency_table);
-        println!("get: {:?}", self.adjacency_table.get(node));
         return self.adjacency_table.get(node).ok_or(NodeNotInGraph);
     }
 
@@ -161,7 +169,6 @@ impl Graph {
         let mut queue: Vec<(Node, Node, i32)> = Vec::new();
         let mut visited: HashSet<(Node, Node)> = HashSet::new();
         for start in start_nodes {
-            println!("start: {:?}", start);
             queue.push((start, start, 0));
         }
         while !queue.is_empty() {
@@ -192,22 +199,27 @@ impl Graph {
     }
 
     fn add_tunnels(&mut self) {
-        println!("add tunnels {:?}", self.adjacency_table.keys());
-        let lower_case_nodes: Vec<Node> = self
-            .adjacency_table
-            .keys()
-            .filter(|n| n.name.is_ascii_lowercase())
-            .cloned()
-            .collect();
-        for lowercase_node in lower_case_nodes {
-            let mut uppercase_node = lowercase_node.clone();
-            uppercase_node.name = lowercase_node.name.to_ascii_uppercase();
-            self.adjacency_table.entry(lowercase_node).and_modify(|e| {
-                e.push((uppercase_node, 1));
-            });
-            self.adjacency_table.entry(uppercase_node).and_modify(|e| {
-                e.push((lowercase_node, 1));
-            });
+        let map_char_node: HashMap<char, Vec<Node>> =
+            self.adjacency_table
+                .keys()
+                .cloned()
+                .fold(HashMap::new(), |mut acc, node| {
+                    acc.entry(node.name).or_insert(Vec::new()).push(node);
+                    acc
+                });
+
+        for c in map_char_node.keys() {
+            if c == &'é' {
+                self.add_edge((&map_char_node[&'é'][0], &map_char_node[&'É'][0], 1));
+            } else if c == &'É' {
+                self.add_edge((&map_char_node[&'É'][0], &map_char_node[&'é'][0], 1));
+            } else if c.is_ascii_lowercase() {
+                let uppercase = c.to_ascii_uppercase();
+                self.add_edge((&map_char_node[c][0], &map_char_node[&uppercase][0], 1));
+            } else if c.is_ascii_uppercase() {
+                let lowercase = c.to_ascii_lowercase();
+                self.add_edge((&map_char_node[c][0], &map_char_node[&lowercase][0], 1));
+            }
         }
     }
 }
@@ -229,8 +241,8 @@ fn dijkstra(graph: &Graph, start_node: Node) -> i32 {
         cost: _,
     }) = frontier.pop()
     {
-        if current.current.name == 'Z' {
-            println!("found Z");
+        if current.current.name == '1' {
+            println!("found 1");
             return cost_so_far[&current];
         }
         for (next, cost) in graph.neighbours(&current) {
@@ -253,25 +265,21 @@ pub fn part1(input: String) -> i64 {
     let grid = Grid::from(input.as_str());
 
     let mut graph = Graph::new();
-    // for start_char in 'A'..='Z' {
-    //     let start = Node {
-    //         pos: grid.start_pos(start_char),
-    //         name: start_char,
-    //     };
-    //     graph.extend_graph(&grid, &start);
-    // }
-    let start_nodes = ('A'..='Z')
+    let start_nodes: Vec<Node> = ('A'..='Z')
+        .chain('a'..='z')
+        .chain("01éÉ".chars())
         .filter(|&start_char| grid.start_pos(start_char).is_some())
         .map(|start_char| Node {
             pos: grid.start_pos(start_char).unwrap(),
             name: start_char,
-        });
-    graph.extend_graph(&grid, start_nodes.collect());
-    println!("{:?}", graph);
+        })
+        .collect();
+    graph.extend_graph(&grid, start_nodes);
+    graph.add_tunnels();
 
     let start = Node {
-        pos: grid.start_pos('A').unwrap(),
-        name: 'A',
+        pos: grid.start_pos('0').unwrap(),
+        name: '0',
     };
     dijkstra(&graph, start) as i64
 }

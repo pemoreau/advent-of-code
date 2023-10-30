@@ -1,4 +1,5 @@
 use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::hash::Hash;
 use std::ops::{Deref, DerefMut};
 use std::thread::current;
 
@@ -85,20 +86,24 @@ struct Node {
 struct State {
     current: Node,
 }
-
+#[derive(Debug, Hash, Eq, PartialEq, Clone)]
+struct State2 {
+    current: Node,
+    level: i32,
+}
 #[derive(Debug, Clone, Eq, PartialEq)]
-struct StateCost<T> {
-    state: T,
+struct StateCost<S> {
+    state: S,
     cost: i32,
 }
 
-impl<T: Eq> PartialOrd for StateCost<T> {
+impl<S: Eq> PartialOrd for StateCost<S> {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(other.cmp(self))
     }
 }
 
-impl<T: Eq> Ord for StateCost<T> {
+impl<S: Eq> Ord for StateCost<S> {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.cost.cmp(&other.cost)
     }
@@ -269,12 +274,14 @@ impl Graph {
     }
 }
 
-fn dijkstra(graph: &Graph, start_node: Node) -> i32 {
-    let mut frontier: BinaryHeap<StateCost<State>> = BinaryHeap::new();
-    let mut cost_so_far: HashMap<State, i32> = HashMap::new();
-    let start = State {
-        current: start_node.clone(),
-    };
+fn dijkstra<S: Eq + Hash + Clone>(
+    graph: &Graph,
+    start: S,
+    neighbours: fn(graph: &Graph, state: &S) -> Vec<(S, i32)>,
+    goal: fn(state: &S) -> bool,
+) -> i32 {
+    let mut frontier: BinaryHeap<StateCost<S>> = BinaryHeap::new();
+    let mut cost_so_far: HashMap<S, i32> = HashMap::new();
     frontier.push(StateCost {
         state: start.clone(),
         cost: 0,
@@ -286,11 +293,12 @@ fn dijkstra(graph: &Graph, start_node: Node) -> i32 {
         cost: _,
     }) = frontier.pop()
     {
-        if current.current.name == '1' {
+        if goal(&current) {
             // println!("found 1");
             return cost_so_far[&current];
         }
-        for (next, cost) in graph.neighbours(&current) {
+
+        for (next, cost) in neighbours(graph, &current) {
             let next_cost = cost_so_far.get(&next);
             let current_cost = cost_so_far.get(&current).unwrap();
             let new_cost = current_cost + cost;
@@ -305,7 +313,6 @@ fn dijkstra(graph: &Graph, start_node: Node) -> i32 {
     }
     i32::MAX
 }
-
 pub fn part1(input: String) -> i64 {
     let grid = Grid::from(input.as_str());
 
@@ -326,52 +333,9 @@ pub fn part1(input: String) -> i64 {
         pos: grid.start_pos('0').unwrap(),
         name: '0',
     };
-    dijkstra(&graph, start) as i64
-}
-
-#[derive(Debug, Hash, Eq, PartialEq, Clone)]
-struct State2 {
-    current: Node,
-    level: i32,
-}
-
-fn dijkstra2(graph: &Graph, start_node: Node) -> i32 {
-    let mut frontier: BinaryHeap<StateCost<State2>> = BinaryHeap::new();
-    let mut cost_so_far: HashMap<State2, i32> = HashMap::new();
-    let start = State2 {
-        current: start_node.clone(),
-        level: 0,
-    };
-    frontier.push(StateCost {
-        state: start.clone(),
-        cost: 0,
-    });
-    cost_so_far.insert(start, 0);
-
-    while let Some(StateCost {
-        state: current,
-        cost: _,
-    }) = frontier.pop()
-    {
-        if current.current.name == '1' && current.level == 0 {
-            // println!("found 1");
-            return cost_so_far[&current];
-        }
-
-        for (next, cost) in graph.neighbours2(&current) {
-            let next_cost = cost_so_far.get(&next);
-            let current_cost = cost_so_far.get(&current).unwrap();
-            let new_cost = current_cost + cost;
-            if next_cost.is_none() || new_cost < *next_cost.unwrap() {
-                cost_so_far.insert(next.clone(), new_cost);
-                frontier.push(StateCost {
-                    state: next,
-                    cost: new_cost,
-                });
-            }
-        }
-    }
-    i32::MAX
+    let neighbours = |graph: &Graph, state: &State| graph.neighbours(state);
+    let goal = |state: &State| state.current.name == '1';
+    dijkstra(&graph, State { current: start }, neighbours, goal) as i64
 }
 
 pub fn part2(input: String) -> i64 {
@@ -394,5 +358,15 @@ pub fn part2(input: String) -> i64 {
         pos: grid.start_pos('0').unwrap(),
         name: '0',
     };
-    dijkstra2(&graph, start) as i64
+    let neighbours = |graph: &Graph, state: &State2| graph.neighbours2(state);
+    let goal = |state: &State2| state.current.name == '1' && state.level == 0;
+    dijkstra(
+        &graph,
+        State2 {
+            current: start,
+            level: 0,
+        },
+        neighbours,
+        goal,
+    ) as i64
 }

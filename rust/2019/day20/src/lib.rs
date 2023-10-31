@@ -252,7 +252,7 @@ impl Graph {
     }
 }
 
-fn dijkstra<S: Eq + Hash + Clone>(
+fn dijkstra<S: Eq + Hash + Clone, Graph>(
     graph: &Graph,
     start: S,
     neighbours: fn(graph: &Graph, state: &S) -> Vec<(S, i32)>,
@@ -272,7 +272,6 @@ fn dijkstra<S: Eq + Hash + Clone>(
     }) = frontier.pop()
     {
         if goal(&current) {
-            // println!("found 1");
             return cost_so_far[&current];
         }
 
@@ -291,7 +290,6 @@ fn dijkstra<S: Eq + Hash + Clone>(
     }
     i32::MAX
 }
-
 fn solve<S: Eq + Hash + Clone>(
     grid: &Grid,
     start: S,

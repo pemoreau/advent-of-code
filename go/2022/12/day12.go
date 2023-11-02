@@ -13,7 +13,7 @@ var input_day string
 
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := utils.BuildIntMatrix(lines)
+	m := utils.BuildMatrix[int](lines)
 	from := search('S', m)
 	to := search('E', m)
 	m[from.Y][from.X] = 'a'
@@ -30,7 +30,7 @@ func Part1(input string) int {
 
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := utils.BuildIntMatrix(lines)
+	m := utils.BuildMatrix[int](lines)
 
 	from := search('S', m)
 	to := search('E', m)
@@ -57,7 +57,7 @@ func main() {
 	fmt.Println(time.Since(start))
 }
 
-func search(v int, m utils.IntMatrix) utils.Pos {
+func search(v int, m utils.Matrix[int]) utils.Pos {
 	for j, l := range m {
 		for i, c := range l {
 			if c == v {
@@ -68,7 +68,7 @@ func search(v int, m utils.IntMatrix) utils.Pos {
 	return utils.Pos{}
 }
 
-func neighbors(m utils.IntMatrix, i, j int) []utils.Pos {
+func neighbors(m utils.Matrix[int], i, j int) []utils.Pos {
 	pos := []utils.Pos{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
 	res := []utils.Pos{}
 	for _, p := range pos {
@@ -83,7 +83,7 @@ func neighbors(m utils.IntMatrix, i, j int) []utils.Pos {
 	return res
 }
 
-func neighbors2(m utils.IntMatrix, i, j int) []utils.Pos {
+func neighbors2(m utils.Matrix[int], i, j int) []utils.Pos {
 	n := neighbors(m, i, j)
 	if m[j][i] == 'a' {
 		a := search('a', m)
@@ -92,7 +92,7 @@ func neighbors2(m utils.IntMatrix, i, j int) []utils.Pos {
 	return n
 }
 
-func cost2(from, to utils.Pos, m utils.IntMatrix) int {
+func cost2(from, to utils.Pos, m utils.Matrix[int]) int {
 	if m[from.Y][from.X] == 'a' && m[to.Y][to.X] == 'a' {
 		return 0
 	}

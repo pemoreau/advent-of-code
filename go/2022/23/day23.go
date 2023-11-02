@@ -88,10 +88,10 @@ func Part1(input string) int {
 	cpt = 0
 	for p := range grid {
 		if grid[p] == '#' {
-			minX = utils.Min(p.X, minX)
-			minY = utils.Min(p.Y, minY)
-			maxX = utils.Max(p.X, maxX)
-			maxY = utils.Max(p.Y, maxY)
+			minX = min(p.X, minX)
+			minY = min(p.Y, minY)
+			maxX = max(p.X, maxX)
+			maxY = max(p.Y, maxY)
 			cpt++
 		}
 	}

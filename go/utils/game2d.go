@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"golang.org/x/exp/constraints"
 	"math"
 	"strings"
 )
@@ -28,29 +29,19 @@ func ManhattanDistance(from, to Pos) int {
 // Matrix Representation
 // ---------------------
 
-type DigitMatrix [][]uint8
+type Matrix[T any] [][]T
 
-type IntMatrix [][]int
-
-func BuildDigitMatrix(lines []string) DigitMatrix {
-	m := make([][]uint8, len(lines))
-	for j, l := range lines {
-		l = strings.TrimSpace(l)
-		m[j] = make([]uint8, len(l))
-		for i, c := range l {
-			m[j][i] = uint8(c - '0')
-		}
-	}
-	return m
+func BuildMatrix[T constraints.Integer](lines []string) Matrix[T] {
+	return BuildConvertMatrix[T](lines, func(c int32) T { return T(c) })
 }
 
-func BuildIntMatrix(lines []string) IntMatrix {
-	m := make([][]int, len(lines))
+func BuildConvertMatrix[T constraints.Integer](lines []string, convert func(c int32) T) Matrix[T] {
+	m := make([][]T, len(lines))
 	for j, l := range lines {
 		l = strings.TrimSpace(l)
-		m[j] = make([]int, len(l))
+		m[j] = make([]T, len(l))
 		for i, c := range l {
-			m[j][i] = int(c)
+			m[j][i] = convert(c)
 		}
 	}
 	return m
@@ -97,10 +88,10 @@ func (p Pos) Neighbors8() []Pos {
 func DisplayMap(grid map[Pos]uint8, empty uint8) {
 	minX, minY, maxX, maxY := math.MaxInt, math.MaxInt, math.MinInt, math.MinInt
 	for p := range grid {
-		minX = Min(p.X, minX)
-		minY = Min(p.Y, minY)
-		maxX = Max(p.X, maxX)
-		maxY = Max(p.Y, maxY)
+		minX = min(p.X, minX)
+		minY = min(p.Y, minY)
+		maxX = max(p.X, maxX)
+		maxY = max(p.Y, maxY)
 	}
 	for y := minY; y <= maxY; y++ {
 		for x := minX; x <= maxX; x++ {
@@ -118,10 +109,10 @@ func DisplayMap(grid map[Pos]uint8, empty uint8) {
 func GridBounds(grid map[Pos]uint8) (minX, maxX, minY, maxY int) {
 	minX, minY, maxX, maxY = math.MaxInt, math.MaxInt, math.MinInt, math.MinInt
 	for p := range grid {
-		minX = Min(p.X, minX)
-		minY = Min(p.Y, minY)
-		maxX = Max(p.X, maxX)
-		maxY = Max(p.Y, maxY)
+		minX = min(p.X, minX)
+		minY = min(p.Y, minY)
+		maxX = max(p.X, maxX)
+		maxY = max(p.Y, maxY)
 	}
 	return minX, maxX, minY, maxY
 }

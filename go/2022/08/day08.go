@@ -11,44 +11,44 @@ import (
 //go:embed input.txt
 var input_day string
 
-type max struct {
+type maxHeight struct {
 	N, S, E, W int8
 }
 
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	matrix := utils.BuildDigitMatrix(lines)
+	matrix := utils.BuildMatrix[int](lines)
 
 	maxY := len(matrix)
 	maxX := len(matrix[0])
 
-	m := make([][]max, maxY)
+	m := make([][]maxHeight, maxY)
 	for j := 0; j < maxY; j++ {
-		m[j] = make([]max, maxX)
+		m[j] = make([]maxHeight, maxX)
 		for i := 0; i < maxX; i++ {
 			N := int8(-1)
 			if j > 0 {
-				N = int8(utils.Max(int(m[j-1][i].N), int(matrix[j-1][i])))
+				N = int8(max(int(m[j-1][i].N), matrix[j-1][i]))
 			}
 			W := int8(-1)
 			if i > 0 {
-				W = int8(utils.Max(int(m[j][i-1].W), int(matrix[j][i-1])))
+				W = int8(max(int(m[j][i-1].W), matrix[j][i-1]))
 			}
-			m[j][i] = max{N: N, W: W}
+			m[j][i] = maxHeight{N: N, W: W}
 		}
 	}
 	for j := maxY - 1; j >= 0; j-- {
 		for i := maxX - 1; i >= 0; i-- {
 			S := int8(-1)
 			if j < maxY-1 {
-				S = int8(utils.Max(int(m[j+1][i].S), int(matrix[j+1][i])))
+				S = int8(max(int(m[j+1][i].S), matrix[j+1][i]))
 			}
 			E := int8(-1)
 			if i < maxX-1 {
-				E = int8(utils.Max(int(m[j][i+1].E), int(matrix[j][i+1])))
+				E = int8(max(int(m[j][i+1].E), matrix[j][i+1]))
 			}
-			m[j][i] = max{S: S, E: E, N: m[j][i].N, W: m[j][i].W}
+			m[j][i] = maxHeight{S: S, E: E, N: m[j][i].N, W: m[j][i].W}
 		}
 	}
 
@@ -68,7 +68,7 @@ func Part1(input string) int {
 func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	matrix := utils.BuildDigitMatrix(lines)
+	matrix := utils.BuildMatrix[int](lines)
 
 	res := 0
 	maxY := len(matrix)
@@ -101,7 +101,7 @@ func Part2(input string) int {
 					break
 				}
 			}
-			res = utils.Max(res, n*s*e*w)
+			res = max(res, n*s*e*w)
 		}
 	}
 	return res

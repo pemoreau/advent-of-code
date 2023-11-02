@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/pemoreau/advent-of-code/go/utils"
 )
 
 type interval [2]int    // [min, max[
@@ -34,17 +32,17 @@ func (b Cuboid) Contains(a Cuboid) bool {
 }
 
 func Intersection(a, b Cuboid) (Cuboid, bool) {
-	xmin, xmax := utils.Max(a[0][0], b[0][0]), utils.Min(a[0][1], b[0][1])
-	ymin, ymax := utils.Max(a[1][0], b[1][0]), utils.Min(a[1][1], b[1][1])
-	zmin, zmax := utils.Max(a[2][0], b[2][0]), utils.Min(a[2][1], b[2][1])
+	xmin, xmax := max(a[0][0], b[0][0]), min(a[0][1], b[0][1])
+	ymin, ymax := max(a[1][0], b[1][0]), min(a[1][1], b[1][1])
+	zmin, zmax := max(a[2][0], b[2][0]), min(a[2][1], b[2][1])
 	c := CreateCuboid(xmin, xmax, ymin, ymax, zmin, zmax)
 	return c, !c.IsEmpty()
 }
 
 func Disjoint(a, b Cuboid) bool {
-	xmin, xmax := utils.Max(a[0][0], b[0][0]), utils.Min(a[0][1], b[0][1])
-	ymin, ymax := utils.Max(a[1][0], b[1][0]), utils.Min(a[1][1], b[1][1])
-	zmin, zmax := utils.Max(a[2][0], b[2][0]), utils.Min(a[2][1], b[2][1])
+	xmin, xmax := max(a[0][0], b[0][0]), min(a[0][1], b[0][1])
+	ymin, ymax := max(a[1][0], b[1][0]), min(a[1][1], b[1][1])
+	zmin, zmax := max(a[2][0], b[2][0]), min(a[2][1], b[2][1])
 	return xmin >= xmax || ymin >= ymax || zmin >= zmax
 }
 
@@ -57,10 +55,10 @@ func (b Cuboid) Overlap(a Cuboid) []Cuboid {
 	dimension := [3][]int{}
 	for i := 0; i < 3; i++ {
 		dimension[i] = []int{
-			utils.Min(a[i][0], b[i][0]),
-			utils.Max(a[i][0], b[i][0]),
-			utils.Min(a[i][1], b[i][1]),
-			utils.Max(a[i][1], b[i][1]),
+			min(a[i][0], b[i][0]),
+			max(a[i][0], b[i][0]),
+			min(a[i][1], b[i][1]),
+			max(a[i][1], b[i][1]),
 		}
 	}
 	res := make([]Cuboid, 0, 27)

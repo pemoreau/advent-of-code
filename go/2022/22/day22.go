@@ -55,10 +55,10 @@ func parse(input string) (topology *Topology, path string) {
 			if c == '#' || c == '.' {
 				p := Pos{i, j}
 				grid[p] = uint8(c)
-				xmin = utils.Min(xmin, i)
-				xmax = utils.Max(xmax, i)
-				ymin = utils.Min(column[i].Min, j)
-				ymax = utils.Max(column[i].Max, j)
+				xmin = min(xmin, i)
+				xmax = max(xmax, i)
+				ymin = min(column[i].Min, j)
+				ymax = max(column[i].Max, j)
 				column[i] = utils.Interval{ymin, ymax}
 			}
 		}

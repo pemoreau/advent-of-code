@@ -242,8 +242,8 @@ func merge(w World) World {
 	m := map[Env]*struct{ min, max int }{}
 	for _, state := range w {
 		if entry, ok := m[state.env]; ok {
-			entry.min = utils.Min(entry.min, state.min)
-			entry.max = utils.Max(entry.max, state.max)
+			entry.min = min(entry.min, state.min)
+			entry.max = max(entry.max, state.max)
 		} else {
 			m[state.env] = &struct{ min, max int }{min: state.min, max: state.max}
 		}
@@ -255,11 +255,11 @@ func merge(w World) World {
 	return res
 }
 
-var min = math.MaxInt
-var max = 0
+var minValue = math.MaxInt
+var maxValue = 0
 
 func Solve(input string) {
-	if min < max {
+	if minValue < maxValue {
 		return
 	}
 	input = strings.TrimSuffix(input, "\n")
@@ -277,21 +277,21 @@ func Solve(input string) {
 	z := regIndex('z')
 	for _, state := range world {
 		if state.env[z] == 0 {
-			min = utils.Min(min, state.min)
-			max = utils.Max(max, state.max)
+			minValue = min(minValue, state.min)
+			maxValue = max(maxValue, state.max)
 		}
 	}
 
 }
 func Part1(input string) int {
 	Solve(input)
-	return max
+	return maxValue
 
 }
 
 func Part2(input string) int {
 	Solve(input)
-	return min
+	return minValue
 }
 
 func main() {

@@ -17,17 +17,17 @@ func (i Interval) Negate() Interval {
 	return Interval{-i.Max, -i.Min}
 }
 
-func (i Interval) Add(b Interval) Interval {
-	return Interval{i.Min + b.Min, i.Max + b.Max}
+func (i Interval) Add(j Interval) Interval {
+	return Interval{i.Min + j.Min, i.Max + j.Max}
 }
 
-func (i Interval) Sub(b Interval) Interval {
-	min := i.Min - b.Min
-	max := i.Max - b.Max
-	if min < max {
-		return Interval{min, max}
+func (i Interval) Sub(j Interval) Interval {
+	a := i.Min - j.Min
+	b := i.Max - j.Max
+	if a < b {
+		return Interval{a, b}
 	} else {
-		return Interval{max, min}
+		return Interval{b, a}
 	}
 }
 
@@ -51,52 +51,50 @@ func minmax(a, b, c, d int) (int, int) {
 		min2 = d
 		max2 = c
 	}
-	return Min(min1, min2), Max(max1, max2)
+	return min(min1, min2), max(max1, max2)
 }
 
-func (i Interval) Mul(b Interval) Interval {
-	if i.Min >= 0 && b.Min >= 0 {
-		return Interval{i.Min * b.Min, i.Max * b.Max}
-	} else if i.Max <= 0 && b.Max <= 0 {
-		return Interval{i.Max * b.Max, i.Min * b.Min}
+func (i Interval) Mul(j Interval) Interval {
+	if i.Min >= 0 && j.Min >= 0 {
+		return Interval{i.Min * j.Min, i.Max * j.Max}
+	} else if i.Max <= 0 && j.Max <= 0 {
+		return Interval{i.Max * j.Max, i.Min * j.Min}
 	}
 
 	// From https://doi.org/10.1145/502102.502106
 	// Figure 6
 	// but it is not more efficient than the following 2 lines
 
-	min, max := minmax(i.Min*b.Min, i.Min*b.Max, i.Max*b.Min, i.Max*b.Max)
-	return Interval{min, max}
+	a, b := minmax(i.Min*j.Min, i.Min*j.Max, i.Max*j.Min, i.Max*j.Max)
+	return Interval{a, b}
 }
 
-func (i Interval) Div(b Interval) Interval {
-	if i.Min >= 0 && b.Min >= 0 {
-		return Interval{i.Min / b.Max, i.Max / b.Min}
-	} else if i.Max <= 0 && b.Max <= 0 {
-		return Interval{i.Max / b.Min, i.Min / b.Max}
+func (i Interval) Div(j Interval) Interval {
+	if i.Min >= 0 && j.Min >= 0 {
+		return Interval{i.Min / j.Max, i.Max / j.Min}
+	} else if i.Max <= 0 && j.Max <= 0 {
+		return Interval{i.Max / j.Min, i.Min / j.Max}
 	}
 
 	// From https://doi.org/10.1145/502102.502106
 	// Figure 7
 	// but it is not more efficient than the following 2 lines
 
-	min, max := minmax(i.Min/b.Min, i.Min/b.Max, i.Max/b.Min, i.Max/b.Max)
-	return Interval{min, max}
+	a, b := minmax(i.Min/j.Min, i.Min/j.Max, i.Max/j.Min, i.Max/j.Max)
+	return Interval{a, b}
 }
 
-func (i Interval) Inter(b Interval) Interval {
-	if i.Max < b.Min || b.Max < i.Min {
+func (i Interval) Inter(j Interval) Interval {
+	if i.Max < j.Min || j.Max < i.Min {
 		return Interval{0, -1}
 	}
-	min := Max(i.Min, b.Min)
-	max := Min(i.Max, b.Max)
-	return Interval{min, max}
+	a := max(i.Min, j.Min)
+	b := min(i.Max, j.Max)
+	return Interval{a, b}
 }
 
-func (i Interval) union(b Interval) Interval {
-	min := Min(i.Min, b.Min)
-	max := Max(i.Max, b.Max)
-	return Interval{min, max}
+func (i Interval) union(j Interval) Interval {
+	return Interval{min(i.Min, j.Min), max(i.Max, j.Max)}
 }
 
 func (i Interval) Mod1(m int) Interval {
@@ -144,7 +142,7 @@ func (i Interval) Mod2(i2 Interval) Interval {
 		return Interval{a, b}.Mod2(Interval{-n, -m})
 	case m <= 0:
 		// (6): similar to (5), make modulus non-negative
-		return Interval{a, b}.Mod2(Interval{1, Max(-m, n)})
+		return Interval{a, b}.Mod2(Interval{1, max(-m, n)})
 	case b-a >= n:
 		// (7): compare to (4) in mod1, check b-a < |modulus|
 		return Interval{0, n - 1}

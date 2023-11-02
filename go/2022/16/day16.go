@@ -3,7 +3,6 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
 	"math"
 	"strings"
 	"time"
@@ -170,11 +169,11 @@ func Part1(input string) int {
 
 	paths := allPath(actives, start, 30)
 
-	max := math.MinInt
+	res := math.MinInt
 	for _, p := range paths {
-		max = utils.Max(max, p)
+		res = max(res, p)
 	}
-	return max
+	return res
 }
 
 func Part2(input string) int {
@@ -200,7 +199,7 @@ func Part2(input string) int {
 				}
 			}
 			if !intersect {
-				res = utils.Max(res, max1+max2)
+				res = max(res, max1+max2)
 			}
 		}
 	}

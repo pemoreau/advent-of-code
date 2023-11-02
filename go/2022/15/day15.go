@@ -54,7 +54,7 @@ func (fs *FreeSpace) Add(interval utils.Interval) {
 	for i < len(fs.intervals) {
 		var last = newSet[len(newSet)-1]
 		if fs.intervals[i].Min < last.Max {
-			newInterval := utils.Interval{utils.Min(last.Min, fs.intervals[i].Min), utils.Max(last.Max, fs.intervals[i].Max)}
+			newInterval := utils.Interval{min(last.Min, fs.intervals[i].Min), max(last.Max, fs.intervals[i].Max)}
 			newSet[len(newSet)-1] = newInterval
 		} else {
 			endSet = append(endSet, fs.intervals[i])
@@ -94,7 +94,7 @@ func (fs *FreeSpace) Intersect(interval utils.Interval) {
 		if i.Min > interval.Max {
 			break
 		}
-		newSet = append(newSet, utils.Interval{utils.Max(i.Min, interval.Min), utils.Min(i.Max, interval.Max)})
+		newSet = append(newSet, utils.Interval{max(i.Min, interval.Min), min(i.Max, interval.Max)})
 	}
 	fs.intervals = newSet
 }

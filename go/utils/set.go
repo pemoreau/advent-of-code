@@ -55,7 +55,7 @@ func (s Set[T]) Equal(other Set[T]) bool {
 }
 
 func (s Set[T]) Union(other Set[T]) Set[T] {
-	res := make(Set[T], Max(s.Len(), other.Len()))
+	res := make(Set[T], max(s.Len(), other.Len()))
 	for elem := range s {
 		res.Add(elem)
 	}

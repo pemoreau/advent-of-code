@@ -3,7 +3,6 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
 	"reflect"
 	"strings"
 	"time"
@@ -58,11 +57,11 @@ func (g Grid) free(place Pos, rock Rock) bool {
 }
 
 func (g Grid) maxY() int {
-	max := 0
+	res := 0
 	for p := range g {
-		max = utils.Max(p.Y+1, max)
+		res = max(p.Y+1, res)
 	}
-	return max
+	return res
 }
 
 func (g Grid) display() {
@@ -148,7 +147,7 @@ func findCycle(input string) (int, int, int, int, []int, []int) {
 		g.add(start, r)
 		pos := g.fall(start, r, input, &index)
 		oldMaxY := maxY
-		maxY = utils.Max(maxY, pos.Y+addY[rockIndex])
+		maxY = max(maxY, pos.Y+addY[rockIndex])
 		values = append(values, maxY-oldMaxY)
 	}
 	i, j := findRecurringElement(prefixes(values, len(input)))
@@ -176,7 +175,7 @@ func Part1(input string) int {
 		start := Pos{X: 2, Y: maxY + 3}
 		g.add(start, r)
 		pos := g.fall(start, r, input, &index)
-		maxY = utils.Max(maxY, pos.Y+addY[rockIndex])
+		maxY = max(maxY, pos.Y+addY[rockIndex])
 	}
 	return maxY
 }

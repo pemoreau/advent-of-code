@@ -84,7 +84,7 @@ func neighbors(s State, condition Condition, maxTime int8) []State {
 		//  if you already have X robots creating resource R, a current stock of Y for that resource, remainingTime minutes left,
 		//   and no robot requires more than Z of resource R to build,
 		//   and X * remainingTime+Y >= remainingTime * Z, then you never need to build another robot mining R anymore.
-		Z := utils.Max(utils.Max(condition[0][i], condition[1][i]), utils.Max(condition[2][i], condition[3][i]))
+		Z := max(condition[0][i], condition[1][i], condition[2][i], condition[3][i])
 		if int16(s.robot[i])*remainingTime+s.product[i] >= remainingTime*Z {
 			continue
 		}
@@ -269,8 +269,8 @@ func Part1(input string) int {
 	states, conditions := parse(input)
 	res := 0
 	for i := 0; i < len(states); i++ {
-		max := solve(states[i], conditions[i], 24)
-		res = res + (max * (i + 1))
+		m := solve(states[i], conditions[i], 24)
+		res = res + (m * (i + 1))
 	}
 	return res
 }
@@ -278,9 +278,9 @@ func Part1(input string) int {
 func Part2(input string) int {
 	states, conditions := parse(input)
 	res := 1
-	for i := 0; i < utils.Min(3, len(states)); i++ {
-		max := solve(states[i], conditions[i], 32)
-		res = res * max
+	for i := 0; i < min(3, len(states)); i++ {
+		m := solve(states[i], conditions[i], 32)
+		res = res * m
 	}
 	return res
 }

@@ -3,7 +3,6 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
 	"math"
 	"strconv"
 	"strings"
@@ -37,12 +36,12 @@ func buildGrid(input string) (Grid, int) {
 		for i := 0; i < len(pairs)-1; i++ {
 			p1 := buildPair(pairs[i])
 			p2 := buildPair(pairs[i+1])
-			for x := utils.Min(p1.X, p2.X); x <= utils.Max(p1.X, p2.X); x++ {
-				for y := utils.Min(p1.Y, p2.Y); y <= utils.Max(p1.Y, p2.Y); y++ {
+			for x := min(p1.X, p2.X); x <= max(p1.X, p2.X); x++ {
+				for y := min(p1.Y, p2.Y); y <= max(p1.Y, p2.Y); y++ {
 					grid[Pos{X: x, Y: y}] = '#'
 				}
-				maxY = utils.Max(p1.Y, maxY)
-				maxY = utils.Max(p2.Y, maxY)
+				maxY = max(p1.Y, maxY)
+				maxY = max(p2.Y, maxY)
 			}
 		}
 	}
@@ -66,10 +65,10 @@ func step(grid map[Pos]uint8, p *Pos) bool {
 func display(grid map[Pos]uint8, p Pos) {
 	minX, minY, maxX, maxY := math.MaxInt, math.MaxInt, math.MinInt, math.MinInt
 	for p := range grid {
-		minX = utils.Min(p.X, minX)
-		minY = utils.Min(p.Y, minY)
-		maxX = utils.Max(p.X, maxX)
-		maxY = utils.Max(p.Y, maxY)
+		minX = min(p.X, minX)
+		minY = min(p.Y, minY)
+		maxX = max(p.X, maxX)
+		maxY = max(p.Y, maxY)
 	}
 	for y := minY; y <= maxY; y++ {
 		for x := minX; x <= maxX; x++ {

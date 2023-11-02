@@ -125,12 +125,12 @@ func findFree(g utils.Set[Pos], xmin, xmax, ymin, ymax, zmin, zmax int) (Pos, bo
 func minmax(g utils.Set[Pos]) (int, int, int, int, int, int) {
 	var xmin, xmax, ymin, ymax, zmin, zmax = math.MaxInt, math.MinInt, math.MaxInt, math.MinInt, math.MaxInt, math.MinInt
 	for p := range g {
-		xmin = utils.Min(xmin, p.X)
-		xmax = utils.Max(xmax, p.X)
-		ymin = utils.Min(ymin, p.Y)
-		ymax = utils.Max(ymax, p.Y)
-		zmin = utils.Min(zmin, p.Z)
-		zmax = utils.Max(zmax, p.Z)
+		xmin = min(xmin, p.X)
+		xmax = max(xmax, p.X)
+		ymin = min(ymin, p.Y)
+		ymax = max(ymax, p.Y)
+		zmin = min(zmin, p.Z)
+		zmax = max(zmax, p.Z)
 	}
 	return xmin, xmax, ymin, ymax, zmin, zmax
 }

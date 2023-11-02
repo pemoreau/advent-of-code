@@ -7,13 +7,13 @@ import (
 )
 
 //go:embed input_test.txt
-var input_test string
+var inputTest string
 
 //go:embed matrix_test.txt
 var matrix_test string
 
 func TestPart1(t *testing.T) {
-	result := Part1(input_test)
+	result := Part1(inputTest)
 	expected := 40
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -21,7 +21,7 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	result := Part2(input_test)
+	result := Part2(inputTest)
 	expected := 315
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -30,7 +30,7 @@ func TestPart2(t *testing.T) {
 func TestMegaMatrix(t *testing.T) {
 	lines := strings.Split(strings.TrimSuffix(matrix_test, "\n"), "\n")
 
-	m := BuildMatrix(strings.Split(strings.TrimSuffix(input_test, "\n"), "\n"))
+	m := BuildMatrix(strings.Split(strings.TrimSuffix(inputTest, "\n"), "\n"))
 	mm := buildMegaMatrix(m)
 
 	expected := len(lines)
@@ -57,14 +57,14 @@ func TestMegaMatrix(t *testing.T) {
 }
 
 func TestPart1Input(t *testing.T) {
-	result := Part1(string(input_day))
+	result := Part1(inputDay)
 	expected := 824
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}
 }
 func TestPart2Input(t *testing.T) {
-	result := Part2(string(input_day))
+	result := Part2(inputDay)
 	expected := 3063
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -72,11 +72,11 @@ func TestPart2Input(t *testing.T) {
 }
 func BenchmarkPart1(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Part1(input_day)
+		Part1(inputDay)
 	}
 }
 func BenchmarkPart2(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Part2(input_day)
+		Part2(inputDay)
 	}
 }

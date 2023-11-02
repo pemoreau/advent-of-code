@@ -8,7 +8,7 @@ import (
 )
 
 //go:embed input.txt
-var input_day string
+var inputDay string
 
 type Monkey struct {
 	name  int8
@@ -105,7 +105,7 @@ func run(part int, n int) int {
 	}
 	work := make([]int, len(monkeys))
 	for i, m := range monkeys {
-		work[i] = int(m.done)
+		work[i] = m.done
 	}
 	sort.Ints(work)
 	return work[len(work)-1] * work[len(work)-2]
@@ -122,10 +122,10 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2022 day 11 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(input_day))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }

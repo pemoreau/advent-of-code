@@ -9,7 +9,7 @@ import (
 )
 
 //go:embed input.txt
-var input_day string
+var inputDay string
 
 const (
 	VALUE = 0
@@ -99,7 +99,7 @@ func Part2(input string) int {
 	lines := strings.Split(input, "\n")
 	lines = append(lines, "[[2]]")
 	lines = append(lines, "[[6]]")
-	l := []node{}
+	var l []node
 	for _, line := range lines {
 		if len(line) == 0 {
 			continue
@@ -122,10 +122,10 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2022 day 13 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(input_day))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }

@@ -91,7 +91,7 @@ func TestPart2_3(t *testing.T) {
 }
 
 func TestPart1Input(t *testing.T) {
-	result := Part1(input_day)
+	result := Part1(inputDay)
 	expected := 3410
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -99,7 +99,7 @@ func TestPart1Input(t *testing.T) {
 }
 
 func TestPart2Input(t *testing.T) {
-	result := Part2(input_day)
+	result := Part2(inputDay)
 	expected := 98796
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -108,11 +108,11 @@ func TestPart2Input(t *testing.T) {
 
 func BenchmarkPart1(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Part1(input_day)
+		Part1(inputDay)
 	}
 }
 func BenchmarkPart2(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Part2(input_day)
+		Part2(inputDay)
 	}
 }

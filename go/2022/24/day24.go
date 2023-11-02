@@ -9,7 +9,7 @@ import (
 )
 
 //go:embed input.txt
-var input_day string
+var inputDay string
 
 type Blizzard [4][][]bool
 
@@ -115,7 +115,7 @@ func (s State) String() string {
 func neighbors(s State, blizzards []Blizzard) []State {
 	i, j := s.pos.X, s.pos.Y
 	explore := []utils.Pos{{i, j}, {i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
-	res := []State{}
+	var res []State
 	newTime := s.time + 1
 	b := blizzards[newTime%len(blizzards)]
 
@@ -205,10 +205,10 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2022 day 24 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(input_day))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }

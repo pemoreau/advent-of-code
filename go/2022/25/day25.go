@@ -8,7 +8,7 @@ import (
 )
 
 //go:embed input.txt
-var input_day string
+var inputDay string
 
 func fromSnafu(s string) int {
 	digit := map[byte]int{'0': 0, '1': 1, '2': 2, '-': -1, '=': -2}
@@ -48,6 +48,6 @@ func Part1(input string) string {
 func main() {
 	fmt.Println("--2022 day 25 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 }

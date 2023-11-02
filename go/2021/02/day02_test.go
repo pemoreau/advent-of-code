@@ -6,17 +6,17 @@ import (
 )
 
 //go:embed input_test.txt
-var input_test string
+var inputTest string
 
 func TestPart1(t *testing.T) {
-	result := Part1(input_test)
+	result := Part1(inputTest)
 	expected := 150
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}
 }
 func TestPart2(t *testing.T) {
-	result := Part2(input_test)
+	result := Part2(inputTest)
 	expected := 900
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -24,14 +24,14 @@ func TestPart2(t *testing.T) {
 }
 
 func TestPart1Input(t *testing.T) {
-	result := Part1(input_day)
+	result := Part1(inputDay)
 	expected := 1648020
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}
 }
 func TestPart2Input(t *testing.T) {
-	result := Part2(input_day)
+	result := Part2(inputDay)
 	expected := 1759818555
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
@@ -39,11 +39,11 @@ func TestPart2Input(t *testing.T) {
 }
 func BenchmarkPart1(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Part1(input_day)
+		Part1(inputDay)
 	}
 }
 func BenchmarkPart2(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Part2(input_day)
+		Part2(inputDay)
 	}
 }

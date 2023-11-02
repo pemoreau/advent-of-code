@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed input.txt
-var input_day string
+var inputDay string
 
 const (
 	ORE      = 0
@@ -35,7 +35,7 @@ func (s State) String() string {
 }
 
 func neighbors(s State, condition Condition, maxTime int8) []State {
-	res := []State{}
+	var res []State
 	remainingTime := int16(maxTime - s.time)
 
 	if s.product[ORE] >= condition[GEODE][ORE] && s.product[CLAY] >= condition[GEODE][CLAY] && s.product[OBSIDIAN] >= condition[GEODE][OBSIDIAN] {
@@ -144,7 +144,7 @@ func removeDuplicates(states []State) []State {
 		}
 	}
 
-	res := []State{}
+	var res []State
 	//for _, s := range states {
 	for s := range bag {
 		maxProduct := robotToProduct[s.robot]
@@ -188,7 +188,7 @@ func removeDuplicates2(states []State) []State {
 		byRobot[robot] = other
 	}
 
-	res := []State{}
+	var res []State
 	for robot := range byRobot {
 		for s := range byRobot[robot] {
 			res = append(res, s)
@@ -202,7 +202,7 @@ func removeDuplicates2(states []State) []State {
 
 func solve(s State, condition Condition, maxTime int8) int {
 	todo := []State{s}
-	var max int16 = 0
+	var res int16 = 0
 	for len(todo) > 0 {
 		s = todo[0]
 		todo = todo[1:]
@@ -223,20 +223,20 @@ func solve(s State, condition Condition, maxTime int8) int {
 		for _, n := range next {
 			if n.time < maxTime {
 				todo = append(todo, n)
-			} else if n.product[3] > max {
-				max = n.product[3]
+			} else if n.product[3] > res {
+				res = n.product[3]
 
 			}
 		}
 	}
-	return int(max)
+	return int(res)
 }
 
 func parse(input string) ([]State, []Condition) {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	states := []State{}
-	conditions := []Condition{}
+	var states []State
+	var conditions []Condition
 	for _, line := range lines {
 		var condition Condition
 		values := strings.Split(line, " ")
@@ -288,10 +288,10 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2022 day 19 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(input_day))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }

@@ -9,7 +9,7 @@ import (
 )
 
 //go:embed input.txt
-var input_day string
+var inputDay string
 
 type Color struct {
 	name    string
@@ -45,7 +45,7 @@ func parseLine(line string) Color {
 type Store = map[string][]ColorWithMultiplicity
 
 func readFile() Store {
-	lines := strings.Split(strings.TrimSuffix(input_day, "\n"), "\n")
+	lines := strings.Split(strings.TrimSuffix(inputDay, "\n"), "\n")
 	res := make(Store)
 	for _, line := range lines {
 		color := parseLine(line)
@@ -95,10 +95,10 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2020 day 07 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(input_day))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }

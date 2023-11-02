@@ -9,7 +9,7 @@ import (
 )
 
 //go:embed input.txt
-var input_day string
+var inputDay string
 
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
@@ -49,11 +49,11 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2022 day 12 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(input_day))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }
 
@@ -70,7 +70,7 @@ func search(v int, m utils.Matrix[int]) utils.Pos {
 
 func neighbors(m utils.Matrix[int], i, j int) []utils.Pos {
 	pos := []utils.Pos{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
-	res := []utils.Pos{}
+	var res []utils.Pos
 	for _, p := range pos {
 		if p.Y >= 0 && p.Y < len(m) && p.X >= 0 && p.X < len(m[0]) {
 			src := m[j][i]

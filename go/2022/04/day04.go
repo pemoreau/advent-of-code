@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed input.txt
-var input_day string
+var inputDay string
 
 func Part1(input string) int {
 	var s scanner.Scanner
@@ -93,10 +93,10 @@ func Part2Slow(input string) int {
 func main() {
 	fmt.Println("--2022 day 04 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(input_day))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }

@@ -9,7 +9,7 @@ import (
 )
 
 //go:embed input.txt
-var input_day string
+var inputDay string
 
 const NBVALVES = 16
 
@@ -27,7 +27,7 @@ func (v *Valve) String() string {
 type Network map[int]*Valve
 
 func neighbors(network Network, s State, maxTime int) []State {
-	res := []State{}
+	var res []State
 	for name := range network {
 		candidate := network[name]
 		cost := network[s.name].cost[name]
@@ -79,7 +79,7 @@ func parse(input string) (Network, Network, int) {
 		name := toint[values[1]]
 		var rate int
 		fmt.Sscanf(values[4], "rate=%d;", &rate)
-		dest := []int{}
+		var dest []int
 		for i := 9; i < len(values); i++ {
 			dest = append(dest, toint[strings.TrimPrefix(strings.TrimSuffix(values[i], ","), " ")])
 		}
@@ -210,10 +210,10 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2022 day 16 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(input_day))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }

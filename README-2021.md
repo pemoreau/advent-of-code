@@ -31,7 +31,7 @@ Used the following construct to embed the input file as a string in the source c
 
 ```go
 //go:embed input.txt
-var input_day string
+var inputDay string
 ```
 
 ## [Day 02: Dive!](https://adventofcode.com/2021/day/2)

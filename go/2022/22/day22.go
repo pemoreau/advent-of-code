@@ -11,7 +11,7 @@ import (
 )
 
 //go:embed input.txt
-var input_day string
+var inputDay string
 
 type Pos struct {
 	X, Y int
@@ -143,7 +143,7 @@ type State3D struct {
 	dir  int //0 for right (>), 1 for down (v), 2 for left (<), and 3 for up (^)
 }
 
-func (s State3D) String() string {
+func (s *State3D) String() string {
 	dir := []string{">", "v", "<", "^"}
 	return fmt.Sprintf("face %d -- %d,%d  %s", s.face+1, s.pos.Y+1, s.pos.X+1, dir[s.dir])
 }
@@ -309,10 +309,10 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2022 day 22 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(input_day))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }

@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed input.txt
-var input_day string
+var inputDay string
 
 func search(values []int, part1 bool) int {
 	minValue, maxValue := math.MaxInt, 0
@@ -57,10 +57,10 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2021 day 07 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(string(input_day)))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(string(input_day)))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }

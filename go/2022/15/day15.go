@@ -9,7 +9,7 @@ import (
 )
 
 //go:embed input.txt
-var input_day string
+var inputDay string
 
 type sensor struct {
 	x, y   int
@@ -26,7 +26,7 @@ type FreeSpace struct {
 	intervals []utils.Interval
 }
 
-func (fs FreeSpace) String() string {
+func (fs *FreeSpace) String() string {
 	res := ""
 	//res += fmt.Sprintf("[%d] ", len(fs.intervals))
 	for _, i := range fs.intervals {
@@ -188,10 +188,10 @@ func Part2(input string) int {
 func main() {
 	fmt.Println("--2022 day 15 solution--")
 	start := time.Now()
-	fmt.Println("part1: ", Part1(input_day))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(input_day))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }

@@ -47,6 +47,13 @@ impl Machine {
     pub fn is_halted(&self) -> bool {
         self.state == State::Halted
     }
+    pub fn is_suspended(&self) -> bool {
+        self.state == State::Suspended
+    }
+
+    pub fn is_idle(&self) -> bool {
+        self.input.is_empty()
+    }
 
     pub fn run_one_step(&mut self) {
         self.step();

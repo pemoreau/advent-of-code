@@ -18,15 +18,65 @@ func startWithDigit1(s string) (bool, int) {
 }
 
 func startWithDigit2(s string) (bool, int) {
-	if isDigit, digit := startWithDigit1(s); isDigit {
-		return true, digit
+	l := len(s)
+	if l == 0 {
+		return false, 0
 	}
-	var digits = []string{"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
-	for i, d := range digits {
-		if strings.HasPrefix(s, d) {
-			return true, i
+	c := s[0]
+	if c >= '0' && c <= '9' {
+		return true, int(c - '0')
+	}
+	if l <= 2 {
+		return false, 0
+	}
+	// discrimination net to improve performance
+	switch c {
+	case 'z':
+		if l > 3 && s[1] == 'e' && s[2] == 'r' && s[3] == 'o' {
+			return true, 0
+		}
+	case 'o':
+		if s[1] == 'n' && s[2] == 'e' {
+			return true, 1
+		}
+	case 't':
+		if s[1] == 'w' && s[2] == 'o' {
+			return true, 2
+		} else if l > 4 && s[1] == 'h' && s[2] == 'r' && s[3] == 'e' && s[4] == 'e' {
+			return true, 3
+		}
+	case 'f':
+		if l > 3 && s[1] == 'o' && s[2] == 'u' && s[3] == 'r' {
+			return true, 4
+		} else if l > 3 && s[1] == 'i' && s[2] == 'v' && s[3] == 'e' {
+			return true, 5
+		}
+	case 's':
+		if s[1] == 'i' && s[2] == 'x' {
+			return true, 6
+		} else if l > 4 && s[1] == 'e' && s[2] == 'v' && s[3] == 'e' && s[4] == 'n' {
+			return true, 7
+		}
+	case 'e':
+		if l > 4 && s[1] == 'i' && s[2] == 'g' && s[3] == 'h' && s[4] == 't' {
+			return true, 8
+		}
+	case 'n':
+		if l > 3 && s[1] == 'i' && s[2] == 'n' && s[3] == 'e' {
+			return true, 9
 		}
 	}
+
+	// simple approach
+	//if isDigit, digit := startWithDigit1(s); isDigit {
+	//	return true, digit
+	//}
+	//var digits = []string{"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
+	//for i, d := range digits {
+	//	if strings.HasPrefix(s, d) {
+	//		return true, i
+	//	}
+	//}
 	return false, 0
 }
 

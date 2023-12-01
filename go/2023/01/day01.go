@@ -36,20 +36,16 @@ func solve(input string, startWithDigit func(string) (bool, int)) int {
 
 	var sum int
 	for _, line := range lines {
-		var first int = 10
+		var first int = -1 // impossible value
 		var last int
-		//fmt.Println(line)
 		for i := range line {
-			//fmt.Println(i, line[i:])
-			isDigit, digit := startWithDigit(line[i:])
-			if isDigit {
-				if first > 9 {
+			if isDigit, digit := startWithDigit(line[i:]); isDigit {
+				if first < 0 {
 					first = digit
 				}
 				last = digit
 			}
 		}
-		//fmt.Println(first, last)
 		sum += 10*first + last
 	}
 	return sum

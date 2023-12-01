@@ -18,12 +18,12 @@ func startWithDigit1(s string) (bool, int) {
 }
 
 func startWithDigit2(s string) (bool, int) {
-	var digits = []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
+	if isDigit, digit := startWithDigit1(s); isDigit {
+		return true, digit
+	}
+	var digits = []string{"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
 	for i, d := range digits {
 		if strings.HasPrefix(s, d) {
-			if i > 9 {
-				i -= 10
-			}
 			return true, i
 		}
 	}

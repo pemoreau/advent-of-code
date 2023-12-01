@@ -10,15 +10,7 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func reverse(s string) string {
-	var sb strings.Builder
-	for i := len(s) - 1; i >= 0; i-- {
-		sb.WriteByte(s[i])
-	}
-	return sb.String()
-}
-
-func startWithDigit1(s string, i int) (bool, int) {
+func isDigit(s string, i int) (bool, int) {
 	if i >= len(s) {
 		return false, 0
 	}
@@ -28,7 +20,7 @@ func startWithDigit1(s string, i int) (bool, int) {
 	return false, 0
 }
 
-func startWithDigit2(s string, i int) (bool, int) {
+func isDigitLetter(s string, i int) (bool, int) {
 	l := len(s) - i
 	if l == 0 {
 		return false, 0
@@ -41,7 +33,7 @@ func startWithDigit2(s string, i int) (bool, int) {
 		return false, 0
 	}
 	// discrimination net to improve performance
-	//zero one two three four five six seven eight nine
+	// zero one two three four five six seven eight nine
 	i1 := i + 1
 	i2 := i + 2
 	i3 := i + 3
@@ -56,20 +48,30 @@ func startWithDigit2(s string, i int) (bool, int) {
 			return true, 1
 		}
 	case 't':
-		if s[i1] == 'w' && s[i2] == 'o' {
-			return true, 2
+		if s[i1] == 'w' {
+			if s[i2] == 'o' {
+				return true, 2
+			}
 		} else if l > 4 && s[i1] == 'h' && s[i2] == 'r' && s[i3] == 'e' && s[i4] == 'e' {
 			return true, 3
 		}
 	case 'f':
-		if l > 3 && s[i1] == 'o' && s[i2] == 'u' && s[i3] == 'r' {
-			return true, 4
-		} else if l > 3 && s[i1] == 'i' && s[i2] == 'v' && s[i3] == 'e' {
-			return true, 5
+		if l > 3 {
+			if s[i1] == 'o' {
+				if s[i2] == 'u' {
+					if s[i3] == 'r' {
+						return true, 4
+					}
+				}
+			} else if s[i1] == 'i' && s[i2] == 'v' && s[i3] == 'e' {
+				return true, 5
+			}
 		}
 	case 's':
-		if s[i1] == 'i' && s[i2] == 'x' {
-			return true, 6
+		if s[i1] == 'i' {
+			if s[i2] == 'x' {
+				return true, 6
+			}
 		} else if l > 4 && s[i1] == 'e' && s[i2] == 'v' && s[i3] == 'e' && s[i4] == 'n' {
 			return true, 7
 		}
@@ -84,7 +86,7 @@ func startWithDigit2(s string, i int) (bool, int) {
 	}
 
 	// simple approach
-	//if isDigit, digit := startWithDigit1(s); isDigit {
+	//if isDigit, digit := isDigit(s); isDigit {
 	//	return true, digit
 	//}
 	//var digits = []string{"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
@@ -96,7 +98,7 @@ func startWithDigit2(s string, i int) (bool, int) {
 	return false, 0
 }
 
-func startWithReverseDigit2(s string, i int) (bool, int) {
+func isDigitReverseLetter(s string, i int) (bool, int) {
 	l := len(s)
 	if l == 0 {
 		return false, 0
@@ -153,7 +155,7 @@ func startWithReverseDigit2(s string, i int) (bool, int) {
 	}
 
 	// simple approach
-	//if isDigit, digit := startWithDigit1(s); isDigit {
+	//if isDigit, digit := isDigit(s); isDigit {
 	//	return true, digit
 	//}
 	//var digits = []string{"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
@@ -165,46 +167,24 @@ func startWithReverseDigit2(s string, i int) (bool, int) {
 	return false, 0
 }
 
-func solve(input string, startWithDigit func(string) (bool, int)) int {
+type isDigitFunc func(string, int) (bool, int)
+
+func solve(input string, isDigit isDigitFunc, isDigitReverse isDigitFunc) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
 	var sum int
 	for _, line := range lines {
-		var first int = -1 // impossible value
-		var last int
-		for i := range line {
-			if isDigit, digit := startWithDigit(line[i:]); isDigit {
-				if first < 0 {
-					first = digit
-				}
-				last = digit
-			}
-		}
-		sum += 10*first + last
-	}
-	return sum
-}
-
-func solve2(input string,
-	startWithDigit func(string, int) (bool, int),
-	startWithReverseDigit func(string, int) (bool, int)) int {
-	input = strings.TrimSuffix(input, "\n")
-	lines := strings.Split(input, "\n")
-
-	var sum int
-	for _, line := range lines {
-
 		var first int
-		var last int
 		for i := range line {
-			if isDigit, digit := startWithDigit(line, i); isDigit {
+			if ok, digit := isDigit(line, i); ok {
 				first = digit
 				break
 			}
 		}
+		var last int
 		for i := len(line) - 1; i >= 0; i-- {
-			if isDigit, digit := startWithReverseDigit(line, i); isDigit {
+			if ok, digit := isDigitReverse(line, i); ok {
 				last = digit
 				break
 			}
@@ -215,13 +195,11 @@ func solve2(input string,
 }
 
 func Part1(input string) int {
-	//return solve(input, startWithDigit1)
-	return solve2(input, startWithDigit1, startWithDigit1)
+	return solve(input, isDigit, isDigit)
 }
 
 func Part2(input string) int {
-	//return solve(input, startWithDigit2)
-	return solve2(input, startWithDigit2, startWithReverseDigit2)
+	return solve(input, isDigitLetter, isDigitReverseLetter)
 }
 
 func main() {

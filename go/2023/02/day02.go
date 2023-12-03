@@ -19,30 +19,25 @@ func parse(input string) [][]rgb {
 	var res [][]rgb
 	lines := strings.Split(input, "\n")
 	for _, line := range lines {
-		parts := strings.Split(line, ":")
-		_, err := strconv.Atoi(parts[0][5:])
-		if err != nil {
-			panic(err)
-		}
-
-		parts = strings.Split(parts[1], ";")
+		colon := strings.IndexByte(line, ':')
+		parts := strings.Split(line[colon+1:], ";")
 		var rbgLine []rgb
 		for _, part := range parts {
-			var c = rgb{0, 0, 0}
+			var cubes = rgb{0, 0, 0}
 			colors := strings.Split(part, ",")
 			for _, color := range colors {
 				nc := strings.Split(strings.TrimSpace(color), " ")
 				n, _ := strconv.Atoi(nc[0])
 				switch strings.TrimSpace(nc[1]) {
 				case "red":
-					c.r = n
+					cubes.r = n
 				case "green":
-					c.g = n
+					cubes.g = n
 				case "blue":
-					c.b = n
+					cubes.b = n
 				}
 			}
-			rbgLine = append(rbgLine, c)
+			rbgLine = append(rbgLine, cubes)
 		}
 		res = append(res, rbgLine)
 	}

@@ -86,13 +86,7 @@ func (p Pos) Neighbors8() []Pos {
 }
 
 func DisplayMap(grid map[Pos]uint8, empty uint8) {
-	minX, minY, maxX, maxY := math.MaxInt, math.MaxInt, math.MinInt, math.MinInt
-	for p := range grid {
-		minX = min(p.X, minX)
-		minY = min(p.Y, minY)
-		maxX = max(p.X, maxX)
-		maxY = max(p.Y, maxY)
-	}
+	minX, maxX, minY, maxY := GridBounds(grid)
 	for y := minY; y <= maxY; y++ {
 		for x := minX; x <= maxX; x++ {
 			if v, ok := grid[Pos{X: x, Y: y}]; ok {

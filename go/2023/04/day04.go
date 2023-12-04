@@ -3,7 +3,9 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/bits-and-blooms/bitset"
 	"github.com/pemoreau/advent-of-code/go/utils"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -26,12 +28,29 @@ func winning(line string) int {
 	return winningNumbers.Intersect(numbers).Len()
 }
 
+func winning2(line string) int {
+	split := func(c rune) bool { return c == ':' || c == '|' }
+	fields := strings.FieldsFunc(line, split)
+
+	var winningNumbers = bitset.New(100)
+	for _, n := range strings.Fields(fields[1]) {
+		v, _ := strconv.Atoi(n)
+		winningNumbers.Set(uint(v))
+	}
+	var numbers = bitset.New(100)
+	for _, n := range strings.Fields(fields[2]) {
+		v, _ := strconv.Atoi(n)
+		numbers.Set(uint(v))
+	}
+	return int(winningNumbers.IntersectionCardinality(numbers))
+}
+
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 	var res int
 	for _, line := range lines {
-		v := winning(line)
+		v := winning2(line)
 		if v > 0 {
 			res += 1 << (v - 1)
 		}
@@ -45,7 +64,7 @@ func Part2(input string) int {
 	var cards []int
 	var matchs []int
 	for _, line := range lines {
-		v := winning(line)
+		v := winning2(line)
 		cards = append(cards, 1)
 		matchs = append(matchs, v)
 	}

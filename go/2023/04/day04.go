@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -13,19 +12,16 @@ import (
 var inputDay string
 
 func winning(line string) int {
-	parts := strings.Split(line, ":")
-	parts = strings.Split(parts[1], "|")
-	var winningNumbers = utils.NewSet[int]()
-	for _, n := range strings.Split(parts[0], " ") {
-		if v, err := strconv.Atoi(n); err == nil {
-			winningNumbers.Add(v)
-		}
+	split := func(c rune) bool { return c == ':' || c == '|' }
+	fields := strings.FieldsFunc(line, split)
+
+	var winningNumbers = utils.NewSet[string]()
+	for _, n := range strings.Fields(fields[1]) {
+		winningNumbers.Add(n)
 	}
-	var numbers = utils.NewSet[int]()
-	for _, n := range strings.Split(parts[1], " ") {
-		if v, err := strconv.Atoi(n); err == nil {
-			numbers.Add(v)
-		}
+	var numbers = utils.NewSet[string]()
+	for _, n := range strings.Fields(fields[2]) {
+		numbers.Add(n)
 	}
 	return winningNumbers.Intersect(numbers).Len()
 }

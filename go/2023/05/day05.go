@@ -17,39 +17,39 @@ type Interval struct{ Min, Max int }
 var EmptyInterval = Interval{0, -1}
 
 // ab: [a, b] seeds to transform
-// i: [src, src + len-1] interval to transform
-func transformer(ab, i Interval, dest int) (transformed Interval, other []Interval) {
-	a := ab.Min
-	b := ab.Max
-	delta := dest - i.Min
-	if b < i.Min || a > i.Max {
+// xy: [src, src + len-1] interval to transform
+func transformer(ab, xy Interval, dest int) (transformed Interval, other []Interval) {
+	a, b := ab.Min, ab.Max
+	x, y := xy.Min, xy.Max
+	delta := dest - x
+	if b < x || a > y {
 		return EmptyInterval, []Interval{ab}
 	}
-	if a >= i.Min && b <= i.Max {
+	if a >= x && b <= y {
 		return Interval{a + delta, b + delta}, other
 	}
-	if b >= i.Min && b < i.Max {
+	if b >= x && b < y {
 		// to avoid empty interval
-		if a < i.Min {
-			other = append(other, Interval{a, i.Min - 1})
+		if a < x {
+			other = append(other, Interval{a, x - 1})
 		}
-		return Interval{i.Min + delta, b + delta}, other
+		return Interval{x + delta, b + delta}, other
 	}
-	if a > i.Min && a <= i.Max {
-		if b > i.Max {
-			other = append(other, Interval{i.Max + 1, b})
+	if a > x && a <= y {
+		if b > y {
+			other = append(other, Interval{y + 1, b})
 		}
-		return Interval{a + delta, i.Max + delta}, other
+		return Interval{a + delta, y + delta}, other
 	}
-	if a <= i.Min && i.Max <= b {
+	if a <= x && y <= b {
 		// to avoid empty interval
-		if a < i.Min {
-			other = append(other, Interval{a, i.Min - 1})
+		if a < x {
+			other = append(other, Interval{a, x - 1})
 		}
-		if i.Max < b {
-			other = append(other, Interval{i.Max + 1, b})
+		if y < b {
+			other = append(other, Interval{y + 1, b})
 		}
-		return Interval{i.Min + delta, i.Max + delta}, other
+		return Interval{x + delta, y + delta}, other
 	}
 	panic("not implemented")
 }
@@ -61,11 +61,13 @@ type Rule struct {
 
 func applyOneRule(rule Rule, seeds []Interval) (transformed []Interval, other []Interval) {
 	for _, seed := range seeds {
-		t, o := transformer(seed, rule.i, rule.dest)
-		if t != EmptyInterval {
+		if seed.Max < rule.i.Min || seed.Min > rule.i.Max {
+			other = append(other, seed)
+		} else {
+			t, o := transformer(seed, rule.i, rule.dest)
 			transformed = append(transformed, t)
+			other = append(other, o...)
 		}
-		other = append(other, o...)
 	}
 	return transformed, other
 }

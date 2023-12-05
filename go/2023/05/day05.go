@@ -56,7 +56,7 @@ type Rule struct {
 	dest int
 }
 
-func applyOneRule(seeds []utils.Interval, rule Rule) (transformed []utils.Interval, other []utils.Interval) {
+func applyOneRule(rule Rule, seeds []utils.Interval) (transformed []utils.Interval, other []utils.Interval) {
 	for _, seed := range seeds {
 		t, o := transformer(seed, rule.i, rule.dest)
 		transformed = append(transformed, t...)
@@ -70,7 +70,7 @@ func apply(rules []Rule, ab utils.Interval) []utils.Interval {
 	var res []utils.Interval
 	var todo = []utils.Interval{ab}
 	for _, rule := range rules {
-		t, o := applyOneRule(todo, rule)
+		t, o := applyOneRule(rule, todo)
 		res = append(res, t...)
 		todo = o
 	}
@@ -78,17 +78,7 @@ func apply(rules []Rule, ab utils.Interval) []utils.Interval {
 	return res
 }
 
-func Part1(input string) int {
-	input = strings.TrimSuffix(input, "\n")
-	parts := strings.Split(input, "\n\n")
-	numbers, _ := strings.CutPrefix(parts[0], "seeds: ")
-	var seeds []utils.Interval
-	for _, v := range strings.Fields(numbers) {
-		n, _ := strconv.Atoi(v)
-		seeds = append(seeds, utils.Interval{n, n})
-	}
-
-	parts = parts[1:]
+func solve(parts []string, seeds []utils.Interval) int {
 	for _, part := range parts {
 		lines := strings.Split(part, "\n")
 		lines = lines[1:]
@@ -107,18 +97,29 @@ func Part1(input string) int {
 
 	var res = math.MaxInt32
 	for _, seed := range seeds {
-		if seed.Min < res {
-			res = seed.Min
-		}
+		res = min(res, seed.Min)
 	}
-
 	return res
+}
+
+func Part1(input string) int {
+	input = strings.TrimSuffix(input, "\n")
+	parts := strings.Split(input, "\n\n")
+	numbers, _ := strings.CutPrefix(parts[0], "seeds: ")
+
+	var seeds []utils.Interval
+	for _, v := range strings.Fields(numbers) {
+		n, _ := strconv.Atoi(v)
+		seeds = append(seeds, utils.Interval{n, n})
+	}
+	return solve(parts[1:], seeds)
 }
 
 func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	parts := strings.Split(input, "\n\n")
 	numbers, _ := strings.CutPrefix(parts[0], "seeds: ")
+
 	var values []int
 	for _, v := range strings.Fields(numbers) {
 		if n, err := strconv.Atoi(v); err == nil {
@@ -130,32 +131,7 @@ func Part2(input string) int {
 	for i := 0; i < len(values); i += 2 {
 		seeds = append(seeds, utils.Interval{values[i], values[i] + values[i+1] - 1})
 	}
-
-	parts = parts[1:]
-	for _, part := range parts {
-		lines := strings.Split(part, "\n")
-		lines = lines[1:]
-		var rules []Rule
-		for _, line := range lines {
-			var dest, src, l int
-			fmt.Sscanf(line, "%d %d %d", &dest, &src, &l)
-			rules = append(rules, Rule{utils.Interval{src, src + l - 1}, dest})
-		}
-		var newSeeds []utils.Interval
-		for _, seed := range seeds {
-			newSeeds = append(newSeeds, apply(rules, seed)...)
-		}
-		seeds = newSeeds
-	}
-
-	var res = math.MaxInt32
-	for _, seed := range seeds {
-		if seed.Min < res {
-			res = seed.Min
-		}
-	}
-
-	return res
+	return solve(parts[1:], seeds)
 }
 
 func main() {

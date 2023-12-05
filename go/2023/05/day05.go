@@ -15,28 +15,28 @@ var inputDay string
 
 // ab: [a, b] seeds to transform
 // i: [src, src + len-1] interval to transform
-func transformer(ab, i utils.Interval, dest int) (transformed []utils.Interval, other []utils.Interval) {
+func transformer(ab, i utils.Interval, dest int) (transformed utils.Interval, other []utils.Interval) {
 	a := ab.Min
 	b := ab.Max
 	delta := dest - i.Min
 	if ab.Inter(i) == utils.Empty() {
-		return transformed, []utils.Interval{ab}
+		return utils.Empty(), []utils.Interval{ab}
 	}
 	if a >= i.Min && b <= i.Max {
-		return []utils.Interval{{a + delta, b + delta}}, other
+		return utils.Interval{a + delta, b + delta}, other
 	}
 	if b >= i.Min && b < i.Max {
 		// to avoid empty interval
 		if a < i.Min {
 			other = append(other, utils.Interval{a, i.Min - 1})
 		}
-		return []utils.Interval{{i.Min + delta, b + delta}}, other
+		return utils.Interval{i.Min + delta, b + delta}, other
 	}
 	if a > i.Min && a <= i.Max {
 		if b > i.Max {
 			other = append(other, utils.Interval{i.Max + 1, b})
 		}
-		return []utils.Interval{{a + delta, i.Max + delta}}, other
+		return utils.Interval{a + delta, i.Max + delta}, other
 	}
 	if a <= i.Min && i.Max <= b {
 		// to avoid empty interval
@@ -46,7 +46,7 @@ func transformer(ab, i utils.Interval, dest int) (transformed []utils.Interval, 
 		if i.Max < b {
 			other = append(other, utils.Interval{i.Max + 1, b})
 		}
-		return []utils.Interval{{i.Min + delta, i.Max + delta}}, other
+		return utils.Interval{i.Min + delta, i.Max + delta}, other
 	}
 	panic("not implemented")
 }
@@ -59,9 +59,10 @@ type Rule struct {
 func applyOneRule(rule Rule, seeds []utils.Interval) (transformed []utils.Interval, other []utils.Interval) {
 	for _, seed := range seeds {
 		t, o := transformer(seed, rule.i, rule.dest)
-		transformed = append(transformed, t...)
+		if t != utils.Empty() {
+			transformed = append(transformed, t)
+		}
 		other = append(other, o...)
-
 	}
 	return transformed, other
 }
@@ -73,6 +74,9 @@ func apply(rules []Rule, ab utils.Interval) []utils.Interval {
 		t, o := applyOneRule(rule, todo)
 		res = append(res, t...)
 		todo = o
+		if len(todo) == 0 {
+			return res
+		}
 	}
 	res = append(res, todo...)
 	return res
@@ -95,7 +99,7 @@ func solve(parts []string, seeds []utils.Interval) int {
 		seeds = newSeeds
 	}
 
-	var res = math.MaxInt32
+	var res = math.MaxInt64
 	for _, seed := range seeds {
 		res = min(res, seed.Min)
 	}

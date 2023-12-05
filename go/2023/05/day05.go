@@ -3,7 +3,6 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
 	"math"
 	"strconv"
 	"strings"
@@ -13,53 +12,57 @@ import (
 //go:embed input.txt
 var inputDay string
 
+type Interval struct{ Min, Max int }
+
+var EmptyInterval = Interval{0, -1}
+
 // ab: [a, b] seeds to transform
 // i: [src, src + len-1] interval to transform
-func transformer(ab, i utils.Interval, dest int) (transformed utils.Interval, other []utils.Interval) {
+func transformer(ab, i Interval, dest int) (transformed Interval, other []Interval) {
 	a := ab.Min
 	b := ab.Max
 	delta := dest - i.Min
-	if ab.Inter(i) == utils.Empty() {
-		return utils.Empty(), []utils.Interval{ab}
+	if b < i.Min || a > i.Max {
+		return EmptyInterval, []Interval{ab}
 	}
 	if a >= i.Min && b <= i.Max {
-		return utils.Interval{a + delta, b + delta}, other
+		return Interval{a + delta, b + delta}, other
 	}
 	if b >= i.Min && b < i.Max {
 		// to avoid empty interval
 		if a < i.Min {
-			other = append(other, utils.Interval{a, i.Min - 1})
+			other = append(other, Interval{a, i.Min - 1})
 		}
-		return utils.Interval{i.Min + delta, b + delta}, other
+		return Interval{i.Min + delta, b + delta}, other
 	}
 	if a > i.Min && a <= i.Max {
 		if b > i.Max {
-			other = append(other, utils.Interval{i.Max + 1, b})
+			other = append(other, Interval{i.Max + 1, b})
 		}
-		return utils.Interval{a + delta, i.Max + delta}, other
+		return Interval{a + delta, i.Max + delta}, other
 	}
 	if a <= i.Min && i.Max <= b {
 		// to avoid empty interval
 		if a < i.Min {
-			other = append(other, utils.Interval{a, i.Min - 1})
+			other = append(other, Interval{a, i.Min - 1})
 		}
 		if i.Max < b {
-			other = append(other, utils.Interval{i.Max + 1, b})
+			other = append(other, Interval{i.Max + 1, b})
 		}
-		return utils.Interval{i.Min + delta, i.Max + delta}, other
+		return Interval{i.Min + delta, i.Max + delta}, other
 	}
 	panic("not implemented")
 }
 
 type Rule struct {
-	i    utils.Interval
+	i    Interval
 	dest int
 }
 
-func applyOneRule(rule Rule, seeds []utils.Interval) (transformed []utils.Interval, other []utils.Interval) {
+func applyOneRule(rule Rule, seeds []Interval) (transformed []Interval, other []Interval) {
 	for _, seed := range seeds {
 		t, o := transformer(seed, rule.i, rule.dest)
-		if t != utils.Empty() {
+		if t != EmptyInterval {
 			transformed = append(transformed, t)
 		}
 		other = append(other, o...)
@@ -67,9 +70,9 @@ func applyOneRule(rule Rule, seeds []utils.Interval) (transformed []utils.Interv
 	return transformed, other
 }
 
-func apply(rules []Rule, ab utils.Interval) []utils.Interval {
-	var res []utils.Interval
-	var todo = []utils.Interval{ab}
+func apply(rules []Rule, ab Interval) []Interval {
+	var res []Interval
+	var todo = []Interval{ab}
 	for _, rule := range rules {
 		t, o := applyOneRule(rule, todo)
 		res = append(res, t...)
@@ -82,7 +85,7 @@ func apply(rules []Rule, ab utils.Interval) []utils.Interval {
 	return res
 }
 
-func solve(parts []string, seeds []utils.Interval) int {
+func solve(parts []string, seeds []Interval) int {
 	for _, part := range parts {
 		lines := strings.Split(part, "\n")
 		lines = lines[1:]
@@ -90,9 +93,9 @@ func solve(parts []string, seeds []utils.Interval) int {
 		for _, line := range lines {
 			var dest, src, l int
 			fmt.Sscanf(line, "%d %d %d", &dest, &src, &l)
-			rules = append(rules, Rule{utils.Interval{src, src + l - 1}, dest})
+			rules = append(rules, Rule{Interval{src, src + l - 1}, dest})
 		}
-		var newSeeds []utils.Interval
+		var newSeeds []Interval
 		for _, seed := range seeds {
 			newSeeds = append(newSeeds, apply(rules, seed)...)
 		}
@@ -111,10 +114,10 @@ func Part1(input string) int {
 	parts := strings.Split(input, "\n\n")
 	numbers, _ := strings.CutPrefix(parts[0], "seeds: ")
 
-	var seeds []utils.Interval
+	var seeds []Interval
 	for _, v := range strings.Fields(numbers) {
 		n, _ := strconv.Atoi(v)
-		seeds = append(seeds, utils.Interval{n, n})
+		seeds = append(seeds, Interval{n, n})
 	}
 	return solve(parts[1:], seeds)
 }
@@ -131,9 +134,9 @@ func Part2(input string) int {
 		}
 	}
 
-	var seeds []utils.Interval
+	var seeds []Interval
 	for i := 0; i < len(values); i += 2 {
-		seeds = append(seeds, utils.Interval{values[i], values[i] + values[i+1] - 1})
+		seeds = append(seeds, Interval{values[i], values[i] + values[i+1] - 1})
 	}
 	return solve(parts[1:], seeds)
 }

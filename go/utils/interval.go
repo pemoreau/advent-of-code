@@ -84,9 +84,11 @@ func (i Interval) Div(j Interval) Interval {
 	return Interval{a, b}
 }
 
+func Empty() Interval { return Interval{0, -1} }
+
 func (i Interval) Inter(j Interval) Interval {
 	if i.Max < j.Min || j.Max < i.Min {
-		return Interval{0, -1}
+		return Empty()
 	}
 	a := max(i.Min, j.Min)
 	b := min(i.Max, j.Max)

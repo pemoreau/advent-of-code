@@ -21,18 +21,6 @@ func buildArray(line string) []int {
 	return res
 }
 
-func buildConcat(line string) int {
-	s := ""
-	for _, field := range strings.Fields(line) {
-		v := strings.TrimSpace(field)
-		if _, err := strconv.Atoi(v); err == nil {
-			s = s + v
-		}
-	}
-	res, _ := strconv.Atoi(s)
-	return res
-}
-
 func calcDist(hold, maxTime int) int {
 	return (maxTime - hold) * hold
 }
@@ -59,6 +47,13 @@ func Part1(input string) int {
 	for i, t := range times {
 		res *= solve(t, dist[i])
 	}
+	return res
+}
+
+func buildConcat(line string) int {
+	line = strings.ReplaceAll(line, " ", "")
+	_, line, _ = strings.Cut(line, ":")
+	res, _ := strconv.Atoi(line)
 	return res
 }
 

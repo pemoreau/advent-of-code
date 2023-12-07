@@ -25,7 +25,7 @@ const (
 )
 
 func (h hand) kind(withJoker bool) int {
-	var mult [15]int
+	var mult = make([]int, 15)
 	for i := 0; i < len(h); i++ {
 		mult[index(h[i])]++
 	}
@@ -36,38 +36,28 @@ func (h hand) kind(withJoker bool) int {
 		mult[indexJ] = 0
 	}
 
-	var orderedOccurrence []int
-	for _, e := range mult {
-		if e > 0 {
-			orderedOccurrence = append(orderedOccurrence, e)
-		}
-	}
-	slices.SortFunc(orderedOccurrence, func(a, b int) int { return b - a })
+	slices.SortFunc(mult, func(a, b int) int { return b - a })
 
 	if withJoker {
-		if len(orderedOccurrence) == 0 {
-			orderedOccurrence = append(orderedOccurrence, nbJoker)
-		} else {
-			orderedOccurrence[0] += nbJoker
-		}
+		mult[0] += nbJoker
 	}
 
-	if orderedOccurrence[0] == 5 {
+	if mult[0] == 5 {
 		return STRAIGHT
 	}
-	if orderedOccurrence[0] == 4 {
+	if mult[0] == 4 {
 		return FOUROFAKIND
 	}
-	if orderedOccurrence[0] == 3 && orderedOccurrence[1] == 2 {
+	if mult[0] == 3 && mult[1] == 2 {
 		return FULLHOUSE
 	}
-	if orderedOccurrence[0] == 3 {
+	if mult[0] == 3 {
 		return THREEOFAKIND
 	}
-	if orderedOccurrence[0] == 2 && orderedOccurrence[1] == 2 {
+	if mult[0] == 2 && mult[1] == 2 {
 		return TWOPAIRS
 	}
-	if orderedOccurrence[0] == 2 {
+	if mult[0] == 2 {
 		return PAIR
 	}
 	return HIGHCARD

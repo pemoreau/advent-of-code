@@ -166,7 +166,7 @@ func decode(bytes []byte, bit_start uint32) (packet Packet, index uint32) {
 	} else {
 		var lengthTypeId bool
 
-		packets := make([]Packet, 0)
+		var packets []Packet
 		lengthTypeId, index = bit(bytes, index)
 		if !lengthTypeId {
 			var length uint64

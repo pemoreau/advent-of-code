@@ -48,14 +48,14 @@ func parseRule(rule string) Rule {
 	}
 	if strings.Contains(rule, "|") {
 		parts := strings.Split(rule, "|")
-		rules := make([]Rule, 0)
+		var rules []Rule
 		for _, part := range parts {
 			rules = append(rules, parseRule(part))
 		}
 		return AlternativeRule{rules: rules}
 	}
 	parts := strings.Split(rule, " ")
-	rules := make([]int, 0)
+	var rules []int
 	for _, part := range parts {
 		n, _ := strconv.Atoi(part)
 		rules = append(rules, n)

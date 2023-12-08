@@ -144,8 +144,8 @@ func parse(input string) []Tile {
 		tile := Tile{id: ID(tileNumber), nbBits: int16(len(lines[1]))}
 		tile.north = toInt(lines[1])
 		tile.south = toInt(lines[len(lines)-1])
-		var left = make([]byte, 0)
-		var right = make([]byte, 0)
+		var left []byte
+		var right []byte
 		for _, line := range lines[1:] {
 			left = append(left, line[0])
 			right = append(right, line[len(line)-1])

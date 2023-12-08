@@ -31,7 +31,7 @@ func turn(p Pos) Pos {
 }
 
 func allRotations(p Pos) []Pos {
-	res := make([]Pos, 0)
+	var res []Pos
 	for cycle := 0; cycle < 2; cycle++ {
 		for step := 0; step < 3; step++ {
 			p = roll(p)
@@ -71,7 +71,7 @@ func (s Scanner) String() string {
 }
 
 func ParseScanner(lines []string) Scanner {
-	view := make([]Pos, 0)
+	var view []Pos
 	for i, line := range lines {
 		if i > 0 {
 			view = append(view, ParsePos(line))
@@ -86,7 +86,7 @@ func norme(x, y, z int) int {
 }
 
 func computeDistance(view []Pos) []int {
-	res := make([]int, 0)
+	var res []int
 	for i, p := range view {
 		for j := i + 1; j < len(view); j++ {
 			q := view[j]
@@ -105,7 +105,7 @@ func intersectionIntList(a, b []int) []int {
 		count[q]++
 	}
 
-	res := make([]int, 0)
+	var res []int
 	for p, c := range count {
 		if c > 1 {
 			res = append(res, p)
@@ -120,9 +120,9 @@ func arrangementView(s []Pos) [][]Pos {
 		points = append(points, allRotations(p))
 	}
 
-	res := make([][]Pos, 0)
+	var res [][]Pos
 	for i := 0; i < len(points[0]); i++ { // 24 rotations
-		view := make([]Pos, 0)
+		var view []Pos
 		for j := range points {
 			view = append(view, points[j][i])
 		}
@@ -234,7 +234,7 @@ func searchTranslation(s1, s2 Scanner) (Pos, uint8, bool) {
 func solve(input string) (int, []Pos) {
 	input = strings.TrimSuffix(input, "\n")
 	parts := strings.Split(input, "\n\n")
-	scanners := make([]Scanner, 0)
+	var scanners []Scanner
 	for _, part := range parts {
 		lines := strings.Split(part, "\n")
 		scanners = append(scanners, ParseScanner(lines))
@@ -259,7 +259,7 @@ func solve(input string) (int, []Pos) {
 					s2.position = t
 					s2.rotation = r
 					s2.view = arrangementView(s2.view)[r]
-					alignedv2 := make([]Pos, 0)
+					var alignedv2 []Pos
 					for _, p2 := range s2.view {
 						alignedv2 = append(alignedv2, Pos{p2.x + t.x, p2.y + t.y, p2.z + t.z})
 					}
@@ -273,7 +273,7 @@ func solve(input string) (int, []Pos) {
 			}
 		}
 	}
-	res := make([]Pos, 0, len(scanners))
+	var res = make([]Pos, 0, len(scanners))
 	for _, s := range scanners {
 		res = append(res, s.position)
 	}

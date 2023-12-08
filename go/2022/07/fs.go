@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/stack"
 )
 
 type fs struct {
 	root *node
-	path *utils.Stack[*node]
+	path *stack.Stack[*node]
 }
 
 type node struct {
@@ -18,7 +18,7 @@ type node struct {
 
 func NewFS() fs {
 	root := NewDir("/")
-	res := fs{root: root, path: &utils.Stack[*node]{}}
+	res := fs{root: root, path: &stack.Stack[*node]{}}
 	res.path.Push(root)
 	return res
 }

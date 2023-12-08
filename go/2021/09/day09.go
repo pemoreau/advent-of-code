@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"sort"
 	"strings"
 	"time"
@@ -49,14 +49,14 @@ func smallerThanNeighbors(m matrix, i, j int) bool {
 	return true
 }
 
-func explore(m matrix) []utils.Set[Pos] {
-	var collectedBasin []utils.Set[Pos]
+func explore(m matrix) []set.Set[Pos] {
+	var collectedBasin []set.Set[Pos]
 	for i := range m {
 		for j := range m[i] {
 			if m[i][j] == 9 {
 				// already visited: skip
 			} else {
-				newBasin := utils.NewSet[Pos]()
+				newBasin := set.NewSet[Pos]()
 				collectNeighbors(Pos{i, j}, m, newBasin)
 				collectedBasin = append(collectedBasin, newBasin)
 			}
@@ -65,7 +65,7 @@ func explore(m matrix) []utils.Set[Pos] {
 	return collectedBasin
 }
 
-func collectNeighbors(p Pos, m matrix, collected utils.Set[Pos]) {
+func collectNeighbors(p Pos, m matrix, collected set.Set[Pos]) {
 	if collected.Contains(p) {
 		return
 	}

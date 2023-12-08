@@ -1,33 +1,33 @@
 package main
 
 import (
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/interval"
 )
 
-type EnvInterval [4]utils.Interval
+type EnvInterval [4]interval.Interval
 
 func createEnvInterval(env Env) EnvInterval {
 	var res EnvInterval
 	for i, v := range env {
-		res[i] = utils.Interval{v, v}
+		res[i] = interval.Interval{v, v}
 	}
 	return res
 }
 
-func eqlInterval(a, b utils.Interval) utils.Interval {
+func eqlInterval(a, b interval.Interval) interval.Interval {
 	if a.Min == a.Max && a.Min == b.Min && a.Max == b.Max {
-		return utils.Interval{1, 1}
+		return interval.Interval{1, 1}
 	}
 	if a.Max < b.Min || b.Max < a.Min {
-		return utils.Interval{0, 0}
+		return interval.Interval{0, 0}
 	}
-	return utils.Interval{0, 1}
+	return interval.Interval{0, 1}
 }
 
-func abstractInterpretation(e Expr, env EnvInterval) utils.Interval {
+func abstractInterpretation(e Expr, env EnvInterval) interval.Interval {
 	switch exp := e.(type) {
 	case Value:
-		return utils.Interval{int(exp), int(exp)}
+		return interval.Interval{int(exp), int(exp)}
 	case Reg:
 		return env[exp]
 	case Add:
@@ -52,7 +52,7 @@ func abstractInterpretationInstr(i Instr, env EnvInterval) EnvInterval {
 		newEnv[ins.reg] = abstractInterpretation(ins.rhs, env)
 	case Input:
 		wIndex := 0
-		newEnv[wIndex] = utils.Interval{1, 9}
+		newEnv[wIndex] = interval.Interval{1, 9}
 	default:
 		panic("unknown instr")
 	}

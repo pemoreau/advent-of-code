@@ -3,13 +3,12 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils/interval"
 	"math"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/pemoreau/advent-of-code/go/utils"
 )
 
 //go:embed input.txt
@@ -182,7 +181,7 @@ func eval(e Instr, remaining []Instr, world World) World {
 					env[wIndex] = i
 
 					envInterval := createEnvInterval(env)
-					envInterval[wIndex] = utils.Interval{i, i}
+					envInterval[wIndex] = interval.Interval{i, i}
 					// If reachable(remaining, createEnvInterval(state.env)) {
 					if reachable(remaining, envInterval) {
 						newState := State{env: env, min: 10*state.min + i, max: 10*state.max + i}

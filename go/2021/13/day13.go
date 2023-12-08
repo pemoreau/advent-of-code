@@ -4,7 +4,7 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"strconv"
 	"strings"
 	"time"
@@ -23,8 +23,8 @@ type Instr struct {
 	value int
 }
 
-func BuildPos(input string) utils.Set[Pos] {
-	res := utils.NewSet[Pos]()
+func BuildPos(input string) set.Set[Pos] {
+	res := set.NewSet[Pos]()
 	for _, l := range strings.Split(input, "\n") {
 		coords := strings.SplitN(l, ",", 2)
 		x, _ := strconv.Atoi(coords[0])
@@ -47,7 +47,7 @@ func BuildInstr(input string) []Instr {
 	return res
 }
 
-func step(screen utils.Set[Pos], inst Instr) {
+func step(screen set.Set[Pos], inst Instr) {
 	d := inst.value
 	for p := range screen {
 		switch inst.axis {
@@ -65,7 +65,7 @@ func step(screen utils.Set[Pos], inst Instr) {
 	}
 }
 
-func display(pos utils.Set[Pos]) {
+func display(pos set.Set[Pos]) {
 	screen := [6][40]rune{}
 	for p := range pos {
 		screen[p.y][p.x] = '#'

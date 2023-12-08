@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"strings"
 	"time"
 
@@ -19,14 +20,14 @@ type Pos struct {
 type State struct {
 	n    int
 	rope []Pos
-	path utils.Set[Pos]
+	path set.Set[Pos]
 }
 
 func NewState(n int) *State {
 	res := &State{
 		n:    n,
 		rope: make([]Pos, n),
-		path: utils.NewSet[Pos](),
+		path: set.NewSet[Pos](),
 	}
 	res.path.Add(res.rope[n-1])
 	return res

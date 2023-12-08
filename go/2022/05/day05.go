@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/stack"
 	"strings"
 	"time"
 )
@@ -11,15 +11,15 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func BuildStacks(part0 string) []utils.Stack[uint8] {
+func BuildStacks(part0 string) []stack.Stack[uint8] {
 	lines := strings.Split(part0, "\n")
 	stackLines := lines[0 : len(lines)-1]
 	axe := lines[len(lines)-1]
 
 	// build stacks
-	stacks := make([]utils.Stack[uint8], 0)
+	stacks := make([]stack.Stack[uint8], 0)
 	for i := 1; i < len(axe); i += 4 {
-		stacks = append(stacks, utils.NewStack[uint8]())
+		stacks = append(stacks, stack.NewStack[uint8]())
 	}
 
 	// parse stacks
@@ -61,7 +61,7 @@ func parseInstruction(instruction string) (n, src, dest int) {
 	return
 }
 
-func eval(stacks []utils.Stack[uint8], instructions []string, part2 bool) string {
+func eval(stacks []stack.Stack[uint8], instructions []string, part2 bool) string {
 	for _, instruction := range instructions {
 
 		n, src, dest := parseInstruction(instruction)

@@ -1,6 +1,9 @@
-package utils
+package interval
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
+)
 
 type Interval struct{ Min, Max int }
 
@@ -112,12 +115,12 @@ func (i Interval) Mod1(m int) Interval {
 	case a < 0:
 		// (3): split into negative and non-negative Interval, compute and join
 		return Interval{a, -1}.Mod1(m).union(Interval{0, b}.Mod1(m))
-	case b-a < Abs(m) && a%m <= b%m:
+	case b-a < utils.Abs(m) && a%m <= b%m:
 		// (4): there is no k > 0 such that a < k*m <= b
 		return Interval{a % m, b % m}
 	default:
 		// (5): we can't do better than that
-		return Interval{0, Abs(m) - 1}
+		return Interval{0, utils.Abs(m) - 1}
 	}
 }
 

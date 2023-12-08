@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"strings"
 	"time"
 )
@@ -68,7 +69,7 @@ func Part2(input string) int {
 	minX, maxX, minY, maxY := utils.GridBounds(grid)
 
 	var startMap = make(map[utils.Pos][]int)
-	var stars = utils.NewSet[utils.Pos]()
+	var stars = set.NewSet[utils.Pos]()
 	for y := minY; y <= maxY; y++ {
 		var current int
 		for x := minX; x <= maxX; x++ {

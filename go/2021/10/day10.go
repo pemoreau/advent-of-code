@@ -3,11 +3,10 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils/stack"
 	"sort"
 	"strings"
 	"time"
-
-	"github.com/pemoreau/advent-of-code/go/utils"
 )
 
 //go:embed input.txt
@@ -37,7 +36,7 @@ var autoScore = map[rune]int{
 func parseLine(line string) (corrupted int, auto int) {
 	corrupted = 0
 	auto = 0
-	stack := utils.NewStack[rune]()
+	stack := stack.NewStack[rune]()
 	for _, c := range line {
 		if c == '(' || c == '[' || c == '{' || c == '<' {
 			stack.Push(c)

@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/interval"
 	"math"
 	"strconv"
 	"strings"
@@ -18,8 +18,8 @@ type Pos struct {
 }
 
 type Topology struct {
-	row    map[int]utils.Interval
-	column map[int]utils.Interval
+	row    map[int]interval.Interval
+	column map[int]interval.Interval
 	grid   map[Pos]uint8
 }
 
@@ -40,8 +40,8 @@ func parse(input string) (topology *Topology, path string) {
 	lines := strings.Split(parts[0], "\n")
 
 	grid := make(map[Pos]uint8)
-	row := make(map[int]utils.Interval)
-	column := make(map[int]utils.Interval)
+	row := make(map[int]interval.Interval)
+	column := make(map[int]interval.Interval)
 
 	for j, line := range lines {
 		ymin := math.MaxInt
@@ -50,7 +50,7 @@ func parse(input string) (topology *Topology, path string) {
 		xmax := 0
 		for i, c := range line {
 			if _, ok := column[i]; !ok {
-				column[i] = utils.Interval{math.MaxInt, 0}
+				column[i] = interval.Interval{math.MaxInt, 0}
 			}
 			if c == '#' || c == '.' {
 				p := Pos{i, j}
@@ -59,10 +59,10 @@ func parse(input string) (topology *Topology, path string) {
 				xmax = max(xmax, i)
 				ymin = min(column[i].Min, j)
 				ymax = max(column[i].Max, j)
-				column[i] = utils.Interval{ymin, ymax}
+				column[i] = interval.Interval{ymin, ymax}
 			}
 		}
-		row[j] = utils.Interval{xmin, xmax}
+		row[j] = interval.Interval{xmin, xmax}
 	}
 
 	return &Topology{row, column, grid}, parts[1]
@@ -260,15 +260,15 @@ func Part2(input string) int {
 
 	N := 50
 	faces := [6]struct {
-		X utils.Interval
-		Y utils.Interval
+		X interval.Interval
+		Y interval.Interval
 	}{
-		{X: utils.Interval{1 * N, 2*N - 1}, Y: utils.Interval{0 * N, 1*N - 1}},
-		{X: utils.Interval{2 * N, 3*N - 1}, Y: utils.Interval{0 * N, 1*N - 1}},
-		{X: utils.Interval{1 * N, 2*N - 1}, Y: utils.Interval{1 * N, 2*N - 1}},
-		{X: utils.Interval{0 * N, 1*N - 1}, Y: utils.Interval{2 * N, 3*N - 1}},
-		{X: utils.Interval{1 * N, 2*N - 1}, Y: utils.Interval{2 * N, 3*N - 1}},
-		{X: utils.Interval{0 * N, 1*N - 1}, Y: utils.Interval{3 * N, 4*N - 1}},
+		{X: interval.Interval{1 * N, 2*N - 1}, Y: interval.Interval{0 * N, 1*N - 1}},
+		{X: interval.Interval{2 * N, 3*N - 1}, Y: interval.Interval{0 * N, 1*N - 1}},
+		{X: interval.Interval{1 * N, 2*N - 1}, Y: interval.Interval{1 * N, 2*N - 1}},
+		{X: interval.Interval{0 * N, 1*N - 1}, Y: interval.Interval{2 * N, 3*N - 1}},
+		{X: interval.Interval{1 * N, 2*N - 1}, Y: interval.Interval{2 * N, 3*N - 1}},
+		{X: interval.Interval{0 * N, 1*N - 1}, Y: interval.Interval{3 * N, 4*N - 1}},
 	}
 
 	transition := TransitionTable{

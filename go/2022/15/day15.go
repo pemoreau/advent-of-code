@@ -4,6 +4,8 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/interval"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"strings"
 	"time"
 )
@@ -23,7 +25,7 @@ type beacon struct {
 
 // ordered list of disjoint intervals
 type FreeSpace struct {
-	intervals []utils.Interval
+	intervals []interval.Interval
 }
 
 func (fs *FreeSpace) String() string {
@@ -35,26 +37,26 @@ func (fs *FreeSpace) String() string {
 	return res
 }
 
-func (fs *FreeSpace) Add(interval utils.Interval) {
+func (fs *FreeSpace) Add(ab interval.Interval) {
 	// https://coderbyte.com/algorithm/insert-interval-into-list-of-sorted-disjoint-intervals
-	newSet := make([]utils.Interval, 0)
-	endSet := make([]utils.Interval, 0)
+	var newSet []interval.Interval
+	var endSet []interval.Interval
 	i := 0
 	// add intervals that come before the new interval
-	for i < len(fs.intervals) && fs.intervals[i].Max < interval.Min {
+	for i < len(fs.intervals) && fs.intervals[i].Max < ab.Min {
 		newSet = append(newSet, fs.intervals[i])
 		i++
 	}
 
 	// add our new interval to this final list
-	newSet = append(newSet, interval)
+	newSet = append(newSet, ab)
 
 	// check each interval that comes after the new interval to determine if we can merge
 	// if no merges are required then populate a list of the remaining intervals
 	for i < len(fs.intervals) {
 		var last = newSet[len(newSet)-1]
 		if fs.intervals[i].Min < last.Max {
-			newInterval := utils.Interval{min(last.Min, fs.intervals[i].Min), max(last.Max, fs.intervals[i].Max)}
+			newInterval := interval.Interval{min(last.Min, fs.intervals[i].Min), max(last.Max, fs.intervals[i].Max)}
 			newSet[len(newSet)-1] = newInterval
 		} else {
 			endSet = append(endSet, fs.intervals[i])
@@ -68,7 +70,7 @@ func (fs *FreeSpace) Merge() {
 	if len(fs.intervals) == 0 {
 		return
 	}
-	newSet := make([]utils.Interval, 0)
+	var newSet []interval.Interval
 	var last = fs.intervals[0]
 	i := 1
 
@@ -85,16 +87,16 @@ func (fs *FreeSpace) Merge() {
 	fs.intervals = newSet
 }
 
-func (fs *FreeSpace) Intersect(interval utils.Interval) {
-	newSet := make([]utils.Interval, 0)
+func (fs *FreeSpace) Intersect(ab interval.Interval) {
+	var newSet []interval.Interval
 	for _, i := range fs.intervals {
-		if i.Max < interval.Min {
+		if i.Max < ab.Min {
 			continue
 		}
-		if i.Min > interval.Max {
+		if i.Min > ab.Max {
 			break
 		}
-		newSet = append(newSet, utils.Interval{max(i.Min, interval.Min), min(i.Max, interval.Max)})
+		newSet = append(newSet, interval.Interval{max(i.Min, ab.Min), min(i.Max, ab.Max)})
 	}
 	fs.intervals = newSet
 }
@@ -112,7 +114,7 @@ func getLine(sensors []sensor, ty int) FreeSpace {
 	for _, s := range sensors {
 		r := s.dist - utils.Abs(s.y-ty)
 		if r > 0 {
-			line.Add(utils.Interval{s.x - r, s.x + r})
+			line.Add(interval.Interval{s.x - r, s.x + r})
 		}
 	}
 	line.Merge()
@@ -126,7 +128,7 @@ func manhattanDistance(xa, ya, xb, yb int) int {
 func parse(input string) []sensor {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	sensors := make([]sensor, 0)
+	var sensors []sensor
 	for _, line := range lines {
 		var xs, ys, xb, yb int
 		fmt.Sscanf(line, "Sensor at x=%d, y=%d: closest beacon is at x=%d, y=%d", &xs, &ys, &xb, &yb)
@@ -140,7 +142,7 @@ func parse(input string) []sensor {
 func Part1(input string) int {
 	sensors := parse(input)
 	ty := 2000000
-	beacons := utils.NewSet[beacon]()
+	beacons := set.NewSet[beacon]()
 	for _, s := range sensors {
 		if s.beacon.y == ty {
 			beacons.Add(*s.beacon)
@@ -171,7 +173,7 @@ func Part2(input string) int {
 			//fmt.Println("Starting", min, max)
 			for ty := min; ty < max+1; ty++ {
 				line := getLine(sensors, ty)
-				line.Intersect(utils.Interval{0, MAX})
+				line.Intersect(interval.Interval{0, MAX})
 				if len(line.intervals) > 1 {
 					tx := line.intervals[0].Max + 1
 					//fmt.Println("Found", tx, ty)

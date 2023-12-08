@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"math"
 	"strings"
 	"time"
@@ -60,7 +60,7 @@ func (p Pos) neighbors27() []Pos {
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	g := utils.Set[Pos]{}
+	g := set.Set[Pos]{}
 	var x, y, z int
 	for _, line := range lines {
 		fmt.Sscanf(line, "%d,%d,%d", &x, &y, &z)
@@ -83,7 +83,7 @@ func Part1(input string) int {
 func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	g := utils.Set[Pos]{}
+	g := set.Set[Pos]{}
 	var x, y, z int
 	for _, line := range lines {
 		fmt.Sscanf(line, "%d,%d,%d", &x, &y, &z)
@@ -96,7 +96,7 @@ func Part2(input string) int {
 	return res
 }
 
-func count(component utils.Set[Pos], free utils.Set[Pos]) int {
+func count(component set.Set[Pos], free set.Set[Pos]) int {
 	res := 0
 	for p := range component {
 		for _, q := range p.neighbors() {
@@ -108,7 +108,7 @@ func count(component utils.Set[Pos], free utils.Set[Pos]) int {
 	return res
 }
 
-func findFree(g utils.Set[Pos], xmin, xmax, ymin, ymax, zmin, zmax int) (Pos, bool) {
+func findFree(g set.Set[Pos], xmin, xmax, ymin, ymax, zmin, zmax int) (Pos, bool) {
 	for x := xmin; x <= xmax; x++ {
 		for y := ymin; y <= ymax; y++ {
 			for z := zmin; z <= zmax; z++ {
@@ -122,7 +122,7 @@ func findFree(g utils.Set[Pos], xmin, xmax, ymin, ymax, zmin, zmax int) (Pos, bo
 	return Pos{}, false
 }
 
-func minmax(g utils.Set[Pos]) (int, int, int, int, int, int) {
+func minmax(g set.Set[Pos]) (int, int, int, int, int, int) {
 	var xmin, xmax, ymin, ymax, zmin, zmax = math.MaxInt, math.MinInt, math.MaxInt, math.MinInt, math.MaxInt, math.MinInt
 	for p := range g {
 		xmin = min(xmin, p.X)
@@ -135,9 +135,9 @@ func minmax(g utils.Set[Pos]) (int, int, int, int, int, int) {
 	return xmin, xmax, ymin, ymax, zmin, zmax
 }
 
-func collectFree(g utils.Set[Pos], xmin, xmax, ymin, ymax, zmin, zmax int) utils.Set[Pos] {
-	todo := utils.Set[Pos]{}
-	res := utils.Set[Pos]{}
+func collectFree(g set.Set[Pos], xmin, xmax, ymin, ymax, zmin, zmax int) set.Set[Pos] {
+	todo := set.Set[Pos]{}
+	res := set.Set[Pos]{}
 	p, ok := findFree(g, xmin, xmax, ymin, ymax, zmin, zmax)
 	if !ok {
 		return res

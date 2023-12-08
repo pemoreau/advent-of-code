@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"strconv"
 	"strings"
 	"time"
@@ -57,7 +57,7 @@ func step(env *Env) {
 }
 
 func terminates(env Env) (bool, int) {
-	visited := utils.NewSet[int]()
+	visited := set.NewSet[int]()
 	for !visited.Contains(env.pc) {
 		if env.pc >= len(env.prg) {
 			return true, env.acc

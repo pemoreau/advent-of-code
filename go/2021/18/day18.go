@@ -3,12 +3,11 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils/stack"
 	"log"
 	"strings"
 	"time"
 	"unicode"
-
-	"github.com/pemoreau/advent-of-code/go/utils"
 )
 
 //go:embed input.txt
@@ -173,7 +172,7 @@ func normalize(l flattree) flattree {
 // 	return res
 // }
 
-func PushMagnitude(s *utils.Stack[value], v value) {
+func PushMagnitude(s *stack.Stack[value], v value) {
 	if s.IsEmpty() {
 		s.Push(v)
 		return
@@ -189,7 +188,7 @@ func PushMagnitude(s *utils.Stack[value], v value) {
 }
 
 func Magnitude(l flattree) int {
-	stack := utils.NewStack[value]()
+	stack := stack.NewStack[value]()
 	for _, v := range l {
 		PushMagnitude(&stack, v)
 	}

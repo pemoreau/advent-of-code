@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"strconv"
 	"strings"
 	"time"
@@ -15,8 +15,8 @@ var inputDay string
 type Game struct {
 	deck1  []int
 	deck2  []int
-	past1  utils.Set[int]
-	past2  utils.Set[int]
+	past1  set.Set[int]
+	past2  set.Set[int]
 	winner int
 	round  int
 }
@@ -73,7 +73,7 @@ func Part1(input string) int {
 		deck2 = append(deck2, num)
 	}
 
-	game := Game{deck1, deck2, utils.NewSet[int](), utils.NewSet[int](), 0, 0}
+	game := Game{deck1, deck2, set.NewSet[int](), set.NewSet[int](), 0, 0}
 	for !endOfGame(game) {
 		game = playRound(game)
 	}
@@ -123,7 +123,7 @@ func playRound2(g Game) Game {
 		newDeck2 := make([]int, card2)
 		copy(newDeck1, g.deck1[:card1])
 		copy(newDeck2, g.deck2[:card2])
-		newGame := Game{newDeck1, newDeck2, utils.NewSet[int](), utils.NewSet[int](), 0, 0}
+		newGame := Game{newDeck1, newDeck2, set.NewSet[int](), set.NewSet[int](), 0, 0}
 		//fmt.Println("start recursive game")
 		for !endOfGame(newGame) {
 			newGame = playRound2(newGame)
@@ -167,7 +167,7 @@ func Part2(input string) int {
 		deck2 = append(deck2, num)
 	}
 
-	game := Game{deck1, deck2, utils.NewSet[int](), utils.NewSet[int](), 0, 0}
+	game := Game{deck1, deck2, set.NewSet[int](), set.NewSet[int](), 0, 0}
 	for !endOfGame(game) {
 		game = playRound2(game)
 	}

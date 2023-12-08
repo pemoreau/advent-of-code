@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/bits-and-blooms/bitset"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"strconv"
 	"strings"
 	"time"
@@ -17,11 +17,11 @@ func winning(line string) int {
 	split := func(c rune) bool { return c == ':' || c == '|' }
 	fields := strings.FieldsFunc(line, split)
 
-	var winningNumbers = utils.NewSet[string]()
+	var winningNumbers = set.NewSet[string]()
 	for _, n := range strings.Fields(fields[1]) {
 		winningNumbers.Add(n)
 	}
-	var numbers = utils.NewSet[string]()
+	var numbers = set.NewSet[string]()
 	for _, n := range strings.Fields(fields[2]) {
 		numbers.Add(n)
 	}

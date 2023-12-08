@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"strconv"
 	"strings"
 	"time"
@@ -131,7 +131,7 @@ func removeDuplicates(states []State) []State {
 	}
 	t := states[0].time
 	robotToProduct := map[Robot]Product{}
-	bag := utils.Set[State]{}
+	bag := set.Set[State]{}
 	// compute max product for a given robot configuration
 	for _, s := range states {
 		bag.Add(s)
@@ -166,12 +166,12 @@ func removeDuplicates2(states []State) []State {
 	}
 
 	//bag := utils.Set[State]{}
-	byRobot := map[Robot]utils.Set[State]{}
+	byRobot := map[Robot]set.Set[State]{}
 	for _, s := range states {
 		//bag.Add(s)
 		_, ok := byRobot[s.robot]
 		if !ok {
-			byRobot[s.robot] = utils.Set[State]{}
+			byRobot[s.robot] = set.Set[State]{}
 		}
 		byRobot[s.robot].Add(s)
 	}

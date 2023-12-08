@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	set2 "github.com/pemoreau/advent-of-code/go/utils/set"
 	"strings"
 	"time"
 	"unicode"
@@ -12,15 +12,15 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func set(s string) utils.Set[uint8] {
-	res := make(utils.Set[uint8], len(s))
+func set(s string) set2.Set[uint8] {
+	res := make(set2.Set[uint8], len(s))
 	for _, c := range s {
 		res.Add(uint8(c))
 	}
 	return res
 }
 
-func score(i utils.Set[uint8]) int {
+func score(i set2.Set[uint8]) int {
 	res := 0
 	for c := range i {
 		if unicode.IsLower(rune(c)) {

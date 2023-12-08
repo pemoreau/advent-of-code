@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"sort"
 	"strings"
 	"time"
@@ -12,15 +12,15 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func parse(input string) (allergens map[string]utils.Set[string], icount map[string]int) {
+func parse(input string) (allergens map[string]set.Set[string], icount map[string]int) {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
 	icount = map[string]int{}
-	allergens = map[string]utils.Set[string]{} // allergen -> ingredients
+	allergens = map[string]set.Set[string]{} // allergen -> ingredients
 
 	for _, line := range lines {
-		ingredients := utils.Set[string]{}
+		ingredients := set.Set[string]{}
 
 		parts := strings.Split(line, " (contains ")
 		iList := strings.Split(parts[0], " ")
@@ -34,7 +34,7 @@ func parse(input string) (allergens map[string]utils.Set[string], icount map[str
 
 		for _, a := range aList {
 			if _, ok := allergens[a]; !ok {
-				allergens[a] = utils.Set[string]{}
+				allergens[a] = set.Set[string]{}
 				for i := range ingredients {
 					allergens[a].Add(i)
 				}

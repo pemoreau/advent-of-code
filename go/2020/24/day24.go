@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"strings"
 	"time"
 )
@@ -42,11 +42,11 @@ func toDirections(s string) []int {
 	return res
 }
 
-func parse(input string) utils.Set[Hex] {
+func parse(input string) set.Set[Hex] {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
-	blackTiles := utils.Set[Hex]{}
+	blackTiles := set.Set[Hex]{}
 	for _, line := range lines {
 		hex := Hex{0, 0, 0}
 		for _, dir := range toDirections(line) {
@@ -66,7 +66,7 @@ func Part1(input string) int {
 	return len(parse(input))
 }
 
-func step(blackTiles utils.Set[Hex]) utils.Set[Hex] {
+func step(blackTiles set.Set[Hex]) set.Set[Hex] {
 	// number of black blackNeighbors
 	blackNeighbors := make(map[Hex]int)
 	for hex := range blackTiles {
@@ -76,7 +76,7 @@ func step(blackTiles utils.Set[Hex]) utils.Set[Hex] {
 	}
 
 	// apply rules
-	res := utils.Set[Hex]{}
+	res := set.Set[Hex]{}
 	for hex := range blackNeighbors {
 		if blackTiles.Contains(hex) {
 			if !(blackNeighbors[hex] == 0 || blackNeighbors[hex] > 2) {

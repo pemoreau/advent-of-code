@@ -13,7 +13,7 @@ pub fn recursive_fuel(mass: i64) -> i64 {
     }
 }
 
-fn sum_fuel(masses: &[i32], fuel_func: fn(i64) -> i64) -> i64 {
+fn sum_fuel(masses: &Vec<i64>, fuel_func: fn(i64) -> i64) -> i64 {
     masses.iter().map(|&mass| fuel_func(mass.into())).sum()
 }
 

@@ -204,7 +204,7 @@ impl Graph {
 fn dijkstra(grid: &Grid, graph: &Graph, start_nodes: Vec<Node>) -> i32 {
     let number_of_keys = grid.number_of_keys();
     let mut frontier: BinaryHeap<StateCost> = BinaryHeap::new();
-    let mut cost_so_far: HashMap<&State, i32> = HashMap::new();
+    let mut cost_so_far: HashMap<State, i32> = HashMap::new();
     let start = State {
         current: start_nodes.clone(),
         keys: Vec::new(),
@@ -213,7 +213,7 @@ fn dijkstra(grid: &Grid, graph: &Graph, start_nodes: Vec<Node>) -> i32 {
         state: start.clone(),
         cost: 0,
     });
-    cost_so_far.insert(&start, 0);
+    cost_so_far.insert(start, 0);
 
     while let Some(StateCost {
         state: current,
@@ -230,7 +230,7 @@ fn dijkstra(grid: &Grid, graph: &Graph, start_nodes: Vec<Node>) -> i32 {
             let current_cost = cost_so_far.get(&current).unwrap();
             let new_cost = current_cost + cost;
             if next_cost.is_none() || new_cost < *next_cost.unwrap() {
-                cost_so_far.insert(next, new_cost);
+                cost_so_far.insert(next.clone(), new_cost);
                 frontier.push(StateCost {
                     state: next.clone(),
                     cost: new_cost,

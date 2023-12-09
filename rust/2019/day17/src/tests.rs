@@ -8,6 +8,6 @@ mod tests {
 
     #[test]
     fn test_input_part2() {
-        assert_eq!(0, part2(include_str!("../input.txt").to_string()));
+        assert_eq!(923017, part2(include_str!("../input.txt").to_string()));
     }
 }

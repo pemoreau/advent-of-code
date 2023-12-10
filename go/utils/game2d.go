@@ -63,6 +63,17 @@ func BuildGrid(lines []string) Grid {
 	return grid
 }
 
+func BuildGridUp(lines []string) Grid {
+	grid := make(Grid)
+	var height = len(lines)
+	for j, l := range lines {
+		for i, c := range l {
+			grid[Pos{X: i, Y: height - j - 1}] = uint8(c)
+		}
+	}
+	return grid
+}
+
 func (p Pos) Neighbors4() []Pos {
 	return []Pos{
 		{X: p.X, Y: p.Y - 1},

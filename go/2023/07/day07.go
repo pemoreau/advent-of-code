@@ -12,7 +12,11 @@ import (
 //go:embed input.txt
 var inputDay string
 
-type hand string
+type hand struct {
+	initial string
+	kind    int
+	encoded string
+}
 
 const (
 	HIGHCARD = iota
@@ -24,10 +28,19 @@ const (
 	STRAIGHT
 )
 
-func (h hand) kind(withJoker bool) int {
+func newHand(s string, withJoker bool) hand {
+	var res = hand{
+		initial: s,
+	}
+	res.kind = res.computeKind(withJoker)
+	res.encoded = encode(s, withJoker)
+	return res
+}
+
+func (h hand) computeKind(withJoker bool) int {
 	var mult = make([]int, 15)
-	for i := 0; i < len(h); i++ {
-		mult[index(h[i])]++
+	for i := 0; i < len(h.initial); i++ {
+		mult[index(h.initial[i])]++
 	}
 
 	var indexJ = index('J')
@@ -42,25 +55,24 @@ func (h hand) kind(withJoker bool) int {
 		mult[0] += nbJoker
 	}
 
+	var res int
 	if mult[0] == 5 {
-		return STRAIGHT
+		res = STRAIGHT
+	} else if mult[0] == 4 {
+		res = FOUROFAKIND
+	} else if mult[0] == 3 && mult[1] == 2 {
+		res = FULLHOUSE
+	} else if mult[0] == 3 {
+		res = THREEOFAKIND
+	} else if mult[0] == 2 && mult[1] == 2 {
+		res = TWOPAIRS
+	} else if mult[0] == 2 {
+		res = PAIR
+	} else {
+		res = HIGHCARD
 	}
-	if mult[0] == 4 {
-		return FOUROFAKIND
-	}
-	if mult[0] == 3 && mult[1] == 2 {
-		return FULLHOUSE
-	}
-	if mult[0] == 3 {
-		return THREEOFAKIND
-	}
-	if mult[0] == 2 && mult[1] == 2 {
-		return TWOPAIRS
-	}
-	if mult[0] == 2 {
-		return PAIR
-	}
-	return HIGHCARD
+
+	return res
 }
 
 func index(c byte) int {
@@ -82,36 +94,22 @@ func index(c byte) int {
 	panic("invalid card")
 }
 
-func compareString(s1, s2 hand, withJoker bool) int {
-	if s1 == s2 {
-		return 0
-	}
-	var e1, e2 string
-	for i := 0; i < len(s1); i++ {
-		if s1[i] == 'J' && withJoker {
-			e1 = e1 + "A"
+func encode(s string, withJoker bool) string {
+	var res string
+	for i := 0; i < len(s); i++ {
+		if s[i] == 'J' && withJoker {
+			res = res + "A"
 		} else {
-			e1 = e1 + string('A'+uint8(index(s1[i])))
-		}
-		if s2[i] == 'J' && withJoker {
-			e2 = e2 + "A"
-		} else {
-			e2 = e2 + string('A'+uint8(index(s2[i])))
+			res = res + string('A'+uint8(index(s[i])))
 		}
 	}
-	if e1 > e2 {
-		return 1
-	}
-	return -1
+	return res
 }
 
-func compare(h1, h2 hand, withJoker bool) int {
-	if h1 == h2 {
-		return 0
-	}
+func compare(h1, h2 hand) int {
+	var k1 = h1.kind
+	var k2 = h2.kind
 
-	var k1 = h1.kind(withJoker)
-	var k2 = h2.kind(withJoker)
 	if k1 > k2 {
 		return 1
 	}
@@ -119,27 +117,31 @@ func compare(h1, h2 hand, withJoker bool) int {
 		return -1
 	}
 
-	return compareString(h1, h2, withJoker)
+	if h1.encoded == h2.encoded {
+		return 0
+	}
+	if h1.encoded > h2.encoded {
+		return 1
+	}
+	return -1
 }
 
 func solve(input string, withJoker bool) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
-	var hands []hand
+	var hands = make([]hand, 0, len(lines))
 	var bid = make(map[hand]int)
 	for _, line := range lines {
 		s := strings.Split(line, " ")
-		hand := hand(s[0])
+		hand := newHand(s[0], withJoker)
 		hands = append(hands, hand)
 		v, _ := strconv.Atoi(s[1])
 		bid[hand] = v
 	}
 
-	slices.SortFunc(hands, func(a, b hand) int { return compare(a, b, withJoker) })
-	//for _, h := range hands {
-	//	fmt.Println(h)
-	//}
+	slices.SortFunc(hands, compare)
+
 	var res int
 	for i, h := range hands {
 		res += bid[h] * (i + 1)

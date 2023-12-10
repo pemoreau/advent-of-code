@@ -27,134 +27,76 @@ const (
 	WEST
 )
 
-func tileToString(tile uint8) string {
-	switch tile {
-	case EMPTY:
-		return "EMPTY"
-	case UPPER_LEFT:
-		return "UPPER_LEFT"
-	case UPPER_RIGHT:
-		return "UPPER_RIGHT"
-	case LOWER_LEFT:
-		return "LOWER_LEFT"
-	case LOWER_RIGHT:
-		return "LOWER_RIGHT"
-	case START:
-		return "START"
-	case VERTICAL:
-		return "VERTICAL"
-	case HORIZONTAL:
-		return "HORIZONTAL"
-	}
-	panic("unreachable")
-}
-
-func dirToString(dir int) string {
-	switch dir {
-	case NORTH:
-		return "NORTH"
-	case SOUTH:
-		return "SOUTH"
-	case EAST:
-		return "EAST"
-	case WEST:
-		return "WEST"
-	}
-	panic("unreachable")
-}
-
 func step(grid utils.Grid, pos utils.Pos, from int) (newPos utils.Pos, newFrom int, ok bool) {
 	tile, found := grid[pos]
 
-	if !found {
-		return pos, from, false
-	}
-	if tile == EMPTY {
+	if !found || tile == EMPTY {
 		return pos, from, false
 	}
 	if tile == START {
 		return pos, from, true
 	}
 
-	//fmt.Printf("pos %v tile %s from %s\n", pos, tileToString(tile), dirToString(from))
-
-	if tile == VERTICAL {
+	switch tile {
+	case VERTICAL:
 		if from == NORTH {
 			return utils.Pos{X: pos.X, Y: pos.Y + 1}, from, true
-		}
-		if from == SOUTH {
+		} else if from == SOUTH {
 			return utils.Pos{X: pos.X, Y: pos.Y - 1}, from, true
 		}
-		return pos, from, false
-	}
-	if tile == HORIZONTAL {
+	case HORIZONTAL:
 		if from == EAST {
 			return utils.Pos{X: pos.X - 1, Y: pos.Y}, from, true
-		}
-		if from == WEST {
+		} else if from == WEST {
 			return utils.Pos{X: pos.X + 1, Y: pos.Y}, from, true
 		}
-		return pos, from, false
-	}
-	if tile == UPPER_LEFT {
+	case UPPER_LEFT:
 		if from == SOUTH {
 			return utils.Pos{X: pos.X + 1, Y: pos.Y}, WEST, true
-		}
-		if from == EAST {
+		} else if from == EAST {
 			return utils.Pos{X: pos.X, Y: pos.Y + 1}, NORTH, true
 		}
-		return pos, from, false
-	}
-	if tile == UPPER_RIGHT {
+	case UPPER_RIGHT:
 		if from == SOUTH {
 			return utils.Pos{X: pos.X - 1, Y: pos.Y}, EAST, true
-		}
-		if from == WEST {
+		} else if from == WEST {
 			return utils.Pos{X: pos.X, Y: pos.Y + 1}, NORTH, true
 		}
-		return pos, from, false
-	}
-	if tile == LOWER_LEFT {
+	case LOWER_LEFT:
 		if from == NORTH {
 			return utils.Pos{X: pos.X + 1, Y: pos.Y}, WEST, true
-		}
-		if from == EAST {
+		} else if from == EAST {
 			return utils.Pos{X: pos.X, Y: pos.Y - 1}, SOUTH, true
 		}
-		return pos, from, false
-	}
-	if tile == LOWER_RIGHT {
+	case LOWER_RIGHT:
 		if from == NORTH {
 			return utils.Pos{X: pos.X - 1, Y: pos.Y}, EAST, true
-		}
-		if from == WEST {
+		} else if from == WEST {
 			return utils.Pos{X: pos.X, Y: pos.Y - 1}, SOUTH, true
 		}
-		return pos, from, false
 	}
-	panic("unreachable")
+	return pos, from, false
 }
 
-func findLoop(grid utils.Grid, pos utils.Pos, from int) (path []utils.Pos, ok bool) {
+func findLoop(grid utils.Grid, pos utils.Pos, from int) (path set.Set[utils.Pos], ok bool) {
+	path = make(set.Set[utils.Pos])
 	var tile, found = grid[pos]
-	if found {
-		path = append(path, pos)
+	if !found || tile == EMPTY {
+		return path, false
 	}
-	for found {
+
+	path.Add(pos)
+	for {
 		pos, from, found = step(grid, pos, from)
 		if !found {
 			return path, false
 		}
-		tile, found = grid[pos]
-		if !found || tile == EMPTY {
-			return path, false
-		}
-		path = append(path, pos)
+		path.Add(pos)
+		tile, _ = grid[pos]
 		if tile == START {
 			return path, true
 		}
 	}
-	return path, false
 }
 
 func findStart(grid utils.Grid) (pos utils.Pos) {
@@ -173,8 +115,6 @@ func Part1(input string) int {
 	var grid = utils.BuildGrid(lines)
 	var start = findStart(grid)
 
-	//utils.DisplayMap(grid, EMPTY)
-
 	var neighbors = []utils.Pos{
 		{start.X + 1, start.Y},
 		{start.X - 1, start.Y},
@@ -183,50 +123,17 @@ func Part1(input string) int {
 	}
 	var froms = []int{WEST, EAST, SOUTH, NORTH}
 
-	var res int
 	for i, n := range neighbors {
-		fmt.Println("findLoop", i)
 		loop, found := findLoop(grid, n, froms[i])
 		if found {
-			res = max(res, len(loop))
-			break
-		} else {
-			continue
+			var l = len(loop)
+			if l%2 == 0 {
+				return l / 2
+			}
+			return l/2 + 1
 		}
 	}
-	if res%2 == 0 {
-		return res / 2
-	}
-	return res/2 + 1
-}
-
-func numberIntersections(p utils.Pos, grid utils.Grid, maxX int, path set.Set[utils.Pos]) int {
-	var res int
-	fmt.Print("numberIntersections", p)
-	if path.Contains(p) {
-		return 0
-	}
-	var last uint8
-	for x := p.X + 1; x <= maxX; x++ {
-		if path.Contains(utils.Pos{X: x, Y: p.Y}) {
-			tile, _ := grid[utils.Pos{X: x, Y: p.Y}]
-			if last == UPPER_LEFT && tile == UPPER_RIGHT {
-				res += 2
-			} else if last == UPPER_LEFT && tile == LOWER_RIGHT {
-				res++
-			} else if last == LOWER_LEFT && tile == LOWER_RIGHT {
-				res += 2
-			} else if last == LOWER_LEFT && tile == UPPER_RIGHT {
-				res++
-			}
-			if tile != HORIZONTAL {
-				res++
-				last = tile
-			}
-		}
-	}
-	fmt.Println(" --> ", res)
-	return res
+	panic("no solution found")
 }
 
 func Part2(input string) int {
@@ -236,8 +143,6 @@ func Part2(input string) int {
 	var grid = utils.BuildGrid(lines)
 	var start = findStart(grid)
 
-	//utils.DisplayMap(grid, EMPTY)
-
 	var neighbors = []utils.Pos{
 		{start.X + 1, start.Y},
 		{start.X - 1, start.Y},
@@ -246,38 +151,44 @@ func Part2(input string) int {
 	}
 	var froms = []int{WEST, EAST, SOUTH, NORTH}
 
-	var loop []utils.Pos
+	var loopSet set.Set[utils.Pos]
 	for i, n := range neighbors {
-		fmt.Println("findLoop", i)
 		var found bool
-		loop, found = findLoop(grid, n, froms[i])
+		loopSet, found = findLoop(grid, n, froms[i])
 		if found {
 			break
-		} else {
-			fmt.Println("loop not found")
-			continue
 		}
 	}
 
-	var loopSet = make(set.Set[utils.Pos])
-	for _, p := range loop {
-		loopSet.Add(p)
-	}
 	var res int
 	minX, maxX, minY, maxY := utils.GridBounds(grid)
 	for y := minY; y <= maxY; y++ {
-		for x := minX; x <= maxX; x++ {
+		var last uint8
+		var cpt = 0
+		for x := maxX; x >= minX; x-- {
 			p := utils.Pos{X: x, Y: y}
-			if loopSet.Contains(p) {
-				continue
-			}
-			n := numberIntersections(p, grid, maxX, loopSet)
-			if n%2 == 1 {
-				fmt.Println(x, y)
-				res++
+			if !loopSet.Contains(p) {
+				if cpt%2 == 1 {
+					res++
+				}
+			} else {
+				tile, _ := grid[p]
+				if last == UPPER_RIGHT && tile == UPPER_LEFT {
+					cpt++
+				} else if last == UPPER_RIGHT && tile == LOWER_LEFT {
+					// do not count
+				} else if last == LOWER_RIGHT && tile == LOWER_LEFT {
+					cpt++
+				} else if last == LOWER_RIGHT && tile == UPPER_LEFT {
+					// do not count
+				} else if tile != HORIZONTAL {
+					last = tile
+					cpt++
+				}
 			}
 		}
 	}
+
 	return res
 }
 

@@ -11,70 +11,58 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func BuildGrid(lines []string) (utils.Grid, []int) {
-	grid := make(utils.Grid)
-	var emptyLines []int
-	for j, l := range lines {
-		var emptyLine = true
-		for i, c := range l {
-			if c == '#' {
-				grid[utils.Pos{X: i, Y: j}] = uint8(c)
-				emptyLine = false
-			}
-		}
-		if emptyLine {
-			emptyLines = append(emptyLines, j)
-		}
-	}
-	return grid, emptyLines
-}
-
 func virtualPos(pos utils.Pos, emptyLines []int, emptyColumns []int, factor int) utils.Pos {
-	var x = pos.X
-	var y = pos.Y
 	var addX, addY int
 	for _, l := range emptyLines {
-		if l < y {
+		if l < pos.Y {
 			addY += factor - 1
 		}
 	}
 	for _, c := range emptyColumns {
-		if c < x {
+		if c < pos.X {
 			addX += factor - 1
 		}
 	}
-	return utils.Pos{X: x + addX, Y: y + addY}
+	return utils.Pos{X: pos.X + addX, Y: pos.Y + addY}
 }
 
 func solve(input string, factor int) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
-	var grid, emptyLines = BuildGrid(lines)
-	var emptyColumns []int
-	minX, maxX, minY, maxY := utils.GridBounds(grid)
-
-	for i := minX; i <= maxX; i++ {
-		var emptyColumn = true
-		for j := minY; j <= maxY; j++ {
-			if c, ok := grid[utils.Pos{X: i, Y: j}]; ok && c == '#' {
-				emptyColumn = false
+	var galaxies []utils.Pos
+	var emptyLines []int
+	var occupiedColumn []bool = make([]bool, len(lines[0]))
+	for j, l := range lines {
+		var emptyLine = true
+		for i, c := range l {
+			if c == '#' {
+				galaxies = append(galaxies, utils.Pos{X: i, Y: j})
+				emptyLine = false
+				occupiedColumn[i] = true
 			}
 		}
-		if emptyColumn {
+		if emptyLine {
+			emptyLines = append(emptyLines, j)
+		}
+	}
+
+	var emptyColumns []int
+	for i, c := range occupiedColumn {
+		if !c {
 			emptyColumns = append(emptyColumns, i)
 		}
 	}
 
-	var g = make([]utils.Pos, 0, len(grid))
-	for k := range grid {
-		g = append(g, virtualPos(k, emptyLines, emptyColumns, factor))
+	var expandedGalaxies = make([]utils.Pos, 0, len(galaxies))
+	for _, g := range galaxies {
+		expandedGalaxies = append(expandedGalaxies, virtualPos(g, emptyLines, emptyColumns, factor))
 	}
 
 	var res int
-	for i := 0; i < len(g); i++ {
-		for j := i + 1; j < len(g); j++ {
-			res += utils.ManhattanDistance(g[i], g[j])
+	for i := 0; i < len(expandedGalaxies); i++ {
+		for j := i + 1; j < len(expandedGalaxies); j++ {
+			res += utils.ManhattanDistance(expandedGalaxies[i], expandedGalaxies[j])
 		}
 	}
 	return res

@@ -42,15 +42,15 @@ func count(pattern string, numbers []uint8) int {
 		return setCache(pattern, numbers, res)
 	}
 
-	// cut branches
-	var sum int
-	for _, n := range numbers {
-		sum += int(n)
-	}
-	if len(pattern) < sum+len(numbers)-1 {
-		res := 0
-		return setCache(pattern, numbers, res)
-	}
+	// cut branches: not very useful
+	//var sum int
+	//for _, n := range numbers {
+	//	sum += int(n)
+	//}
+	//if len(pattern) < sum+len(numbers)-1 {
+	//	res := 0
+	//	return setCache(pattern, numbers, res)
+	//}
 
 	if pattern[0] == '?' {
 		res := count(pattern[1:], numbers) + count("#"+pattern[1:], numbers)
@@ -82,12 +82,11 @@ func count(pattern string, numbers []uint8) int {
 		}
 
 		if remaining[0] == '#' {
-			// fail
+			// fail: it should be a .
 			res := 0
 			return setCache(pattern, numbers, res)
 		}
-		// remaining[0] == '.' || remaining[0] == '?'
-		// eat first ? since it should be a .
+		// remaining[0] == '.' || remaining[0] == '?': skip first ? since it should be a .
 		res := count(remaining[1:], numbers[1:])
 		return setCache(pattern, numbers, res)
 	}

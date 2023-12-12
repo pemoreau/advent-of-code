@@ -106,11 +106,10 @@ func solve(input string, part2 bool) int {
 	lines := strings.Split(input, "\n")
 
 	var res int
-	var numbers = make([]uint8, 0, 30)
 	for _, line := range lines {
 		fields := strings.FieldsFunc(line, func(r rune) bool { return r == ' ' || r == ',' })
 		var pattern = fields[0]
-		numbers = numbers[:0] // reset array
+		var numbers []uint8
 		for _, field := range fields[1:] {
 			numbers = append(numbers, uint8(utils.ToInt(field)))
 		}

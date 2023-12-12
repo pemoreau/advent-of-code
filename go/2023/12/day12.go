@@ -47,7 +47,7 @@ func count(pattern string, numbers []uint8) int {
 	for _, n := range numbers {
 		sum += int(n)
 	}
-	if len(pattern) < sum {
+	if len(pattern) < sum+len(numbers)-1 {
 		res := 0
 		return setCache(pattern, numbers, res)
 	}
@@ -94,39 +94,32 @@ func count(pattern string, numbers []uint8) int {
 	panic("unreachable")
 }
 
-func unfoldPattern(pattern string) string {
-	var res = pattern
-	for i := 0; i < 4; i++ {
-		res = res + "?" + pattern
-	}
-	return res
+func unfold(pattern string, numbers []uint8) (string, []uint8) {
+	var resPattern = pattern + "?" + pattern + "?" + pattern + "?" + pattern + "?" + pattern
+	var resNumbers = append(numbers, numbers...)
+	resNumbers = append(resNumbers, resNumbers...)
+	resNumbers = append(resNumbers, numbers...)
+	return resPattern, resNumbers
 }
 
-func unfoldNumbers(numbers []uint8) []uint8 {
-	var res []uint8
-	for i := 0; i < 5; i++ {
-		res = append(res, numbers...)
-	}
-	return res
-}
-
-func solve(input string, unfold bool) int {
+func solve(input string, part2 bool) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
 	var res int
+	var numbers = make([]uint8, 0, 30)
 	for _, line := range lines {
 		fields := strings.FieldsFunc(line, func(r rune) bool { return r == ' ' || r == ',' })
 		var pattern = fields[0]
-		var numbers []uint8
+		numbers = numbers[:0] // reset array
 		for _, field := range fields[1:] {
 			numbers = append(numbers, uint8(utils.ToInt(field)))
 		}
-		if unfold {
-			pattern = unfoldPattern(pattern)
-			numbers = unfoldNumbers(numbers)
+		if part2 {
+			res += count(unfold(pattern, numbers))
+		} else {
+			res += count(pattern, numbers)
 		}
-		res += count(pattern, numbers)
 	}
 
 	return res

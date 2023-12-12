@@ -18,12 +18,12 @@ type state struct {
 
 var cache = make(map[state]int)
 
-func setCache(pattern string, numbers []int, value int) int {
-	cache[state{pattern, fmt.Sprint(numbers)}] = value
+func setCache(pattern string, numbers []uint8, value int) int {
+	cache[state{pattern, string(numbers)}] = value
 	return value
 }
 
-func count(pattern string, numbers []int) int {
+func count(pattern string, numbers []uint8) int {
 	if len(pattern) == 0 && len(numbers) == 0 {
 		return 1
 	}
@@ -33,7 +33,7 @@ func count(pattern string, numbers []int) int {
 	}
 
 	// test cache
-	if value, ok := cache[state{pattern, fmt.Sprint(numbers)}]; ok {
+	if value, ok := cache[state{pattern, string(numbers)}]; ok {
 		return value
 	}
 
@@ -42,9 +42,10 @@ func count(pattern string, numbers []int) int {
 		return setCache(pattern, numbers, res)
 	}
 
+	// cut branches
 	var sum int
 	for _, n := range numbers {
-		sum += n
+		sum += int(n)
 	}
 	if len(pattern) < sum {
 		res := 0
@@ -55,18 +56,19 @@ func count(pattern string, numbers []int) int {
 		res := count(pattern[1:], numbers) + count("#"+pattern[1:], numbers)
 		return setCache(pattern, numbers, res)
 	}
+
 	if pattern[0] == '#' {
 		if len(numbers) == 0 {
 			res := 0
 			return setCache(pattern, numbers, res)
 		}
-		n := numbers[0]
 
+		n := numbers[0]
 		indexDot := strings.Index(pattern, ".")
 		if indexDot == -1 {
 			indexDot = len(pattern)
 		}
-		if indexDot < n {
+		if indexDot < int(n) {
 			// not enough # or ?
 			res := 0
 			return setCache(pattern, numbers, res)
@@ -84,41 +86,12 @@ func count(pattern string, numbers []int) int {
 			res := 0
 			return setCache(pattern, numbers, res)
 		}
-		if remaining[0] == '.' {
-			res := count(remaining[1:], numbers[1:])
-			return setCache(pattern, numbers, res)
-		}
-		if remaining[0] == '?' {
-			// eat first ? since it should be a .
-			res := count(remaining[1:], numbers[1:])
-			return setCache(pattern, numbers, res)
-		}
+		// remaining[0] == '.' || remaining[0] == '?'
+		// eat first ? since it should be a .
+		res := count(remaining[1:], numbers[1:])
+		return setCache(pattern, numbers, res)
 	}
 	panic("unreachable")
-}
-
-func solve(input string, unfold bool) int {
-	input = strings.TrimSuffix(input, "\n")
-	lines := strings.Split(input, "\n")
-
-	var res int
-	for _, line := range lines {
-		fields := strings.FieldsFunc(line, func(r rune) bool { return r == ' ' || r == ',' })
-		var pattern = fields[0]
-		var numbers []int
-		for _, field := range fields[1:] {
-			numbers = append(numbers, utils.ToInt(field))
-		}
-		if unfold {
-			pattern = unfoldPattern(pattern)
-			numbers = unfoldNumbers(numbers)
-		}
-		v := count(pattern, numbers)
-		//fmt.Println(pattern, v)
-		res += v
-	}
-
-	return res
 }
 
 func unfoldPattern(pattern string) string {
@@ -129,11 +102,33 @@ func unfoldPattern(pattern string) string {
 	return res
 }
 
-func unfoldNumbers(numbers []int) []int {
-	var res []int
+func unfoldNumbers(numbers []uint8) []uint8 {
+	var res []uint8
 	for i := 0; i < 5; i++ {
 		res = append(res, numbers...)
 	}
+	return res
+}
+
+func solve(input string, unfold bool) int {
+	input = strings.TrimSuffix(input, "\n")
+	lines := strings.Split(input, "\n")
+
+	var res int
+	for _, line := range lines {
+		fields := strings.FieldsFunc(line, func(r rune) bool { return r == ' ' || r == ',' })
+		var pattern = fields[0]
+		var numbers []uint8
+		for _, field := range fields[1:] {
+			numbers = append(numbers, uint8(utils.ToInt(field)))
+		}
+		if unfold {
+			pattern = unfoldPattern(pattern)
+			numbers = unfoldNumbers(numbers)
+		}
+		res += count(pattern, numbers)
+	}
+
 	return res
 }
 
@@ -143,24 +138,6 @@ func Part1(input string) int {
 
 func Part2(input string) int {
 	return solve(input, true)
-	//input = strings.TrimSuffix(input, "\n")
-	//lines := strings.Split(input, "\n")
-	//
-	//var res int
-	//for _, line := range lines {
-	//	clear(cache)
-	//	fields := strings.FieldsFunc(line, func(r rune) bool { return r == ' ' || r == ',' })
-	//	var pattern = fields[0]
-	//	var numbers []int
-	//	for _, field := range fields[1:] {
-	//		numbers = append(numbers, utils.ToInt(field))
-	//	}
-	//	v := count(unfoldPattern(pattern), unfoldNumbers(numbers))
-	//	fmt.Println(unfoldPattern(pattern), unfoldNumbers(numbers), v)
-	//	res += v
-	//}
-	//
-	//return res
 }
 
 func main() {

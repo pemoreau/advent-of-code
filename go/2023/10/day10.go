@@ -27,17 +27,17 @@ const (
 	WEST
 )
 
-func step(grid utils.Grid, pos utils.Pos, from int) (newPos utils.Pos, newFrom int, ok bool) {
-	tile, found := grid[pos]
-
-	if !found || tile == EMPTY {
+func step(grid utils.Matrix[uint8], pos utils.Pos, from int) (newPos utils.Pos, newFrom int, ok bool) {
+	if !grid.IsValidPos(pos) {
 		return pos, from, false
 	}
-	if tile == START {
-		return pos, from, true
-	}
+	tile := grid[pos.Y][pos.X]
 
 	switch tile {
+	case EMPTY:
+		return pos, from, false
+	case START:
+		return pos, from, true
 	case VERTICAL:
 		if from == NORTH {
 			return utils.Pos{X: pos.X, Y: pos.Y + 1}, from, true
@@ -78,31 +78,38 @@ func step(grid utils.Grid, pos utils.Pos, from int) (newPos utils.Pos, newFrom i
 	return pos, from, false
 }
 
-func findLoop(grid utils.Grid, pos utils.Pos, from int) (path set.Set[utils.Pos], ok bool) {
+func findLoop(grid utils.Matrix[uint8], pos utils.Pos, from int) (path set.Set[utils.Pos], ok bool) {
+	if !grid.IsValidPos(pos) {
+		return path, false
+	}
+
 	path = make(set.Set[utils.Pos])
-	var tile, found = grid[pos]
-	if !found || tile == EMPTY {
+
+	if tile := grid[pos.Y][pos.X]; tile == EMPTY {
 		return path, false
 	}
 
 	path.Add(pos)
 	for {
+		var found bool
 		pos, from, found = step(grid, pos, from)
 		if !found {
 			return path, false
 		}
 		path.Add(pos)
-		tile, _ = grid[pos]
-		if tile == START {
+
+		if tile := grid[pos.Y][pos.X]; tile == START {
 			return path, true
 		}
 	}
 }
 
-func findStart(grid utils.Grid) (pos utils.Pos) {
-	for pos, tile := range grid {
-		if tile == START {
-			return pos
+func findStart(grid utils.Matrix[uint8]) utils.Pos {
+	for y, l := range grid {
+		for x, c := range l {
+			if c == START {
+				return utils.Pos{X: x, Y: y}
+			}
 		}
 	}
 	panic("unreachable")
@@ -112,7 +119,7 @@ func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
-	var grid = utils.BuildGrid(lines)
+	var grid = utils.BuildMatrixChar(lines)
 	var start = findStart(grid)
 
 	var neighbors = []utils.Pos{
@@ -140,7 +147,7 @@ func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
-	var grid = utils.BuildGrid(lines)
+	var grid = utils.BuildMatrixChar(lines)
 	var start = findStart(grid)
 
 	var neighbors = []utils.Pos{
@@ -161,18 +168,16 @@ func Part2(input string) int {
 	}
 
 	var res int
-	minX, maxX, minY, maxY := utils.GridBounds(grid)
-	for y := minY; y <= maxY; y++ {
+	for y := 0; y <= grid.MaxY(); y++ {
 		var last uint8
 		var cpt = 0
-		for x := maxX; x >= minX; x-- {
-			p := utils.Pos{X: x, Y: y}
-			if !loopSet.Contains(p) {
+		for x := grid.MaxX(); x >= 0; x-- {
+			if !loopSet.Contains(utils.Pos{x, y}) {
 				if cpt%2 == 1 {
 					res++
 				}
 			} else {
-				tile, _ := grid[p]
+				tile := grid[y][x]
 				if last == UPPER_RIGHT && tile == UPPER_LEFT {
 					cpt++
 				} else if last == UPPER_RIGHT && tile == LOWER_LEFT {

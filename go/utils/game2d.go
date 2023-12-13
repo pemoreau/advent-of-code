@@ -78,6 +78,10 @@ func (m Matrix[any]) MaxX() int {
 	return len(m[0]) - 1
 }
 
+func (m Matrix[any]) IsValidPos(pos Pos) bool {
+	return pos.Y >= 0 && pos.Y < len(m) && pos.X >= 0 && pos.X < len(m[pos.Y])
+}
+
 func (m Matrix[any]) String() string {
 	var sb strings.Builder
 	for _, l := range m {

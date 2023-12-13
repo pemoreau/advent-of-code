@@ -13,7 +13,7 @@ var inputDay string
 
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := utils.BuildMatrix[int](lines)
+	m := utils.BuildMatrixInt[int](lines)
 	from := search('S', m)
 	to := search('E', m)
 	m[from.Y][from.X] = 'a'
@@ -30,7 +30,7 @@ func Part1(input string) int {
 
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := utils.BuildMatrix[int](lines)
+	m := utils.BuildMatrixInt[int](lines)
 
 	from := search('S', m)
 	to := search('E', m)

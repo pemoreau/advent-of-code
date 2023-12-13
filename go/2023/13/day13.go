@@ -11,12 +11,11 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func isVerticalMirror(g utils.Grid, x int) bool {
-	minX, maxX, minY, maxY := utils.GridBounds(g)
-	diff := min(maxX-(x+1), x-minX)
-	for y := minY; y <= maxY; y++ {
+func isVerticalMirror(m utils.Matrix[uint8], x int) bool {
+	diff := min(m.MaxX()-(x+1), x)
+	for y := 0; y <= m.MaxY(); y++ {
 		for i := 0; i <= diff; i++ {
-			if g[utils.Pos{X: x + 1 + i, Y: y}] != g[utils.Pos{X: x - i, Y: y}] {
+			if m[y][x+1+i] != m[y][x-i] {
 				return false
 			}
 		}
@@ -24,22 +23,20 @@ func isVerticalMirror(g utils.Grid, x int) bool {
 	return true
 }
 
-func findVerticalMirror(g utils.Grid, old int) int {
-	minX, maxX, _, _ := utils.GridBounds(g)
-	for x := minX; x <= maxX-1; x++ {
-		if x+1 != old && isVerticalMirror(g, x) {
+func findVerticalMirror(m utils.Matrix[uint8], old int) int {
+	for x := 0; x <= m.MaxX()-1; x++ {
+		if x+1 != old && isVerticalMirror(m, x) {
 			return x + 1
 		}
 	}
 	return 0
 }
 
-func isHorizontalMirror(g utils.Grid, y int) bool {
-	minX, maxX, minY, maxY := utils.GridBounds(g)
-	diff := min(maxY-(y+1), y-minY)
-	for x := minX; x <= maxX; x++ {
+func isHorizontalMirror(m utils.Matrix[uint8], y int) bool {
+	diff := min(m.MaxY()-(y+1), y)
+	for x := 0; x <= m.MaxX(); x++ {
 		for i := 0; i <= diff; i++ {
-			if g[utils.Pos{Y: y + 1 + i, X: x}] != g[utils.Pos{Y: y - i, X: x}] {
+			if m[y+1+i][x] != m[y-i][x] {
 				return false
 			}
 		}
@@ -47,92 +44,77 @@ func isHorizontalMirror(g utils.Grid, y int) bool {
 	return true
 }
 
-func findHorizontalMirror(g utils.Grid, old int) int {
-	_, _, minY, maxY := utils.GridBounds(g)
-	for y := minY; y <= maxY-1; y++ {
-		if y+1 != old && isHorizontalMirror(g, y) {
+func findHorizontalMirror(m utils.Matrix[uint8], old int) int {
+	for y := 0; y <= m.MaxY()-1; y++ {
+		if y+1 != old && isHorizontalMirror(m, y) {
 			return y + 1
 		}
 	}
 	return 0
 }
 
-func findSmudge(g utils.Grid) int {
+func computeScore(m utils.Matrix[uint8]) int {
+	var h = findHorizontalMirror(m, -1)
+	var v = findVerticalMirror(m, -1)
+	return v + (h * 100)
+}
+
+func trySwap(m utils.Matrix[uint8], x, y int, c uint8, h, v int) int {
+	old := m[y][x]
+	m[y][x] = c
+	if nh := findHorizontalMirror(m, h); nh > 0 {
+		m[y][x] = old
+		return 100 * nh
+	} else if nv := findVerticalMirror(m, v); nv > 0 {
+		m[y][x] = old
+		return nv
+	}
+	m[y][x] = old
+	return 0
+}
+
+func findSmudge(g utils.Matrix[uint8]) int {
 	h := findHorizontalMirror(g, -1)
 	v := findVerticalMirror(g, -1)
-	//fmt.Println("previous h v", h, v)
 
-	minX, maxX, minY, maxY := utils.GridBounds(g)
-	for y := minY; y <= maxY; y++ {
-		for x := minX; x <= maxX; x++ {
-			var res int
-			if g[utils.Pos{X: x, Y: y}] == '#' {
-				g[utils.Pos{X: x, Y: y}] = '.'
-				nh := findHorizontalMirror(g, h)
-				nv := findVerticalMirror(g, v)
-				if nh > 0 && nh != h {
-					res += 100 * nh
+	for y := 0; y <= g.MaxY(); y++ {
+		for x := 0; x <= g.MaxX(); x++ {
+			if g[y][x] == '#' {
+				if r := trySwap(g, x, y, '.', h, v); r > 0 {
+					return r
 				}
-				if nv > 0 && nv != v {
-					res += nv
-				}
-				g[utils.Pos{X: x, Y: y}] = '#'
-				if res > 0 {
-					//fmt.Printf("smugle at %d,%d --> nh=%d nv=%d --> res=%d\n", x, y, nh, nv, res)
-					return res
-				}
-			} else if g[utils.Pos{X: x, Y: y}] == '.' {
-				g[utils.Pos{X: x, Y: y}] = '#'
-				nh := findHorizontalMirror(g, h)
-				nv := findVerticalMirror(g, v)
-				if nh > 0 && nh != h {
-					res += 100 * nh
-				}
-				if nv > 0 && nv != v {
-					res += nv
-				}
-				g[utils.Pos{X: x, Y: y}] = '.'
-				if res > 0 {
-					//fmt.Printf("smugle at %d,%d --> nh=%d nv=%d --> res=%d\n", x, y, nh, nv, res)
-					return res
+			} else if g[y][x] == '.' {
+				if r := trySwap(g, x, y, '#', h, v); r > 0 {
+					return r
 				}
 			} else {
 				panic("invalid char")
 			}
 		}
 	}
-	//fmt.Println("No smugle found")
-	return 0
+	panic("no smudge found")
+}
+
+func solve(input string, score func(matrix utils.Matrix[uint8]) int) int {
+	input = strings.TrimSuffix(input, "\n")
+	parts := strings.Split(input, "\n\n")
+
+	var res int
+	for _, p := range parts {
+		lines := strings.Split(p, "\n")
+		m := utils.BuildMatrixChar(lines)
+		res += score(m)
+	}
+
+	return res
 }
 
 func Part1(input string) int {
-	input = strings.TrimSuffix(input, "\n")
-	parts := strings.Split(input, "\n\n")
-
-	var res int
-	for _, p := range parts {
-		lines := strings.Split(p, "\n")
-		grid := utils.BuildGrid(lines)
-		h := findHorizontalMirror(grid, -1)
-		v := findVerticalMirror(grid, -1)
-		res += v + (h * 100)
-	}
-
-	return res
+	return solve(input, computeScore)
 }
 
 func Part2(input string) int {
-	input = strings.TrimSuffix(input, "\n")
-	parts := strings.Split(input, "\n\n")
-
-	var res int
-	for _, p := range parts {
-		lines := strings.Split(p, "\n")
-		grid := utils.BuildGrid(lines)
-		s := findSmudge(grid)
-		res += s
-	}
-	return res
+	return solve(input, findSmudge)
 }
 
 func main() {

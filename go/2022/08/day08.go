@@ -18,7 +18,7 @@ type maxHeight struct {
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	matrix := utils.BuildMatrix[int](lines)
+	matrix := utils.BuildMatrixInt[int](lines)
 
 	maxY := len(matrix)
 	maxX := len(matrix[0])
@@ -68,7 +68,7 @@ func Part1(input string) int {
 func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	matrix := utils.BuildMatrix[int](lines)
+	matrix := utils.BuildMatrixInt[int](lines)
 
 	res := 0
 	maxY := len(matrix)

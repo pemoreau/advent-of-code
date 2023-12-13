@@ -27,15 +27,32 @@ func ManhattanDistance(from, to Pos) int {
 
 // ---------------------
 // Matrix Representation
+// m[line][column]
 // ---------------------
 
 type Matrix[T any] [][]T
 
-func BuildMatrix[T constraints.Integer](lines []string) Matrix[T] {
-	return BuildConvertMatrix[T](lines, func(c int32) T { return T(c) })
+func BuildMatrixInt[T constraints.Integer](lines []string) Matrix[T] {
+	return BuildMatrixFunc[T](lines, func(c int32) T { return T(c) })
 }
 
-func BuildConvertMatrix[T constraints.Integer](lines []string, convert func(c int32) T) Matrix[T] {
+func BuildMatrixChar(lines []string) Matrix[uint8] {
+	return BuildMatrixFunc[uint8](lines, func(c int32) uint8 { return uint8(c) })
+}
+
+//func BuildConvertMatrix[T constraints.Integer](lines []string, convert func(c int32) T) Matrix[T] {
+//	m := make([][]T, len(lines))
+//	for j, l := range lines {
+//		l = strings.TrimSpace(l)
+//		m[j] = make([]T, len(l))
+//		for i, c := range l {
+//			m[j][i] = convert(c)
+//		}
+//	}
+//	return m
+//}
+
+func BuildMatrixFunc[T any](lines []string, convert func(c int32) T) Matrix[T] {
 	m := make([][]T, len(lines))
 	for j, l := range lines {
 		l = strings.TrimSpace(l)
@@ -45,6 +62,31 @@ func BuildConvertMatrix[T constraints.Integer](lines []string, convert func(c in
 		}
 	}
 	return m
+}
+
+func (m Matrix[any]) MaxY() int {
+	if len(m) == 0 {
+		return 0
+	}
+	return len(m) - 1
+}
+
+func (m Matrix[any]) MaxX() int {
+	if len(m) == 0 {
+		return 0
+	}
+	return len(m[0]) - 1
+}
+
+func (m Matrix[any]) String() string {
+	var sb strings.Builder
+	for _, l := range m {
+		for _, c := range l {
+			sb.WriteString(fmt.Sprintf("%c", c))
+		}
+		sb.WriteString("\n")
+	}
+	return sb.String()
 }
 
 // ---------------------------

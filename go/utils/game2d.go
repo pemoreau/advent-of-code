@@ -84,11 +84,13 @@ func (m Matrix[any]) IsValidPos(pos Pos) bool {
 
 func (m Matrix[any]) String() string {
 	var sb strings.Builder
-	for _, l := range m {
+	for i, l := range m {
 		for _, c := range l {
 			sb.WriteString(fmt.Sprintf("%c", c))
 		}
-		sb.WriteString("\n")
+		if i < len(m)-1 {
+			sb.WriteString("\n")
+		}
 	}
 	return sb.String()
 }

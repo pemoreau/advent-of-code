@@ -11,58 +11,153 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func dropColumn(m utils.Matrix[uint8], x int) int {
-	var last int
+func totalLoad(m utils.Matrix[uint8]) int {
 	var res int
 	for y := 0; y <= m.MaxY(); y++ {
+		for x := 0; x <= m.MaxX(); x++ {
+			if m[y][x] == 'O' {
+				res += m.MaxY() - y + 1
+			}
+		}
+	}
+	return res
+}
+
+const (
+	NORTH = 1
+	SOUTH = -1
+)
+
+func moveColumn(m utils.Matrix[uint8], x int, dir int) {
+	var start, end int
+	if dir == NORTH {
+		start = 0
+		end = m.MaxY() + dir
+	} else if dir == SOUTH {
+		start = m.MaxY()
+		end = 0 + dir
+	}
+	var last = start
+	for y := start; y != end; y = y + dir {
 		v := m[y][x]
 		if v == '.' {
 			// do nothing
 		} else if v == '#' {
-			last = y + 1
-			fmt.Printf("x=%d, y=%d, v=%c set last=%d\n", x, y, v, last)
+			last = y + dir
 		} else if v == 'O' {
-			if y > last {
+			if (dir == NORTH && y > last) || (dir == SOUTH && y < last) {
 				m[y][x] = '.'
 				m[last][x] = 'O'
-				fmt.Printf("x=%d, y=%d, v=%c drop last=%d new last=%d\n", x, y, v, last, last+1)
-				last++
+				last = last + dir
 			} else {
-				last++
-				fmt.Printf("x=%d, y=%d, v=%c do not move increment last=%d\n", x, y, v, last)
+				last = last + dir
 			}
-			fmt.Println("add to res", last, m.MaxY()-last+2)
-			res += m.MaxY() - last + 2
-
 		} else {
 			panic("unknown char")
 		}
 	}
-	fmt.Println("----------")
+}
 
-	return res
+const (
+	WEST = 1
+	EAST = -1
+)
+
+func moveRow(m utils.Matrix[uint8], y int, dir int) {
+	var start, end int
+	if dir == WEST {
+		start = 0
+		end = m.MaxX() + dir
+	} else if dir == EAST {
+		start = m.MaxX()
+		end = 0 + dir
+	}
+	var last = start
+	for x := start; x != end; x = x + dir {
+		v := m[y][x]
+		if v == '.' {
+			// do nothing
+		} else if v == '#' {
+			last = x + dir
+		} else if v == 'O' {
+			if (dir == WEST && x > last) || (dir == EAST && x < last) {
+				m[y][x] = '.'
+				m[y][last] = 'O'
+				last = last + dir
+			} else {
+				last = last + dir
+			}
+		} else {
+			panic("unknown char")
+		}
+	}
+}
+
+func moveNorth(m utils.Matrix[uint8]) {
+	for x := 0; x <= m.MaxX(); x++ {
+		moveColumn(m, x, NORTH)
+	}
+}
+func moveSouth(m utils.Matrix[uint8]) {
+	for x := 0; x <= m.MaxX(); x++ {
+		moveColumn(m, x, SOUTH)
+	}
+}
+func moveWest(m utils.Matrix[uint8]) {
+	for y := 0; y <= m.MaxY(); y++ {
+		moveRow(m, y, WEST)
+	}
+}
+func moveEast(m utils.Matrix[uint8]) {
+	for y := 0; y <= m.MaxY(); y++ {
+		moveRow(m, y, EAST)
+	}
+}
+
+func cycle(m utils.Matrix[uint8]) {
+	moveNorth(m)
+	moveWest(m)
+	moveSouth(m)
+	moveEast(m)
 }
 
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 	m := utils.BuildMatrixChar(lines)
-	fmt.Println(m)
-	fmt.Println()
-	var res int
-	for x := 0; x <= m.MaxX(); x++ {
-		res += dropColumn(m, x)
-		fmt.Println(m)
+	moveNorth(m)
+	return totalLoad(m)
+}
+
+func repeatWithCycle(m utils.Matrix[uint8], n int) utils.Matrix[uint8] {
+	var valueToIndex = make(map[string]int)
+	var indexToValue []string
+	for i := 0; i < n; i++ {
+		cycle(m)
+		s := m.String() // use as a key
+		indexToValue = append(indexToValue, s)
+		if _, ok := valueToIndex[s]; ok {
+			// cycle found
+			indexForN := valueToIndex[s] + (n-1-i)%(i-valueToIndex[s])
+			s2 := indexToValue[indexForN]
+			m2 := utils.BuildMatrixChar(strings.Split(s2, "\n"))
+			return m2
+		} else {
+			valueToIndex[s] = i
+		}
 	}
-	return res
+	return m
 }
 
 func Part2(input string) int {
-	return 0
+	input = strings.TrimSuffix(input, "\n")
+	lines := strings.Split(input, "\n")
+	m := utils.BuildMatrixChar(lines)
+	return totalLoad(repeatWithCycle(m, 1000000000))
 }
 
 func main() {
-	fmt.Println("--2023 day 13 solution--")
+	fmt.Println("--2023 day 14 solution--")
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

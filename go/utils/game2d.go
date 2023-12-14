@@ -40,6 +40,13 @@ func BuildMatrixChar(lines []string) Matrix[uint8] {
 	return BuildMatrixFunc[uint8](lines, func(c int32) uint8 { return uint8(c) })
 }
 
+func BuildMatrixCharFromString(s string) Matrix[uint8] {
+	s = strings.TrimSpace(s)
+	s = strings.TrimSuffix(s, "\n")
+	lines := strings.Split(s, "\n")
+	return BuildMatrixChar(lines)
+}
+
 //func BuildConvertMatrix[T constraints.Integer](lines []string, convert func(c int32) T) Matrix[T] {
 //	m := make([][]T, len(lines))
 //	for j, l := range lines {
@@ -80,6 +87,45 @@ func (m Matrix[any]) MaxX() int {
 
 func (m Matrix[any]) IsValidPos(pos Pos) bool {
 	return pos.Y >= 0 && pos.Y < len(m) && pos.X >= 0 && pos.X < len(m[pos.Y])
+}
+
+func (m Matrix[any]) RotateLeft() Matrix[any] {
+	var m2 = make([][]any, len(m[0]))
+	for i := range m2 {
+		m2[i] = make([]any, len(m))
+	}
+	for j, l := range m {
+		for i, c := range l {
+			m2[m.MaxX()-i][j] = c
+		}
+	}
+	return m2
+}
+
+func (m Matrix[any]) RotateRight() Matrix[any] {
+	var m2 = make([][]any, len(m[0]))
+	for i := range m2 {
+		m2[i] = make([]any, len(m))
+	}
+	for j, l := range m {
+		for i, c := range l {
+			m2[i][m.MaxY()-j] = c
+		}
+	}
+	return m2
+}
+
+func (m Matrix[any]) Transpose() Matrix[any] {
+	var m2 = make([][]any, len(m[0]))
+	for i := range m2 {
+		m2[i] = make([]any, len(m))
+	}
+	for j, l := range m {
+		for i, c := range l {
+			m2[i][j] = c
+		}
+	}
+	return m2
 }
 
 func (m Matrix[any]) String() string {

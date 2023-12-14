@@ -22,3 +22,8 @@ go/initaoc/initaoc
 #OSX
 **/.DS_Store
 
+#C
+**/*.out
+**/*.o
+**/main
+

@@ -28,36 +28,31 @@ func ManhattanDistance(from, to Pos) int {
 // ---------------------
 // Matrix Representation
 // m[line][column]
+// 0 1 2
+// 1
+// 2
 // ---------------------
 
 type Matrix[T any] [][]T
+type MatrixChar = Matrix[uint8]
 
-func BuildMatrixInt[T constraints.Integer](lines []string) Matrix[T] {
-	return BuildMatrixFunc[T](lines, func(c int32) T { return T(c) })
+func BuildMatrixChar(lines []string) MatrixChar {
+	m := make([][]uint8, len(lines))
+	for j, l := range lines {
+		m[j] = []uint8(l)
+	}
+	return m
 }
 
-func BuildMatrixChar(lines []string) Matrix[uint8] {
-	return BuildMatrixFunc[uint8](lines, func(c int32) uint8 { return uint8(c) })
-}
-
-func BuildMatrixCharFromString(s string) Matrix[uint8] {
+func BuildMatrixCharFromString(s string) MatrixChar {
 	s = strings.TrimSpace(s)
-	s = strings.TrimSuffix(s, "\n")
 	lines := strings.Split(s, "\n")
 	return BuildMatrixChar(lines)
 }
 
-//func BuildConvertMatrix[T constraints.Integer](lines []string, convert func(c int32) T) Matrix[T] {
-//	m := make([][]T, len(lines))
-//	for j, l := range lines {
-//		l = strings.TrimSpace(l)
-//		m[j] = make([]T, len(l))
-//		for i, c := range l {
-//			m[j][i] = convert(c)
-//		}
-//	}
-//	return m
-//}
+func BuildMatrixInt[T constraints.Integer](lines []string) Matrix[T] {
+	return BuildMatrixFunc[T](lines, func(c int32) T { return T(c) })
+}
 
 func BuildMatrixFunc[T any](lines []string, convert func(c int32) T) Matrix[T] {
 	m := make([][]T, len(lines))
@@ -71,18 +66,26 @@ func BuildMatrixFunc[T any](lines []string, convert func(c int32) T) Matrix[T] {
 	return m
 }
 
-func (m Matrix[any]) MaxY() int {
+func (m Matrix[any]) LenY() int {
 	if len(m) == 0 {
 		return 0
 	}
-	return len(m) - 1
+	return len(m)
+}
+
+func (m Matrix[any]) LenX() int {
+	if len(m) == 0 {
+		return 0
+	}
+	return len(m[0])
+}
+
+func (m Matrix[any]) MaxY() int {
+	return m.LenY() - 1
 }
 
 func (m Matrix[any]) MaxX() int {
-	if len(m) == 0 {
-		return 0
-	}
-	return len(m[0]) - 1
+	return m.LenX() - 1
 }
 
 func (m Matrix[any]) IsValidPos(pos Pos) bool {

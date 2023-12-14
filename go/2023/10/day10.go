@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
 	"github.com/pemoreau/advent-of-code/go/utils/set"
-	"strings"
 	"time"
 )
 
@@ -27,7 +26,7 @@ const (
 	WEST
 )
 
-func step(grid utils.Matrix[uint8], pos utils.Pos, from int) (newPos utils.Pos, newFrom int, ok bool) {
+func step(grid utils.MatrixChar, pos utils.Pos, from int) (newPos utils.Pos, newFrom int, ok bool) {
 	if !grid.IsValidPos(pos) {
 		return pos, from, false
 	}
@@ -78,7 +77,7 @@ func step(grid utils.Matrix[uint8], pos utils.Pos, from int) (newPos utils.Pos, 
 	return pos, from, false
 }
 
-func findLoop(grid utils.Matrix[uint8], pos utils.Pos, from int) (path set.Set[utils.Pos], ok bool) {
+func findLoop(grid utils.MatrixChar, pos utils.Pos, from int) (path set.Set[utils.Pos], ok bool) {
 	if !grid.IsValidPos(pos) {
 		return path, false
 	}
@@ -104,7 +103,7 @@ func findLoop(grid utils.Matrix[uint8], pos utils.Pos, from int) (path set.Set[u
 	}
 }
 
-func findStart(grid utils.Matrix[uint8]) utils.Pos {
+func findStart(grid utils.MatrixChar) utils.Pos {
 	for y, l := range grid {
 		for x, c := range l {
 			if c == START {
@@ -116,10 +115,7 @@ func findStart(grid utils.Matrix[uint8]) utils.Pos {
 }
 
 func Part1(input string) int {
-	input = strings.TrimSuffix(input, "\n")
-	lines := strings.Split(input, "\n")
-
-	var grid = utils.BuildMatrixChar(lines)
+	var grid = utils.BuildMatrixCharFromString(input)
 	var start = findStart(grid)
 
 	var neighbors = []utils.Pos{
@@ -144,10 +140,7 @@ func Part1(input string) int {
 }
 
 func Part2(input string) int {
-	input = strings.TrimSuffix(input, "\n")
-	lines := strings.Split(input, "\n")
-
-	var grid = utils.BuildMatrixChar(lines)
+	var grid = utils.BuildMatrixCharFromString(input)
 	var start = findStart(grid)
 
 	var neighbors = []utils.Pos{

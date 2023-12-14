@@ -10,10 +10,10 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func moveNorth(m utils.Matrix[uint8]) {
-	for x := 0; x <= m.MaxX(); x++ {
+func moveNorth(m utils.MatrixChar) {
+	for x := 0; x < m.LenX(); x++ {
 		var last int
-		for y := 0; y <= m.MaxY(); y++ {
+		for y := 0; y < m.LenY(); y++ {
 			switch m[y][x] {
 			case '.':
 				// do nothing
@@ -30,7 +30,7 @@ func moveNorth(m utils.Matrix[uint8]) {
 	}
 }
 
-func totalLoad(m utils.Matrix[uint8]) int {
+func totalLoad(m utils.MatrixChar) int {
 	var res int
 	for y, l := range m {
 		for _, c := range l {
@@ -42,7 +42,7 @@ func totalLoad(m utils.Matrix[uint8]) int {
 	return res
 }
 
-func cycle(m utils.Matrix[uint8]) utils.Matrix[uint8] {
+func cycle(m utils.MatrixChar) utils.MatrixChar {
 	moveNorth(m)
 	m = m.RotateRight()
 	moveNorth(m)
@@ -65,16 +65,16 @@ func Part1(input string) int {
 	return totalLoad(m)
 }
 
-func repeatWithCycle(m utils.Matrix[uint8], n int) utils.Matrix[uint8] {
+func repeatWithCycle(m utils.MatrixChar, n int) utils.MatrixChar {
 	var valueToIndex = make(map[string]int)
 	var indexToValue []string
 	for i := 0; i < n; i++ {
 		m = cycle(m)
 		s := m.String() // use as a key
 		indexToValue = append(indexToValue, s)
-		if _, ok := valueToIndex[s]; ok {
+		if index, ok := valueToIndex[s]; ok {
 			// cycle found
-			indexForN := valueToIndex[s] + (n-1-i)%(i-valueToIndex[s])
+			indexForN := index + (n-1-i)%(i-index)
 			s2 := indexToValue[indexForN]
 			m2 := utils.BuildMatrixCharFromString(s2)
 			return m2
@@ -106,7 +106,7 @@ func main() {
 //	SOUTH = -1
 //)
 //
-//func moveColumn(m utils.Matrix[uint8], x int, dir int) {
+//func moveColumn(m utils.MatrixChar, x int, dir int) {
 //	var start, end int
 //	if dir == NORTH {
 //		start = 0
@@ -141,7 +141,7 @@ func main() {
 //	EAST = -1
 //)
 //
-//func moveRow(m utils.Matrix[uint8], y int, dir int) {
+//func moveRow(m utils.MatrixChar, y int, dir int) {
 //	var start, end int
 //	if dir == WEST {
 //		start = 0
@@ -171,17 +171,17 @@ func main() {
 //	}
 //}
 //
-//func moveSouth(m utils.Matrix[uint8]) {
+//func moveSouth(m utils.MatrixChar) {
 //	for x := 0; x <= m.MaxX(); x++ {
 //		moveColumn(m, x, SOUTH)
 //	}
 //}
-//func moveWest(m utils.Matrix[uint8]) {
+//func moveWest(m utils.MatrixChar) {
 //	for y := 0; y <= m.MaxY(); y++ {
 //		moveRow(m, y, WEST)
 //	}
 //}
-//func moveEast(m utils.Matrix[uint8]) {
+//func moveEast(m utils.MatrixChar) {
 //	for y := 0; y <= m.MaxY(); y++ {
 //		moveRow(m, y, EAST)
 //	}

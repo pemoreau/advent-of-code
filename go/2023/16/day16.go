@@ -12,23 +12,13 @@ import (
 var inputDay string
 
 const (
-	UP        = 1
-	RIGHT     = 2
-	DOWN      = 3
-	LEFT      = 4
-	UPDOWN    = 5
-	LEFTRIGHT = 6
+	UP = iota
+	RIGHT
+	DOWN
+	LEFT
+	UPDOWN
+	LEFTRIGHT
 )
-
-type state struct {
-	pos utils.Pos
-	dir int
-}
-
-func (s state) String() string {
-	var dirs = []string{"UP", "RIGHT", "DOWN", "LEFT"}
-	return fmt.Sprintf("pos: %v, dir: %s", s.pos, dirs[s.dir])
-}
 
 func nextDir(dir int, c uint8) int {
 	switch dir {
@@ -80,10 +70,15 @@ func nextDir(dir int, c uint8) int {
 	panic("invalid state")
 }
 
+type state struct {
+	pos utils.Pos
+	dir int
+}
+
 func solve(grid utils.MatrixChar, current state) int {
-	var energized = set.NewSet[utils.Pos]()
 	var todo []state
 	var visited = set.NewSet[state]()
+	var energized = set.NewSet[utils.Pos]()
 
 	todo = append(todo, current)
 	for len(todo) > 0 {
@@ -113,7 +108,6 @@ func solve(grid utils.MatrixChar, current state) int {
 			todo = append(todo, state{pos: utils.Pos{X: x + 1, Y: y}, dir: RIGHT})
 		}
 	}
-
 	return len(energized)
 }
 

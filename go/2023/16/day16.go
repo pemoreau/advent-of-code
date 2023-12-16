@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
 	"github.com/pemoreau/advent-of-code/go/utils/set"
-	"strings"
 	"time"
 )
 
@@ -13,10 +12,12 @@ import (
 var inputDay string
 
 const (
-	UP    = 0
-	RIGHT = 1
-	DOWN  = 2
-	LEFT  = 3
+	UP        = 1
+	RIGHT     = 2
+	DOWN      = 3
+	LEFT      = 4
+	UPDOWN    = 5
+	LEFTRIGHT = 6
 )
 
 type state struct {
@@ -29,103 +30,58 @@ func (s state) String() string {
 	return fmt.Sprintf("pos: %v, dir: %s", s.pos, dirs[s.dir])
 }
 
-func neighboors(g utils.Grid, s state) []state {
-	var res []state
-	var deltaDir = []utils.Pos{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
-
-	c, found := g[s.pos]
-
-	if !found {
-		return res
-	}
-
-	x := s.pos.X
-	y := s.pos.Y
-
-	if c == '.' {
-		newPos := utils.Pos{X: x + deltaDir[s.dir].X, Y: y + deltaDir[s.dir].Y}
-		res = append(res, state{pos: newPos, dir: s.dir})
-		return res
-	}
-	if c == '-' {
-		if s.dir == UP || s.dir == DOWN {
-			res = append(res, state{pos: utils.Pos{X: x - 1, Y: y}, dir: LEFT})
-			res = append(res, state{pos: utils.Pos{X: x + 1, Y: y}, dir: RIGHT})
-			return res
+func nextDir(dir int, c uint8) int {
+	switch dir {
+	case RIGHT:
+		switch c {
+		case '.', '-':
+			return RIGHT
+		case '|':
+			return UPDOWN
+		case '/':
+			return UP
+		case '\\':
+			return DOWN
 		}
-		if s.dir == LEFT {
-			res = append(res, state{pos: utils.Pos{X: x - 1, Y: y}, dir: LEFT})
-			return res
+	case LEFT:
+		switch c {
+		case '.', '-':
+			return LEFT
+		case '|':
+			return UPDOWN
+		case '/':
+			return DOWN
+		case '\\':
+			return UP
 		}
-		if s.dir == RIGHT {
-			res = append(res, state{pos: utils.Pos{X: x + 1, Y: y}, dir: RIGHT})
-			return res
+	case UP:
+		switch c {
+		case '.', '|':
+			return UP
+		case '-':
+			return LEFTRIGHT
+		case '/':
+			return RIGHT
+		case '\\':
+			return LEFT
 		}
-	}
-	if c == '|' {
-		if s.dir == LEFT || s.dir == RIGHT {
-			res = append(res, state{pos: utils.Pos{X: x, Y: y - 1}, dir: UP})
-			res = append(res, state{pos: utils.Pos{X: x, Y: y + 1}, dir: DOWN})
-			return res
-		}
-		if s.dir == UP {
-			res = append(res, state{pos: utils.Pos{X: x, Y: y - 1}, dir: UP})
-			return res
-		}
-		if s.dir == DOWN {
-			res = append(res, state{pos: utils.Pos{X: x, Y: y + 1}, dir: DOWN})
-			return res
-		}
-	}
-	if c == '/' {
-		if s.dir == UP {
-			res = append(res, state{pos: utils.Pos{X: x + 1, Y: y}, dir: RIGHT})
-			return res
-		}
-		if s.dir == RIGHT {
-			res = append(res, state{pos: utils.Pos{X: x, Y: y - 1}, dir: UP})
-			return res
-		}
-		if s.dir == DOWN {
-			res = append(res, state{pos: utils.Pos{X: x - 1, Y: y}, dir: LEFT})
-			return res
-		}
-		if s.dir == LEFT {
-			res = append(res, state{pos: utils.Pos{X: x, Y: y + 1}, dir: DOWN})
-			return res
+	case DOWN:
+		switch c {
+		case '.', '|':
+			return DOWN
+		case '-':
+			return LEFTRIGHT
+		case '/':
+			return LEFT
+		case '\\':
+			return RIGHT
 		}
 	}
-	if c == '\\' {
-		if s.dir == UP {
-			res = append(res, state{pos: utils.Pos{X: x - 1, Y: y}, dir: LEFT})
-			return res
-		}
-		if s.dir == RIGHT {
-			res = append(res, state{pos: utils.Pos{X: x, Y: y + 1}, dir: DOWN})
-			return res
-		}
-		if s.dir == DOWN {
-			res = append(res, state{pos: utils.Pos{X: x + 1, Y: y}, dir: RIGHT})
-			return res
-		}
-		if s.dir == LEFT {
-			res = append(res, state{pos: utils.Pos{X: x, Y: y - 1}, dir: UP})
-			return res
-		}
-	}
-	return res
-
+	panic("invalid state")
 }
 
-func solve(input string, current state) int {
-	input = strings.TrimSpace(input)
-	var lines = strings.Split(input, "\n")
-	var grid = utils.BuildGrid(lines)
-
-	var energized = utils.BuildGrid([]string{})
-
-	//var current = state{pos: utils.Pos{X: 0, Y: 0}, dir: RIGHT}
-
+func solve(grid utils.MatrixChar, current state) int {
+	var energized = set.NewSet[utils.Pos]()
 	var todo []state
 	var visited = set.NewSet[state]()
 
@@ -133,52 +89,50 @@ func solve(input string, current state) int {
 	for len(todo) > 0 {
 		var s = todo[0]
 		todo = todo[1:]
-		if visited.Contains(s) {
+		if visited.Contains(s) || !grid.IsValidPos(s.pos) {
 			continue
 		}
+		visited.Add(s)
+		energized.Add(s.pos)
 
-		if _, ok := grid[s.pos]; ok {
-			visited.Add(s)
-			energized[s.pos] = '#'
-		} else {
-			continue
-		}
-
-		//utils.DisplayMap(grid, ' ')
-		//fmt.Println(s)
-		//fmt.Println(todo)
-
-		for _, n := range neighboors(grid, s) {
-			todo = append(todo, n)
+		x, y := s.pos.X, s.pos.Y
+		switch nextDir(s.dir, grid[y][x]) {
+		case UP:
+			todo = append(todo, state{pos: utils.Pos{X: x, Y: y - 1}, dir: UP})
+		case RIGHT:
+			todo = append(todo, state{pos: utils.Pos{X: x + 1, Y: y}, dir: RIGHT})
+		case DOWN:
+			todo = append(todo, state{pos: utils.Pos{X: x, Y: y + 1}, dir: DOWN})
+		case LEFT:
+			todo = append(todo, state{pos: utils.Pos{X: x - 1, Y: y}, dir: LEFT})
+		case UPDOWN:
+			todo = append(todo, state{pos: utils.Pos{X: x, Y: y - 1}, dir: UP})
+			todo = append(todo, state{pos: utils.Pos{X: x, Y: y + 1}, dir: DOWN})
+		case LEFTRIGHT:
+			todo = append(todo, state{pos: utils.Pos{X: x - 1, Y: y}, dir: LEFT})
+			todo = append(todo, state{pos: utils.Pos{X: x + 1, Y: y}, dir: RIGHT})
 		}
 	}
 
-	//utils.DisplayMap(grid, ' ')
-	//utils.DisplayMap(energized, ' ')
-
-	var res int
-	res = len(energized)
-	return res
+	return len(energized)
 }
 
 func Part1(input string) int {
-	return solve(input, state{pos: utils.Pos{X: 0, Y: 0}, dir: RIGHT})
+	grid := utils.BuildMatrixCharFromString(input)
+	return solve(grid, state{pos: utils.Pos{X: 0, Y: 0}, dir: RIGHT})
 }
 
 func Part2(input string) int {
-	input = strings.TrimSpace(input)
-	var lines = strings.Split(input, "\n")
-	var grid = utils.BuildGrid(lines)
-	minX, maxX, minY, maxY := utils.GridBounds(grid)
+	grid := utils.BuildMatrixCharFromString(input)
 
 	var res int
-	for x := minX; x <= maxX; x++ {
-		res = max(res, solve(input, state{pos: utils.Pos{X: x, Y: minY}, dir: DOWN}))
-		res = max(res, solve(input, state{pos: utils.Pos{X: x, Y: maxY}, dir: UP}))
+	for x := 0; x <= grid.MaxX(); x++ {
+		res = max(res, solve(grid, state{pos: utils.Pos{X: x, Y: 0}, dir: DOWN}))
+		res = max(res, solve(grid, state{pos: utils.Pos{X: x, Y: grid.MaxY()}, dir: UP}))
 	}
-	for y := minY; y <= maxY; y++ {
-		res = max(res, solve(input, state{pos: utils.Pos{X: minX, Y: y}, dir: RIGHT}))
-		res = max(res, solve(input, state{pos: utils.Pos{X: maxX, Y: y}, dir: LEFT}))
+	for y := 0; y <= grid.LenY(); y++ {
+		res = max(res, solve(grid, state{pos: utils.Pos{X: 0, Y: y}, dir: RIGHT}))
+		res = max(res, solve(grid, state{pos: utils.Pos{X: grid.MaxX(), Y: y}, dir: LEFT}))
 	}
 
 	return res

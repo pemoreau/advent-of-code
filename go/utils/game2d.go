@@ -35,6 +35,7 @@ func ManhattanDistance(from, to Pos) int {
 
 type Matrix[T any] [][]T
 type MatrixChar = Matrix[uint8]
+type MatrixDigit = Matrix[uint8]
 
 func BuildMatrixChar(lines []string) MatrixChar {
 	m := make([][]uint8, len(lines))
@@ -48,6 +49,12 @@ func BuildMatrixCharFromString(s string) MatrixChar {
 	s = strings.TrimSpace(s)
 	lines := strings.Split(s, "\n")
 	return BuildMatrixChar(lines)
+}
+
+func BuildMatrixDigitFromString(s string) MatrixDigit {
+	s = strings.TrimSpace(s)
+	lines := strings.Split(s, "\n")
+	return BuildMatrixFunc(lines, func(c int32) uint8 { return uint8(c - '0') })
 }
 
 func BuildMatrixInt[T constraints.Integer](lines []string) Matrix[T] {

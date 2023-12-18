@@ -12,7 +12,24 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func Part1(input string) int {
+func parseLine1(line string) (uint8, int) {
+	d := line[0]
+	index := strings.Index(line[2:], " ")
+	dec := line[2 : index+2]
+	n, _ := strconv.Atoi(dec)
+	return d, n
+}
+
+func parseLine2(line string) (uint8, int) {
+	l := len(line)
+	d := line[l-2] // direction: last digit of line
+	hex := line[l-7 : l-2]
+	n, _ := strconv.ParseUint(hex, 16, 64)
+	var dirs = []uint8{'R', 'D', 'L', 'U'}
+	return dirs[d-'0'], int(n)
+}
+
+func solve(input string, parseLine func(string) (uint8, int)) int {
 	input = strings.TrimSpace(input)
 	lines := strings.Split(input, "\n")
 
@@ -20,16 +37,15 @@ func Part1(input string) int {
 	var polygon = []utils.Pos{{X: x, Y: y}}
 
 	for _, line := range lines {
-		parts := strings.Split(line, " ")
-		n, _ := strconv.Atoi(parts[1])
-		switch parts[0] {
-		case "U":
+		dir, n := parseLine(line)
+		switch dir {
+		case 'U':
 			y -= n
-		case "D":
+		case 'D':
 			y += n
-		case "L":
+		case 'L':
 			x -= n
-		case "R":
+		case 'R':
 			x += n
 		}
 		polygon = append(polygon, utils.Pos{X: x, Y: y})
@@ -37,32 +53,12 @@ func Part1(input string) int {
 	return utils.PolygonArea(polygon)
 }
 
+func Part1(input string) int {
+	return solve(input, parseLine1)
+}
+
 func Part2(input string) int {
-	input = strings.TrimSpace(input)
-	lines := strings.Split(input, "\n")
-
-	var x, y int
-	var polygon = []utils.Pos{{X: x, Y: y}}
-
-	for _, line := range lines {
-		parts := strings.Split(line, " ")
-		// direction: last digit of part[2]
-		d := parts[2][len(parts[2])-2]
-		hex := parts[2][2 : len(parts[2])-2]
-		n, _ := strconv.ParseUint(hex, 16, 64)
-		switch d {
-		case '3': //"U":
-			y -= int(n)
-		case '1': //"D":
-			y += int(n)
-		case '2': //"L":
-			x -= int(n)
-		case '0': //"R":
-			x += int(n)
-		}
-		polygon = append(polygon, utils.Pos{X: x, Y: y})
-	}
-	return utils.PolygonArea(polygon)
+	return solve(input, parseLine2)
 }
 
 func main() {

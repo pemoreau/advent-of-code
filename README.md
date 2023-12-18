@@ -41,7 +41,7 @@ Execution time on an MacBook Air M2
 | [day 15](./go/2023/15/day15.go) | ` 76 μs`     | ` 158 μs`   |
 | [day 16](./go/2023/16/day16.go) | ` 1.25 ms`   | ` 353 ms`   |
 | [day 17](./go/2023/17/day17.go) | ` 8.1 ms`    | ` 181 ms`   |
-| [day 18](./go/2023/18/day18.go) | ` 41 μs`     | ` 59 μs`  |
+| [day 18](./go/2023/18/day18.go) | ` 17 μs`     | ` 18 μs`    |
 | [day 19](./go/2023/19/day19.go) | ` 0.000 ms ` | ` 0.000 ms` |
 | [day 20](./go/2023/20/day20.go) | ` 0.000 ms`  | ` 0.000 ms` |
 | [day 21](./go/2023/21/day21.go) | ` 0.000 ms`  | ` 0.000 ms` |

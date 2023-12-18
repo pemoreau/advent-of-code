@@ -25,25 +25,33 @@ func ManhattanDistance(from, to Pos) int {
 	return absX + absY
 }
 
-func shoeslaceArea(polygon []Pos) int {
-	var area int
+func ShoeslaceFormulae(polygon []Pos) int {
+	var sum1, sum2 int
 	for i := 0; i < len(polygon)-1; i++ {
-		area += (polygon[i+1].X + polygon[i].X) * (polygon[i+1].Y - polygon[i].Y)
+		sum1 += polygon[i].X * polygon[i+1].Y
+		sum2 += polygon[i].Y * polygon[i+1].X
 	}
-	area += (polygon[0].X + polygon[len(polygon)-1].X) * (polygon[0].Y - polygon[len(polygon)-1].Y)
-	area = area / 2
-	return area
+	sum1 += polygon[len(polygon)-1].X * polygon[0].Y
+	sum2 += polygon[len(polygon)-1].Y * polygon[0].X
+	return Abs(sum1-sum2) / 2
 }
 
 func PolygonArea(polygon []Pos) int {
-	var boundary int
+	// Pick's theorem
+	// A = i + b/2 - 1
+	// where:
+	// - A is the area of the polygon,
+	// - i is the number of interior points with integer coordinates,
+	// - b is the number of boundary points with integer coordinates.
+	//
+	// So, i = A - b/2 + 1
+	var b int
 	for i := 0; i < len(polygon)-1; i++ {
-		boundary += ManhattanDistance(polygon[i], polygon[i+1])
+		b += ManhattanDistance(polygon[i], polygon[i+1])
 	}
-	boundary += ManhattanDistance(polygon[0], polygon[len(polygon)-1])
-
-	return shoeslaceArea(polygon) + boundary/2 + 1
-
+	b += ManhattanDistance(polygon[0], polygon[len(polygon)-1])
+	i := ShoeslaceFormulae(polygon) - b/2 + 1
+	return i + b
 }
 
 // ---------------------

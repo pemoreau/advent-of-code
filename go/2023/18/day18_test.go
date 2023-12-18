@@ -8,36 +8,37 @@ import (
 //go:embed input_test.txt
 var inputTest string
 
-//func TestPart1(t *testing.T) {
-//	result := Part1(inputTest)
-//	expected := 102
-//	if result != expected {
-//		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-//	}
-//}
-//
-//func TestPart2(t *testing.T) {
-//	result := Part2(inputTest)
-//	expected := 94
-//	if result != expected {
-//		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-//	}
-//}
-//func TestPart1Input(t *testing.T) {
-//	result := Part1(inputDay)
-//	expected := 1256
-//	if result != expected {
-//		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-//	}
-//}
-//
-//func TestPart2Input(t *testing.T) {
-//	result := Part2(inputDay)
-//	expected := 1382
-//	if result != expected {
-//		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-//	}
-//}
+func TestPart1(t *testing.T) {
+	result := Part1(inputTest)
+	expected := 62
+	if result != expected {
+		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+	}
+}
+
+func TestPart2(t *testing.T) {
+	result := Part2(inputTest)
+	expected := 952408144115
+	if result != expected {
+		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+	}
+}
+
+func TestPart1Input(t *testing.T) {
+	result := Part1(inputDay)
+	expected := 47045
+	if result != expected {
+		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+	}
+}
+
+func TestPart2Input(t *testing.T) {
+	result := Part2(inputDay)
+	expected := 147839570293376
+	if result != expected {
+		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+	}
+}
 
 func BenchmarkPart1(b *testing.B) {
 	for i := 0; i < b.N; i++ {

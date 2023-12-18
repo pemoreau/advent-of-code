@@ -25,6 +25,27 @@ func ManhattanDistance(from, to Pos) int {
 	return absX + absY
 }
 
+func shoeslaceArea(polygon []Pos) int {
+	var area int
+	for i := 0; i < len(polygon)-1; i++ {
+		area += (polygon[i+1].X + polygon[i].X) * (polygon[i+1].Y - polygon[i].Y)
+	}
+	area += (polygon[0].X + polygon[len(polygon)-1].X) * (polygon[0].Y - polygon[len(polygon)-1].Y)
+	area = area / 2
+	return area
+}
+
+func PolygonArea(polygon []Pos) int {
+	var boundary int
+	for i := 0; i < len(polygon)-1; i++ {
+		boundary += ManhattanDistance(polygon[i], polygon[i+1])
+	}
+	boundary += ManhattanDistance(polygon[0], polygon[len(polygon)-1])
+
+	return shoeslaceArea(polygon) + boundary/2 + 1
+
+}
+
 // ---------------------
 // Matrix Representation
 // m[line][column]

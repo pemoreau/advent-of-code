@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"time"
 )
@@ -71,14 +71,14 @@ func nextDir(dir int, c uint8) int {
 }
 
 type state struct {
-	pos utils.Pos
+	pos game2d.Pos
 	dir int
 }
 
-func solve(grid utils.MatrixChar, current state) int {
+func solve(grid game2d.MatrixChar, current state) int {
 	var todo []state
 	var visited = set.NewSet[state]()
-	var energized = set.NewSet[utils.Pos]()
+	var energized = set.NewSet[game2d.Pos]()
 
 	todo = append(todo, current)
 	for len(todo) > 0 {
@@ -93,40 +93,40 @@ func solve(grid utils.MatrixChar, current state) int {
 		x, y := s.pos.X, s.pos.Y
 		switch nextDir(s.dir, grid[y][x]) {
 		case UP:
-			todo = append(todo, state{pos: utils.Pos{X: x, Y: y - 1}, dir: UP})
+			todo = append(todo, state{pos: game2d.Pos{X: x, Y: y - 1}, dir: UP})
 		case RIGHT:
-			todo = append(todo, state{pos: utils.Pos{X: x + 1, Y: y}, dir: RIGHT})
+			todo = append(todo, state{pos: game2d.Pos{X: x + 1, Y: y}, dir: RIGHT})
 		case DOWN:
-			todo = append(todo, state{pos: utils.Pos{X: x, Y: y + 1}, dir: DOWN})
+			todo = append(todo, state{pos: game2d.Pos{X: x, Y: y + 1}, dir: DOWN})
 		case LEFT:
-			todo = append(todo, state{pos: utils.Pos{X: x - 1, Y: y}, dir: LEFT})
+			todo = append(todo, state{pos: game2d.Pos{X: x - 1, Y: y}, dir: LEFT})
 		case UPDOWN:
-			todo = append(todo, state{pos: utils.Pos{X: x, Y: y - 1}, dir: UP})
-			todo = append(todo, state{pos: utils.Pos{X: x, Y: y + 1}, dir: DOWN})
+			todo = append(todo, state{pos: game2d.Pos{X: x, Y: y - 1}, dir: UP})
+			todo = append(todo, state{pos: game2d.Pos{X: x, Y: y + 1}, dir: DOWN})
 		case LEFTRIGHT:
-			todo = append(todo, state{pos: utils.Pos{X: x - 1, Y: y}, dir: LEFT})
-			todo = append(todo, state{pos: utils.Pos{X: x + 1, Y: y}, dir: RIGHT})
+			todo = append(todo, state{pos: game2d.Pos{X: x - 1, Y: y}, dir: LEFT})
+			todo = append(todo, state{pos: game2d.Pos{X: x + 1, Y: y}, dir: RIGHT})
 		}
 	}
 	return len(energized)
 }
 
 func Part1(input string) int {
-	grid := utils.BuildMatrixCharFromString(input)
-	return solve(grid, state{pos: utils.Pos{X: 0, Y: 0}, dir: RIGHT})
+	grid := game2d.BuildMatrixCharFromString(input)
+	return solve(grid, state{pos: game2d.Pos{X: 0, Y: 0}, dir: RIGHT})
 }
 
 func Part2(input string) int {
-	grid := utils.BuildMatrixCharFromString(input)
+	grid := game2d.BuildMatrixCharFromString(input)
 
 	var res int
 	for x := 0; x <= grid.MaxX(); x++ {
-		res = max(res, solve(grid, state{pos: utils.Pos{X: x, Y: 0}, dir: DOWN}))
-		res = max(res, solve(grid, state{pos: utils.Pos{X: x, Y: grid.MaxY()}, dir: UP}))
+		res = max(res, solve(grid, state{pos: game2d.Pos{X: x, Y: 0}, dir: DOWN}))
+		res = max(res, solve(grid, state{pos: game2d.Pos{X: x, Y: grid.MaxY()}, dir: UP}))
 	}
 	for y := 0; y <= grid.LenY(); y++ {
-		res = max(res, solve(grid, state{pos: utils.Pos{X: 0, Y: y}, dir: RIGHT}))
-		res = max(res, solve(grid, state{pos: utils.Pos{X: grid.MaxX(), Y: y}, dir: LEFT}))
+		res = max(res, solve(grid, state{pos: game2d.Pos{X: 0, Y: y}, dir: RIGHT}))
+		res = max(res, solve(grid, state{pos: game2d.Pos{X: grid.MaxX(), Y: y}, dir: LEFT}))
 	}
 
 	return res

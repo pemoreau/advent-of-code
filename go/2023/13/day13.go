@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"strings"
 	"time"
 )
@@ -11,7 +11,7 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func isVerticalMirror(m utils.MatrixChar, x int) bool {
+func isVerticalMirror(m game2d.MatrixChar, x int) bool {
 	diff := min(m.MaxX()-(x+1), x)
 	for y := 0; y <= m.MaxY(); y++ {
 		for i := 0; i <= diff; i++ {
@@ -23,7 +23,7 @@ func isVerticalMirror(m utils.MatrixChar, x int) bool {
 	return true
 }
 
-func findVerticalMirror(m utils.MatrixChar, old int) int {
+func findVerticalMirror(m game2d.MatrixChar, old int) int {
 	for x := 0; x <= m.MaxX()-1; x++ {
 		if x+1 != old && isVerticalMirror(m, x) {
 			return x + 1
@@ -32,7 +32,7 @@ func findVerticalMirror(m utils.MatrixChar, old int) int {
 	return 0
 }
 
-func isHorizontalMirror(m utils.MatrixChar, y int) bool {
+func isHorizontalMirror(m game2d.MatrixChar, y int) bool {
 	diff := min(m.MaxY()-(y+1), y)
 	for x := 0; x <= m.MaxX(); x++ {
 		for i := 0; i <= diff; i++ {
@@ -44,7 +44,7 @@ func isHorizontalMirror(m utils.MatrixChar, y int) bool {
 	return true
 }
 
-func findHorizontalMirror(m utils.MatrixChar, old int) int {
+func findHorizontalMirror(m game2d.MatrixChar, old int) int {
 	for y := 0; y <= m.MaxY()-1; y++ {
 		if y+1 != old && isHorizontalMirror(m, y) {
 			return y + 1
@@ -53,13 +53,13 @@ func findHorizontalMirror(m utils.MatrixChar, old int) int {
 	return 0
 }
 
-func computeScore(m utils.MatrixChar) int {
+func computeScore(m game2d.MatrixChar) int {
 	var h = findHorizontalMirror(m, -1)
 	var v = findVerticalMirror(m, -1)
 	return v + (h * 100)
 }
 
-func trySwap(m utils.MatrixChar, x, y int, c uint8, h, v int) int {
+func trySwap(m game2d.MatrixChar, x, y int, c uint8, h, v int) int {
 	old := m[y][x]
 	m[y][x] = c
 	if nh := findHorizontalMirror(m, h); nh > 0 {
@@ -73,7 +73,7 @@ func trySwap(m utils.MatrixChar, x, y int, c uint8, h, v int) int {
 	return 0
 }
 
-func findSmudge(g utils.MatrixChar) int {
+func findSmudge(g game2d.MatrixChar) int {
 	h := findHorizontalMirror(g, -1)
 	v := findVerticalMirror(g, -1)
 
@@ -96,13 +96,13 @@ func findSmudge(g utils.MatrixChar) int {
 	panic("no smudge found")
 }
 
-func solve(input string, score func(matrix utils.MatrixChar) int) int {
+func solve(input string, score func(matrix game2d.MatrixChar) int) int {
 	input = strings.TrimSuffix(input, "\n")
 	parts := strings.Split(input, "\n\n")
 
 	var res int
 	for _, p := range parts {
-		m := utils.BuildMatrixCharFromString(p)
+		m := game2d.BuildMatrixCharFromString(p)
 		res += score(m)
 	}
 

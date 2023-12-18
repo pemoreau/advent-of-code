@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"time"
 )
@@ -26,7 +26,7 @@ const (
 	WEST
 )
 
-func step(grid utils.MatrixChar, pos utils.Pos, from int) (newPos utils.Pos, newFrom int, ok bool) {
+func step(grid game2d.MatrixChar, pos game2d.Pos, from int) (newPos game2d.Pos, newFrom int, ok bool) {
 	if !grid.IsValidPos(pos) {
 		return pos, from, false
 	}
@@ -39,50 +39,50 @@ func step(grid utils.MatrixChar, pos utils.Pos, from int) (newPos utils.Pos, new
 		return pos, from, true
 	case VERTICAL:
 		if from == NORTH {
-			return utils.Pos{X: pos.X, Y: pos.Y + 1}, from, true
+			return game2d.Pos{X: pos.X, Y: pos.Y + 1}, from, true
 		} else if from == SOUTH {
-			return utils.Pos{X: pos.X, Y: pos.Y - 1}, from, true
+			return game2d.Pos{X: pos.X, Y: pos.Y - 1}, from, true
 		}
 	case HORIZONTAL:
 		if from == EAST {
-			return utils.Pos{X: pos.X - 1, Y: pos.Y}, from, true
+			return game2d.Pos{X: pos.X - 1, Y: pos.Y}, from, true
 		} else if from == WEST {
-			return utils.Pos{X: pos.X + 1, Y: pos.Y}, from, true
+			return game2d.Pos{X: pos.X + 1, Y: pos.Y}, from, true
 		}
 	case UPPER_LEFT:
 		if from == SOUTH {
-			return utils.Pos{X: pos.X + 1, Y: pos.Y}, WEST, true
+			return game2d.Pos{X: pos.X + 1, Y: pos.Y}, WEST, true
 		} else if from == EAST {
-			return utils.Pos{X: pos.X, Y: pos.Y + 1}, NORTH, true
+			return game2d.Pos{X: pos.X, Y: pos.Y + 1}, NORTH, true
 		}
 	case UPPER_RIGHT:
 		if from == SOUTH {
-			return utils.Pos{X: pos.X - 1, Y: pos.Y}, EAST, true
+			return game2d.Pos{X: pos.X - 1, Y: pos.Y}, EAST, true
 		} else if from == WEST {
-			return utils.Pos{X: pos.X, Y: pos.Y + 1}, NORTH, true
+			return game2d.Pos{X: pos.X, Y: pos.Y + 1}, NORTH, true
 		}
 	case LOWER_LEFT:
 		if from == NORTH {
-			return utils.Pos{X: pos.X + 1, Y: pos.Y}, WEST, true
+			return game2d.Pos{X: pos.X + 1, Y: pos.Y}, WEST, true
 		} else if from == EAST {
-			return utils.Pos{X: pos.X, Y: pos.Y - 1}, SOUTH, true
+			return game2d.Pos{X: pos.X, Y: pos.Y - 1}, SOUTH, true
 		}
 	case LOWER_RIGHT:
 		if from == NORTH {
-			return utils.Pos{X: pos.X - 1, Y: pos.Y}, EAST, true
+			return game2d.Pos{X: pos.X - 1, Y: pos.Y}, EAST, true
 		} else if from == WEST {
-			return utils.Pos{X: pos.X, Y: pos.Y - 1}, SOUTH, true
+			return game2d.Pos{X: pos.X, Y: pos.Y - 1}, SOUTH, true
 		}
 	}
 	return pos, from, false
 }
 
-func findLoop(grid utils.MatrixChar, pos utils.Pos, from int) (path set.Set[utils.Pos], ok bool) {
+func findLoop(grid game2d.MatrixChar, pos game2d.Pos, from int) (path set.Set[game2d.Pos], ok bool) {
 	if !grid.IsValidPos(pos) {
 		return path, false
 	}
 
-	path = make(set.Set[utils.Pos])
+	path = make(set.Set[game2d.Pos])
 
 	if tile := grid[pos.Y][pos.X]; tile == EMPTY {
 		return path, false
@@ -103,11 +103,11 @@ func findLoop(grid utils.MatrixChar, pos utils.Pos, from int) (path set.Set[util
 	}
 }
 
-func findStart(grid utils.MatrixChar) utils.Pos {
+func findStart(grid game2d.MatrixChar) game2d.Pos {
 	for y, l := range grid {
 		for x, c := range l {
 			if c == START {
-				return utils.Pos{X: x, Y: y}
+				return game2d.Pos{X: x, Y: y}
 			}
 		}
 	}
@@ -115,10 +115,10 @@ func findStart(grid utils.MatrixChar) utils.Pos {
 }
 
 func Part1(input string) int {
-	var grid = utils.BuildMatrixCharFromString(input)
+	var grid = game2d.BuildMatrixCharFromString(input)
 	var start = findStart(grid)
 
-	var neighbors = []utils.Pos{
+	var neighbors = []game2d.Pos{
 		{start.X + 1, start.Y},
 		{start.X - 1, start.Y},
 		{start.X, start.Y - 1},
@@ -140,10 +140,10 @@ func Part1(input string) int {
 }
 
 func Part2(input string) int {
-	var grid = utils.BuildMatrixCharFromString(input)
+	var grid = game2d.BuildMatrixCharFromString(input)
 	var start = findStart(grid)
 
-	var neighbors = []utils.Pos{
+	var neighbors = []game2d.Pos{
 		{start.X + 1, start.Y},
 		{start.X - 1, start.Y},
 		{start.X, start.Y - 1},
@@ -151,7 +151,7 @@ func Part2(input string) int {
 	}
 	var froms = []int{WEST, EAST, SOUTH, NORTH}
 
-	var loopSet set.Set[utils.Pos]
+	var loopSet set.Set[game2d.Pos]
 	for i, n := range neighbors {
 		var found bool
 		loopSet, found = findLoop(grid, n, froms[i])
@@ -165,7 +165,7 @@ func Part2(input string) int {
 		var last uint8
 		var cpt = 0
 		for x := grid.MaxX(); x >= 0; x-- {
-			if !loopSet.Contains(utils.Pos{x, y}) {
+			if !loopSet.Contains(game2d.Pos{x, y}) {
 				if cpt%2 == 1 {
 					res++
 				}

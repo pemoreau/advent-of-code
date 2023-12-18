@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"math"
 	"strings"
 	"time"
@@ -16,8 +16,8 @@ type State struct {
 	directions []string
 }
 
-func step(g utils.Grid, s *State) (utils.Grid, int) {
-	project := map[utils.Pos][]utils.Pos{} // Pos -> []Pos who want to go there
+func step(g game2d.Grid, s *State) (game2d.Grid, int) {
+	project := map[game2d.Pos][]game2d.Pos{} // Pos -> []Pos who want to go there
 	for p := range g {
 		if g[p] != '#' {
 			continue
@@ -30,7 +30,7 @@ func step(g utils.Grid, s *State) (utils.Grid, int) {
 			}
 		}
 		if move {
-			explore := map[string][]utils.Pos{
+			explore := map[string][]game2d.Pos{
 				"N": {{p.X, p.Y - 1}, {p.X + 1, p.Y - 1}, {p.X - 1, p.Y - 1}},
 				"S": {{p.X, p.Y + 1}, {p.X + 1, p.Y + 1}, {p.X - 1, p.Y + 1}},
 				"W": {{p.X - 1, p.Y}, {p.X - 1, p.Y - 1}, {p.X - 1, p.Y + 1}},
@@ -55,7 +55,7 @@ func step(g utils.Grid, s *State) (utils.Grid, int) {
 	}
 
 	cpt := 0
-	newGrid := utils.Grid{}
+	newGrid := game2d.Grid{}
 	for p, ps := range project {
 		if len(ps) == 1 {
 			from := ps[0]
@@ -77,7 +77,7 @@ func step(g utils.Grid, s *State) (utils.Grid, int) {
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	grid := utils.BuildGrid(lines)
+	grid := game2d.BuildGrid(lines)
 	state := State{directions: []string{"N", "S", "W", "E"}}
 	cpt := 1
 	for i := 0; i < 10; i++ {
@@ -101,7 +101,7 @@ func Part1(input string) int {
 func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	grid := utils.BuildGrid(lines)
+	grid := game2d.BuildGrid(lines)
 	state := State{directions: []string{"N", "S", "W", "E"}}
 	round := 0
 	cpt := 1

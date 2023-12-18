@@ -1,4 +1,4 @@
-FLAGS = -Wall -W
+FLAGS = -Wall -W -O2
 
 all:main
 

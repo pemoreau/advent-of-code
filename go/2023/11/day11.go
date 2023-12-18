@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"strings"
 	"time"
 )
@@ -11,7 +11,7 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func virtualPos(pos utils.Pos, emptyLines []int, emptyColumns []int, factor int) utils.Pos {
+func virtualPos(pos game2d.Pos, emptyLines []int, emptyColumns []int, factor int) game2d.Pos {
 	var addX, addY int
 	for _, l := range emptyLines {
 		if l < pos.Y {
@@ -23,21 +23,21 @@ func virtualPos(pos utils.Pos, emptyLines []int, emptyColumns []int, factor int)
 			addX += factor - 1
 		}
 	}
-	return utils.Pos{X: pos.X + addX, Y: pos.Y + addY}
+	return game2d.Pos{X: pos.X + addX, Y: pos.Y + addY}
 }
 
 func solve(input string, factor int) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
-	var galaxies []utils.Pos
+	var galaxies []game2d.Pos
 	var emptyLines []int
 	var occupiedColumn []bool = make([]bool, len(lines[0]))
 	for j, l := range lines {
 		var emptyLine = true
 		for i, c := range l {
 			if c == '#' {
-				galaxies = append(galaxies, utils.Pos{X: i, Y: j})
+				galaxies = append(galaxies, game2d.Pos{X: i, Y: j})
 				emptyLine = false
 				occupiedColumn[i] = true
 			}
@@ -54,7 +54,7 @@ func solve(input string, factor int) int {
 		}
 	}
 
-	var expandedGalaxies = make([]utils.Pos, 0, len(galaxies))
+	var expandedGalaxies = make([]game2d.Pos, 0, len(galaxies))
 	for _, g := range galaxies {
 		expandedGalaxies = append(expandedGalaxies, virtualPos(g, emptyLines, emptyColumns, factor))
 	}
@@ -62,7 +62,7 @@ func solve(input string, factor int) int {
 	var res int
 	for i := 0; i < len(expandedGalaxies); i++ {
 		for j := i + 1; j < len(expandedGalaxies); j++ {
-			res += utils.ManhattanDistance(expandedGalaxies[i], expandedGalaxies[j])
+			res += game2d.ManhattanDistance(expandedGalaxies[i], expandedGalaxies[j])
 		}
 	}
 	return res

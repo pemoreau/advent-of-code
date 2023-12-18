@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"strings"
 	"time"
 )
@@ -18,7 +18,7 @@ type maxHeight struct {
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	matrix := utils.BuildMatrixInt[int](lines)
+	matrix := game2d.BuildMatrixInt[int](lines)
 
 	maxY := len(matrix)
 	maxX := len(matrix[0])
@@ -68,7 +68,7 @@ func Part1(input string) int {
 func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	matrix := utils.BuildMatrixInt[int](lines)
+	matrix := game2d.BuildMatrixInt[int](lines)
 
 	res := 0
 	maxY := len(matrix)

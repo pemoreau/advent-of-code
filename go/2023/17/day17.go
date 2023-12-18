@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"time"
 )
 
@@ -17,19 +18,19 @@ const (
 	LEFT
 )
 
-var deltaDir = []utils.Pos{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
+var deltaDir = []game2d.Pos{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
 
 type state struct {
-	pos utils.Pos
+	pos game2d.Pos
 	dir int
 }
 
-func neighboors(grid utils.MatrixDigit, s state, mini, maxi int) []state {
+func neighboors(grid game2d.MatrixDigit, s state, mini, maxi int) []state {
 	var res []state
 	dirs := [2]int{(s.dir + 1) % 4, (s.dir + 3) % 4}
 	for _, d := range dirs {
 		for i := mini; i <= maxi; i++ {
-			pos := utils.Pos{s.pos.X + i*deltaDir[d].X, s.pos.Y + i*deltaDir[d].Y}
+			pos := game2d.Pos{s.pos.X + i*deltaDir[d].X, s.pos.Y + i*deltaDir[d].Y}
 			if grid.IsValidPos(pos) {
 				res = append(res, state{pos, d})
 			} else {
@@ -40,7 +41,7 @@ func neighboors(grid utils.MatrixDigit, s state, mini, maxi int) []state {
 	return res
 }
 
-func cost(grid utils.MatrixDigit, from, to state) int {
+func cost(grid game2d.MatrixDigit, from, to state) int {
 	x1, y1 := from.pos.X, from.pos.Y
 	x2, y2 := to.pos.X, to.pos.Y
 	var res int
@@ -72,13 +73,13 @@ func cost(grid utils.MatrixDigit, from, to state) int {
 }
 
 func solve(input string, mini, maxi int) int {
-	grid := utils.BuildMatrixDigitFromString(input)
+	grid := game2d.BuildMatrixDigitFromString(input)
 
-	origin := utils.Pos{0, 0}
+	origin := game2d.Pos{0, 0}
 	starts := []state{{pos: origin, dir: UP}, {pos: origin, dir: RIGHT}}
-	exit := utils.Pos{grid.MaxX(), grid.MaxY()}
+	exit := game2d.Pos{grid.MaxX(), grid.MaxY()}
 
-	heuristicFunction := func(s state) int { return utils.ManhattanDistance(s.pos, exit) }
+	heuristicFunction := func(s state) int { return game2d.ManhattanDistance(s.pos, exit) }
 	goalFunction := func(s state) bool { return s.pos == exit }
 	neighboorsFunction := func(s state) []state { return neighboors(grid, s, mini, maxi) }
 	costFunction := func(from, to state) int { return cost(grid, from, to) }

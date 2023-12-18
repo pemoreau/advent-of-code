@@ -3,14 +3,14 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"time"
 )
 
 //go:embed input.txt
 var inputDay string
 
-func moveNorth(m utils.MatrixChar) {
+func moveNorth(m game2d.MatrixChar) {
 	for x := 0; x < m.LenX(); x++ {
 		var last int
 		for y := 0; y < m.LenY(); y++ {
@@ -30,7 +30,7 @@ func moveNorth(m utils.MatrixChar) {
 	}
 }
 
-func totalLoad(m utils.MatrixChar) int {
+func totalLoad(m game2d.MatrixChar) int {
 	var res int
 	for y, l := range m {
 		for _, c := range l {
@@ -42,7 +42,7 @@ func totalLoad(m utils.MatrixChar) int {
 	return res
 }
 
-func cycle(m utils.MatrixChar) utils.MatrixChar {
+func cycle(m game2d.MatrixChar) game2d.MatrixChar {
 	moveNorth(m)
 	m = m.RotateRight()
 	moveNorth(m)
@@ -60,12 +60,12 @@ func cycle(m utils.MatrixChar) utils.MatrixChar {
 }
 
 func Part1(input string) int {
-	m := utils.BuildMatrixCharFromString(input)
+	m := game2d.BuildMatrixCharFromString(input)
 	moveNorth(m)
 	return totalLoad(m)
 }
 
-func repeatWithCycle(m utils.MatrixChar, n int) utils.MatrixChar {
+func repeatWithCycle(m game2d.MatrixChar, n int) game2d.MatrixChar {
 	var valueToIndex = make(map[string]int)
 	var indexToValue []string
 	for i := 0; i < n; i++ {
@@ -76,7 +76,7 @@ func repeatWithCycle(m utils.MatrixChar, n int) utils.MatrixChar {
 			// cycle found
 			indexForN := index + (n-1-i)%(i-index)
 			s2 := indexToValue[indexForN]
-			m2 := utils.BuildMatrixCharFromString(s2)
+			m2 := game2d.BuildMatrixCharFromString(s2)
 			return m2
 		} else {
 			valueToIndex[s] = i
@@ -86,7 +86,7 @@ func repeatWithCycle(m utils.MatrixChar, n int) utils.MatrixChar {
 }
 
 func Part2(input string) int {
-	m := utils.BuildMatrixCharFromString(input)
+	m := game2d.BuildMatrixCharFromString(input)
 	return totalLoad(repeatWithCycle(m, 1000000000))
 }
 

@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"strings"
 	"time"
 )
@@ -67,7 +68,7 @@ func (b *Blizzard) step() *Blizzard {
 	return &newB
 }
 
-func (b *Blizzard) display(p utils.Pos) {
+func (b *Blizzard) display(p game2d.Pos) {
 	for j := 0; j < len(b[0]); j++ {
 		for i := 0; i < len(b[0][j]); i++ {
 			cpt := 0
@@ -104,7 +105,7 @@ func (b *Blizzard) display(p utils.Pos) {
 }
 
 type State struct {
-	pos  utils.Pos
+	pos  game2d.Pos
 	time int
 }
 
@@ -114,13 +115,13 @@ func (s State) String() string {
 
 func neighbors(s State, blizzards []Blizzard) []State {
 	i, j := s.pos.X, s.pos.Y
-	explore := []utils.Pos{{i, j}, {i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
+	explore := []game2d.Pos{{i, j}, {i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
 	var res []State
 	newTime := s.time + 1
 	b := blizzards[newTime%len(blizzards)]
 
-	exit1 := utils.Pos{0, -1}
-	exit2 := utils.Pos{X: len(b[2]) - 1, Y: len(b[0]) - 1 + 1}
+	exit1 := game2d.Pos{0, -1}
+	exit2 := game2d.Pos{X: len(b[2]) - 1, Y: len(b[0]) - 1 + 1}
 
 	for _, p := range explore {
 		if p == exit1 || p == exit2 {
@@ -138,12 +139,12 @@ func neighbors(s State, blizzards []Blizzard) []State {
 	return res
 }
 
-func parse(input string) ([]Blizzard, utils.Pos, utils.Pos) {
+func parse(input string) ([]Blizzard, game2d.Pos, game2d.Pos) {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	grid := utils.BuildGrid(lines)
+	grid := game2d.BuildGrid(lines)
 
-	minX, maxX, minY, maxY := utils.GridBounds(grid)
+	minX, maxX, minY, maxY := game2d.GridBounds(grid)
 	b := newBlizzard(minX, maxX, minY, maxY)
 	for p, v := range grid {
 		if v == '^' || v == 'v' || v == '<' || v == '>' {
@@ -164,8 +165,8 @@ func parse(input string) ([]Blizzard, utils.Pos, utils.Pos) {
 		//b.display(utils.Pos{0, -1})
 	}
 
-	start := utils.Pos{0, -1}
-	goal := utils.Pos{maxX - minX - 2, maxY - minY - 1}
+	start := game2d.Pos{0, -1}
+	goal := game2d.Pos{maxX - minX - 2, maxY - minY - 1}
 	return blizzards, start, goal
 }
 
@@ -175,7 +176,7 @@ func Part1(input string) int {
 	neighborsF := func(s State) []State { return neighbors(s, blizzards) }
 	costF := func(from, to State) int { return 1 }
 	goalF := func(s State) bool { return s.pos == goal }
-	heuristicF := func(s State) int { return utils.ManhattanDistance(s.pos, goal) }
+	heuristicF := func(s State) int { return game2d.ManhattanDistance(s.pos, goal) }
 
 	_, cost := utils.Astar[State](State{start, 0}, goalF, neighborsF, costF, heuristicF)
 	return cost
@@ -192,8 +193,8 @@ func Part2(input string) int {
 	goal1 := func(s State) bool { return s.pos == goal }
 	goal2 := func(s State) bool { return s.pos == start }
 
-	heuristic1 := func(s State) int { return utils.ManhattanDistance(s.pos, goal) }
-	heuristic2 := func(s State) int { return utils.ManhattanDistance(s.pos, start) }
+	heuristic1 := func(s State) int { return game2d.ManhattanDistance(s.pos, goal) }
+	heuristic2 := func(s State) int { return game2d.ManhattanDistance(s.pos, start) }
 
 	_, cost1 := utils.Astar[State](State{start, 0}, goal1, neighborsF, costF, heuristic1)
 	_, cost2 := utils.Astar[State](State{goal, cost1}, goal2, neighborsF, costF, heuristic2)

@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"strconv"
 	"strings"
 	"time"
@@ -34,7 +34,7 @@ func solve(input string, parseLine func(string) (uint8, int)) int {
 	lines := strings.Split(input, "\n")
 
 	var x, y int
-	var polygon = []utils.Pos{{X: x, Y: y}}
+	var polygon = []game2d.Pos{{X: x, Y: y}}
 
 	for _, line := range lines {
 		dir, n := parseLine(line)
@@ -48,9 +48,9 @@ func solve(input string, parseLine func(string) (uint8, int)) int {
 		case 'R':
 			x += n
 		}
-		polygon = append(polygon, utils.Pos{X: x, Y: y})
+		polygon = append(polygon, game2d.Pos{X: x, Y: y})
 	}
-	return utils.PolygonArea(polygon)
+	return game2d.PolygonArea(polygon)
 }
 
 func Part1(input string) int {

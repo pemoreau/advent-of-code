@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils"
+	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"strings"
 	"time"
@@ -12,7 +12,7 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func symbolInNeighborhood(grid utils.Grid, pos utils.Pos) bool {
+func symbolInNeighborhood(grid game2d.Grid, pos game2d.Pos) bool {
 	for _, neighbor := range pos.Neighbors8() {
 		if n, ok := grid[neighbor]; ok && n != '.' && !(n >= '0' && n <= '9') {
 			return true
@@ -25,17 +25,17 @@ func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
-	var grid = utils.BuildGrid(lines)
-	minX, maxX, minY, maxY := utils.GridBounds(grid)
+	var grid = game2d.BuildGrid(lines)
+	minX, maxX, minY, maxY := game2d.GridBounds(grid)
 
 	var res int
 	for y := minY; y <= maxY; y++ {
 		var current int
 		var symbol bool
 		for x := minX; x <= maxX; x++ {
-			if v, ok := grid[utils.Pos{X: x, Y: y}]; ok && v >= '0' && v <= '9' {
+			if v, ok := grid[game2d.Pos{X: x, Y: y}]; ok && v >= '0' && v <= '9' {
 				current = 10*current + int(v-'0')
-				symbol = symbol || symbolInNeighborhood(grid, utils.Pos{X: x, Y: y})
+				symbol = symbol || symbolInNeighborhood(grid, game2d.Pos{X: x, Y: y})
 			} else {
 				if symbol {
 					res += current
@@ -51,8 +51,8 @@ func Part1(input string) int {
 	return res
 }
 
-func starInNeighborhood(grid utils.Grid, pos utils.Pos) []utils.Pos {
-	var res []utils.Pos
+func starInNeighborhood(grid game2d.Grid, pos game2d.Pos) []game2d.Pos {
+	var res []game2d.Pos
 	for _, neighbor := range pos.Neighbors8() {
 		if n, ok := grid[neighbor]; ok && n == '*' {
 			res = append(res, neighbor)
@@ -65,17 +65,17 @@ func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
 
-	var grid = utils.BuildGrid(lines)
-	minX, maxX, minY, maxY := utils.GridBounds(grid)
+	var grid = game2d.BuildGrid(lines)
+	minX, maxX, minY, maxY := game2d.GridBounds(grid)
 
-	var startMap = make(map[utils.Pos][]int)
-	var stars = set.NewSet[utils.Pos]()
+	var startMap = make(map[game2d.Pos][]int)
+	var stars = set.NewSet[game2d.Pos]()
 	for y := minY; y <= maxY; y++ {
 		var current int
 		for x := minX; x <= maxX; x++ {
-			if v, ok := grid[utils.Pos{X: x, Y: y}]; ok && v >= '0' && v <= '9' {
+			if v, ok := grid[game2d.Pos{X: x, Y: y}]; ok && v >= '0' && v <= '9' {
 				current = 10*current + int(v-'0')
-				stars.AddAll(starInNeighborhood(grid, utils.Pos{X: x, Y: y})...)
+				stars.AddAll(starInNeighborhood(grid, game2d.Pos{X: x, Y: y})...)
 			} else {
 				if len(stars) > 0 {
 					for star := range stars {

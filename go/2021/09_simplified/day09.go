@@ -3,11 +3,10 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"sort"
 	"strings"
 	"time"
-
-	"github.com/pemoreau/advent-of-code/go/utils"
 )
 
 //go:embed input.txt
@@ -17,7 +16,7 @@ type Pos struct {
 	i, j int
 }
 
-func neighboors(m utils.Matrix[uint8], i, j int) []Pos {
+func neighboors(m game2d.Matrix[uint8], i, j int) []Pos {
 	res := make([]Pos, 0, 4)
 	pos := []Pos{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
 	for _, p := range pos {
@@ -29,7 +28,7 @@ func neighboors(m utils.Matrix[uint8], i, j int) []Pos {
 	return res
 }
 
-func collectNeighboors(p Pos, m utils.Matrix[uint8]) int {
+func collectNeighboors(p Pos, m game2d.Matrix[uint8]) int {
 	toVisit := []Pos{p}
 	collected := 0
 	for len(toVisit) > 0 {
@@ -46,7 +45,7 @@ func collectNeighboors(p Pos, m utils.Matrix[uint8]) int {
 	return collected
 }
 
-func smallerThanNeighboors(m utils.Matrix[uint8], i, j int) bool {
+func smallerThanNeighboors(m game2d.Matrix[uint8], i, j int) bool {
 	pos := []Pos{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
 	for _, p := range pos {
 		if p.j >= 0 && p.j < len(m) && p.i >= 0 && p.i < len(m[p.j]) && !(m[j][i] < m[p.j][p.i]) {
@@ -58,7 +57,7 @@ func smallerThanNeighboors(m utils.Matrix[uint8], i, j int) bool {
 
 func Part1(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := utils.BuildConvertMatrix[uint8](lines, func(c int32) uint8 { return uint8(c - '0') })
+	m := game2d.BuildMatrixFunc[uint8](lines, func(c int32) uint8 { return uint8(c - '0') })
 	res := 0
 	for j := range m {
 		for i := range m[j] {
@@ -72,7 +71,7 @@ func Part1(input string) int {
 
 func Part2(input string) int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	m := utils.BuildConvertMatrix[uint8](lines, func(c int32) uint8 { return uint8(c - '0') })
+	m := game2d.BuildMatrixFunc[uint8](lines, func(c int32) uint8 { return uint8(c - '0') })
 
 	var sizes []int
 	for j := range m {

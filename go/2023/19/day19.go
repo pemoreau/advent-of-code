@@ -213,8 +213,8 @@ func Part2(input string) int {
 		rule := parseRule(line)
 		rules[rule.name] = rule
 	}
-
-	var c = Constraint{'x': interval.Interval{1, 4000}, 'm': interval.Interval{1, 4000}, 'a': interval.Interval{1, 4000}, 's': interval.Interval{1, 4000}}
+	start := interval.Interval{1, 4000}
+	var c = Constraint{'x': start, 'm': start, 'a': start, 's': start}
 	res := propagate(rules, c, "in")
 	return res
 }

@@ -8,29 +8,29 @@ import (
 //go:embed input_test.txt
 var inputTest string
 
-//func TestPart1(t *testing.T) {
-//	result := Part1(inputTest)
-//	expected := 62
-//	if result != expected {
-//		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+func TestPart1(t *testing.T) {
+	result := Part1(inputTest)
+	expected := 19114
+	if result != expected {
+		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+	}
+}
+
+//	func TestPart2(t *testing.T) {
+//		result := Part2(inputTest)
+//		expected := 952408144115
+//		if result != expected {
+//			t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+//		}
 //	}
-//}
-//
-//func TestPart2(t *testing.T) {
-//	result := Part2(inputTest)
-//	expected := 952408144115
-//	if result != expected {
-//		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-//	}
-//}
-//
-//func TestPart1Input(t *testing.T) {
-//	result := Part1(inputDay)
-//	expected := 47045
-//	if result != expected {
-//		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-//	}
-//}
+func TestPart1Input(t *testing.T) {
+	result := Part1(inputDay)
+	expected := 420739
+	if result != expected {
+		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+	}
+}
+
 //
 //func TestPart2Input(t *testing.T) {
 //	result := Part2(inputDay)

@@ -3,12 +3,13 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils/interval"
 	"strconv"
 	"strings"
 	"time"
 )
 
-//go:embed input.txt
+//go:embed input_test.txt
 var inputDay string
 
 type Instruction struct {
@@ -38,27 +39,6 @@ func (i Instruction) String() string {
 		return fmt.Sprintf("else: %s", i.then)
 	}
 	return fmt.Sprintf("%c%c%d => %s", i.subject, i.cond, i.value, i.then)
-}
-
-func (r Rule) apply(obj Object) string {
-	fmt.Printf("apply %s to %v\n", r, obj)
-	for _, instr := range r.instr {
-		switch instr.cond {
-		case '<':
-			fmt.Printf("compare %c:%d < %d\n", instr.subject, obj[instr.subject], instr.value)
-			if obj[instr.subject] < instr.value {
-				return instr.then
-			}
-		case '>':
-			fmt.Printf("compare %c:%d > %d\n", instr.subject, obj[instr.subject], instr.value)
-			if obj[instr.subject] > instr.value {
-				return instr.then
-			}
-		case 'T':
-			return instr.then
-		}
-	}
-	panic("no instruction found")
 }
 
 func parseRule(line string) Rule {
@@ -102,6 +82,27 @@ func parseObject(line string) Object {
 		res[fields[i][0]] = value
 	}
 	return res
+}
+
+func (r Rule) apply(obj Object) string {
+	fmt.Printf("apply %s to %v\n", r, obj)
+	for _, instr := range r.instr {
+		switch instr.cond {
+		case '<':
+			fmt.Printf("compare %c:%d < %d\n", instr.subject, obj[instr.subject], instr.value)
+			if obj[instr.subject] < instr.value {
+				return instr.then
+			}
+		case '>':
+			fmt.Printf("compare %c:%d > %d\n", instr.subject, obj[instr.subject], instr.value)
+			if obj[instr.subject] > instr.value {
+				return instr.then
+			}
+		case 'T':
+			return instr.then
+		}
+	}
+	panic("no instruction found")
 }
 
 func run(rules map[string]Rule, object Object) int {
@@ -151,7 +152,79 @@ func Part1(input string) int {
 	return res
 }
 
+type Constraint map[uint8]interval.Interval
+
+func (c Constraint) copy() Constraint {
+	return Constraint{'x': c['x'], 'm': c['m'], 'a': c['a'], 's': c['s']}
+}
+
+func (i Instruction) apply(c Constraint) (Constraint, Constraint) {
+	if i.cond == 'T' {
+		return c, Constraint{'x': interval.Empty(), 'm': interval.Empty(), 'a': interval.Empty(), 's': interval.Empty()}
+	}
+
+	var i1, i2 interval.Interval
+	switch i.cond {
+	case '<':
+		i1 = interval.Interval{1, i.value - 1}
+		i2 = interval.Interval{i.value, 4000}
+	case '>':
+		i1 = interval.Interval{i.value + 1, 4000}
+		i2 = interval.Interval{1, i.value}
+	}
+	c1 := c.copy()
+	c2 := c.copy()
+	c1[i.subject] = c[i.subject].Inter(i1)
+	c2[i.subject] = c[i.subject].Inter(i2)
+	return c1, c2
+}
+
+//func propagate(rules map[string]Rule, c Constraint, pc string) Constraint {
+//	if pc == "A" {
+//		return c
+//	}
+//	if pc == "R" {
+//		return Constraint{x: interval.Empty(), m: interval.Empty(), a: interval.Empty(), s: interval.Empty()}
+//	}
+//	rule := rules[pc]
+//	for _, instr := range rule.instr {
+//		var i1, i2 interval.Interval
+//		switch instr.cond {
+//		case '<':
+//			i1 = interval.Interval{1, instr.value - 1}
+//			i2 = interval.Interval{instr.value, 4000}
+//		case '>':
+//			i1 = interval.Interval{instr.value + 1, 4000}
+//			i2 = interval.Interval{1, instr.value}
+//		case 'T':
+//			return c
+//
+//		}
+//	}
+//
+//}
+
+type ite struct {
+	cond    uint8 // <, > or T
+	subject uint8 // x, m, a or s
+	value   int
+	then    string
+}
+
 func Part2(input string) int {
+	input = strings.TrimSpace(input)
+	parts := strings.Split(input, "\n\n")
+	lines := strings.Split(parts[0], "\n")
+
+	var rules = make(map[string]Rule)
+
+	for _, line := range lines {
+		rule := parseRule(line)
+		rules[rule.name] = rule
+	}
+
+	var c = Constraint{x: interval.Interval{1, 4000}, m: interval.Interval{1, 4000}, a: interval.Interval{1, 4000}, s: interval.Interval{1, 4000}}
+
 	return 0
 }
 

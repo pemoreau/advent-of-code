@@ -12,63 +12,7 @@ import (
 //go:embed input.txt
 var inputDay string
 
-type Instruction struct {
-	cond    uint8 // <, > or T
-	subject uint8 // x, m, a or s
-	value   int
-	then    string
-}
-
-type Rule []Instruction
-
 type Object map[uint8]int
-
-func (i Instruction) String() string {
-	if i.cond == 'T' {
-		return fmt.Sprintf("else: %s", i.then)
-	}
-	return fmt.Sprintf("%c%c%d => %s", i.subject, i.cond, i.value, i.then)
-}
-
-func (o Object) String() string {
-	return fmt.Sprintf("x=%d, m=%d, a=%d, s=%d", o['x'], o['m'], o['a'], o['s'])
-}
-
-func parseRule(line string) (string, Rule) {
-	splitFunc := func(c rune) bool {
-		return c == '{' || c == '}' || c == ',' || c == ':'
-	}
-	fields := strings.FieldsFunc(line, splitFunc)
-	name := fields[0]
-	other := fields[len(fields)-1]
-	var instructions []Instruction
-	for i := 1; i < len(fields)-1; i += 2 {
-		subject := fields[i][0]
-		cond := fields[i][1]
-		value, _ := strconv.Atoi(fields[i][2:])
-		then := fields[i+1]
-		instructions = append(instructions, Instruction{
-			cond:    cond,
-			subject: subject,
-			value:   value,
-			then:    then,
-		})
-	}
-	instructions = append(instructions, Instruction{
-		cond: 'T',
-		then: other,
-	})
-	return name, instructions
-}
-
-func parseRules(lines []string) map[string]Rule {
-	var rules = make(map[string]Rule)
-	for _, line := range lines {
-		name, rule := parseRule(line)
-		rules[name] = rule
-	}
-	return rules
-}
 
 func parseObject(line string) Object {
 	splitFunc := func(c rune) bool {
@@ -81,6 +25,60 @@ func parseObject(line string) Object {
 		res[fields[i][0]] = value
 	}
 	return res
+}
+
+func (o Object) String() string {
+	return fmt.Sprintf("x=%d, m=%d, a=%d, s=%d", o['x'], o['m'], o['a'], o['s'])
+}
+
+func parseInstructions(rules map[string][]string, instr []string) Expr {
+	if len(instr) == 0 {
+		panic("empty list")
+	}
+	head := instr[0]
+	if len(instr) == 1 {
+		if head == "A" {
+			return Accepted{}
+		}
+		if head == "R" {
+			return Rejected{}
+		}
+
+		return parseInstructions(rules, rules[head])
+	}
+	subject := head[0]
+	cond := head[1]
+	value, _ := strconv.Atoi(head[2:])
+	then := instr[1]
+	tail := instr[2:]
+
+	if cond == '<' {
+		return IfThenElse{
+			cond:  Lt{subject, value},
+			then:  parseInstructions(rules, rules[then]),
+			else_: parseInstructions(rules, tail),
+		}
+	}
+	if cond == '>' {
+		return IfThenElse{
+			cond:  Gt{subject, value},
+			then:  parseInstructions(rules, rules[then]),
+			else_: parseInstructions(rules, tail),
+		}
+	}
+	panic("not implemented")
+}
+
+func parseRules(lines []string, start string) Expr {
+	var rules = make(map[string][]string)
+	for _, line := range lines {
+		name, after, _ := strings.Cut(line, "{")
+		fields := strings.FieldsFunc(after, func(c rune) bool { return c == ',' || c == ':' || c == '}' })
+		rules[name] = fields
+	}
+	rules["A"] = []string{"A"}
+	rules["R"] = []string{"R"}
+	return parseInstructions(rules, rules[start])
 }
 
 // AST
@@ -105,18 +103,16 @@ type IfThenElse struct {
 type Accepted struct{}
 type Rejected struct{}
 
-type Var uint8
-
 type Lt struct {
-	v     Var
+	xmas  uint8
 	value int
 }
 type Gt struct {
-	v     Var
+	xmas  uint8
 	value int
 }
 
-func (_ Var) isExpr()        {}
+// func (_ Var) isExpr()        {}
 func (_ IfThenElse) isExpr() {}
 func (_ Accepted) isExpr()   {}
 func (_ Rejected) isExpr()   {}
@@ -133,54 +129,17 @@ func (e IfThenElse) String() string {
 	return fmt.Sprintf("if %v then %v else %v", e.cond, e.then, e.else_)
 }
 func (c Lt) String() string {
-	return fmt.Sprintf("%c < %d", c.v, c.value)
+	return fmt.Sprintf("%c < %d", c.xmas, c.value)
 }
 func (c Gt) String() string {
-	return fmt.Sprintf("%c > %d", c.v, c.value)
-}
-
-func buildExpr(rules map[string]Rule, pc string) Expr {
-	if pc == "A" {
-		return Accepted{}
-	}
-	if pc == "R" {
-		return Rejected{}
-	}
-	return buildRule(rules[pc], rules)
-}
-
-func buildRule(instr []Instruction, rules map[string]Rule) Expr {
-	if len(instr) == 0 {
-		panic("empty list")
-	}
-	if len(instr) == 1 {
-		name := instr[0].then
-		return buildExpr(rules, name)
-	}
-	head := instr[0]
-	tail := instr[1:]
-	if head.cond == '<' {
-		return IfThenElse{
-			cond:  Lt{Var(head.subject), head.value},
-			then:  buildExpr(rules, head.then),
-			else_: buildRule(tail, rules),
-		}
-	}
-	if head.cond == '>' {
-		return IfThenElse{
-			cond:  Gt{Var(head.subject), head.value},
-			then:  buildExpr(rules, head.then),
-			else_: buildRule(tail, rules),
-		}
-	}
-	panic("not implemented")
+	return fmt.Sprintf("%c > %d", c.xmas, c.value)
 }
 
 func (c Lt) apply(obj Object) bool {
-	return obj[uint8(c.v)] < c.value
+	return obj[c.xmas] < c.value
 }
 func (c Gt) apply(obj Object) bool {
-	return obj[uint8(c.v)] > c.value
+	return obj[c.xmas] > c.value
 }
 func (e Accepted) apply(obj Object) int {
 	return obj['x'] + obj['m'] + obj['a'] + obj['s']
@@ -200,7 +159,7 @@ func (e IfThenElse) apply(obj Object) int {
 func (c Lt) propagate(constraint Constraint) (Constraint, Constraint) {
 	pos := constraint.copy()
 	neg := constraint.copy()
-	name := uint8(c.v)
+	name := c.xmas
 	pos[name] = constraint[name].Inter(interval.Interval{1, c.value - 1})
 	neg[name] = constraint[name].Inter(interval.Interval{c.value, 4000})
 	return pos, neg
@@ -209,7 +168,7 @@ func (c Lt) propagate(constraint Constraint) (Constraint, Constraint) {
 func (c Gt) propagate(constraint Constraint) (Constraint, Constraint) {
 	pos := constraint.copy()
 	neg := constraint.copy()
-	name := uint8(c.v)
+	name := c.xmas
 	pos[name] = constraint[name].Inter(interval.Interval{c.value + 1, 4000})
 	neg[name] = constraint[name].Inter(interval.Interval{1, c.value})
 	return pos, neg
@@ -247,8 +206,7 @@ func Part1(input string) int {
 	parts := strings.Split(input, "\n\n")
 	lines := strings.Split(parts[0], "\n")
 
-	var rules = parseRules(lines)
-	var expr = buildExpr(rules, "in")
+	var expr = parseRules(lines, "in")
 
 	var res int
 	lines = strings.Split(parts[1], "\n")
@@ -265,8 +223,7 @@ func Part2(input string) int {
 	parts := strings.Split(input, "\n\n")
 	lines := strings.Split(parts[0], "\n")
 
-	var rules = parseRules(lines)
-	var expr = buildExpr(rules, "in")
+	var expr = parseRules(lines, "in")
 
 	start := interval.Interval{1, 4000}
 	var c = Constraint{'x': start, 'm': start, 'a': start, 's': start}

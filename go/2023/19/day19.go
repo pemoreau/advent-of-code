@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//go:embed input_test.txt
+//go:embed input.txt
 var inputDay string
 
 type Instruction struct {
@@ -26,19 +26,19 @@ type Rule struct {
 
 type Object map[uint8]int
 
-func (o Object) String() string {
-	return fmt.Sprintf("x=%d, m=%d, a=%d, s=%d", o['x'], o['m'], o['a'], o['s'])
+func (i Instruction) String() string {
+	if i.cond == 'T' {
+		return fmt.Sprintf("else: %s", i.then)
+	}
+	return fmt.Sprintf("%c%c%d => %s", i.subject, i.cond, i.value, i.then)
 }
 
 func (r Rule) String() string {
 	return fmt.Sprintf("%s: %v", r.name, r.instr)
 }
 
-func (i Instruction) String() string {
-	if i.cond == 'T' {
-		return fmt.Sprintf("else: %s", i.then)
-	}
-	return fmt.Sprintf("%c%c%d => %s", i.subject, i.cond, i.value, i.then)
+func (o Object) String() string {
+	return fmt.Sprintf("x=%d, m=%d, a=%d, s=%d", o['x'], o['m'], o['a'], o['s'])
 }
 
 func parseRule(line string) Rule {
@@ -50,7 +50,6 @@ func parseRule(line string) Rule {
 	other := fields[len(fields)-1]
 	var instructions []Instruction
 	for i := 1; i < len(fields)-1; i += 2 {
-		//fmt.Printf("i=%d, fields[i]=%s\n", i, fields[i])
 		subject := fields[i][0]
 		cond := fields[i][1]
 		value, _ := strconv.Atoi(fields[i][2:])
@@ -66,9 +65,16 @@ func parseRule(line string) Rule {
 		cond: 'T',
 		then: other,
 	})
-
-	//fmt.Println(fields)
 	return Rule{name: name, instr: instructions}
+}
+
+func parseRules(lines []string) map[string]Rule {
+	var rules = make(map[string]Rule)
+	for _, line := range lines {
+		rule := parseRule(line)
+		rules[rule.name] = rule
+	}
+	return rules
 }
 
 func parseObject(line string) Object {
@@ -85,16 +91,13 @@ func parseObject(line string) Object {
 }
 
 func (r Rule) apply(obj Object) string {
-	fmt.Printf("apply %s to %v\n", r, obj)
 	for _, instr := range r.instr {
 		switch instr.cond {
 		case '<':
-			fmt.Printf("compare %c:%d < %d\n", instr.subject, obj[instr.subject], instr.value)
 			if obj[instr.subject] < instr.value {
 				return instr.then
 			}
 		case '>':
-			fmt.Printf("compare %c:%d > %d\n", instr.subject, obj[instr.subject], instr.value)
 			if obj[instr.subject] > instr.value {
 				return instr.then
 			}
@@ -111,14 +114,11 @@ func run(rules map[string]Rule, object Object) int {
 		rule := rules[pc]
 		label := rule.apply(object)
 		if label == "R" {
-			fmt.Println("Rejected")
 			return 0
 		}
 		if label == "A" {
-			fmt.Println("Accepted")
 			return object['x'] + object['m'] + object['a'] + object['s']
 		}
-		fmt.Println("pc=", label)
 		pc = label
 	}
 }
@@ -128,14 +128,9 @@ func Part1(input string) int {
 	parts := strings.Split(input, "\n\n")
 	lines := strings.Split(parts[0], "\n")
 
-	var rules = make(map[string]Rule)
+	var rules = parseRules(lines)
+
 	var objects []Object
-
-	for _, line := range lines {
-		rule := parseRule(line)
-		rules[rule.name] = rule
-	}
-
 	lines = strings.Split(parts[1], "\n")
 	for _, line := range lines {
 		object := parseObject(line)
@@ -145,7 +140,6 @@ func Part1(input string) int {
 	var res int
 	for _, object := range objects {
 		v := run(rules, object)
-		fmt.Println(object, v)
 		res += v
 	}
 
@@ -154,11 +148,15 @@ func Part1(input string) int {
 
 type Constraint map[uint8]interval.Interval
 
+func (c Constraint) String() string {
+	return fmt.Sprintf("x=%v, m=%v, a=%v, s=%v", c['x'], c['m'], c['a'], c['s'])
+}
+
 func (c Constraint) copy() Constraint {
 	return Constraint{'x': c['x'], 'm': c['m'], 'a': c['a'], 's': c['s']}
 }
 
-func (i Instruction) apply(c Constraint) (Constraint, Constraint) {
+func (i Instruction) apply(c Constraint) (pos Constraint, neg Constraint) {
 	if i.cond == 'T' {
 		return c, Constraint{'x': interval.Empty(), 'm': interval.Empty(), 'a': interval.Empty(), 's': interval.Empty()}
 	}
@@ -172,43 +170,36 @@ func (i Instruction) apply(c Constraint) (Constraint, Constraint) {
 		i1 = interval.Interval{i.value + 1, 4000}
 		i2 = interval.Interval{1, i.value}
 	}
-	c1 := c.copy()
-	c2 := c.copy()
-	c1[i.subject] = c[i.subject].Inter(i1)
-	c2[i.subject] = c[i.subject].Inter(i2)
-	return c1, c2
+	pos = c.copy()
+	neg = c.copy()
+	pos[i.subject] = c[i.subject].Inter(i1)
+	neg[i.subject] = c[i.subject].Inter(i2)
+	return pos, neg
 }
 
-//func propagate(rules map[string]Rule, c Constraint, pc string) Constraint {
-//	if pc == "A" {
-//		return c
-//	}
-//	if pc == "R" {
-//		return Constraint{x: interval.Empty(), m: interval.Empty(), a: interval.Empty(), s: interval.Empty()}
-//	}
-//	rule := rules[pc]
-//	for _, instr := range rule.instr {
-//		var i1, i2 interval.Interval
-//		switch instr.cond {
-//		case '<':
-//			i1 = interval.Interval{1, instr.value - 1}
-//			i2 = interval.Interval{instr.value, 4000}
-//		case '>':
-//			i1 = interval.Interval{instr.value + 1, 4000}
-//			i2 = interval.Interval{1, instr.value}
-//		case 'T':
-//			return c
-//
-//		}
-//	}
-//
-//}
+func (c Constraint) combinaison() int {
+	res := 1
+	for _, v := range c {
+		res *= v.Len()
+	}
+	return res
+}
 
-type ite struct {
-	cond    uint8 // <, > or T
-	subject uint8 // x, m, a or s
-	value   int
-	then    string
+func propagate(rules map[string]Rule, c Constraint, pc string) int {
+	if pc == "A" {
+		return c.combinaison()
+	}
+	if pc == "R" {
+		return 0
+	}
+	var res int
+	rule := rules[pc]
+	for _, instr := range rule.instr {
+		pos, neg := instr.apply(c)
+		res += propagate(rules, pos, instr.then)
+		c = neg
+	}
+	return res
 }
 
 func Part2(input string) int {
@@ -223,9 +214,9 @@ func Part2(input string) int {
 		rules[rule.name] = rule
 	}
 
-	var c = Constraint{x: interval.Interval{1, 4000}, m: interval.Interval{1, 4000}, a: interval.Interval{1, 4000}, s: interval.Interval{1, 4000}}
-
-	return 0
+	var c = Constraint{'x': interval.Interval{1, 4000}, 'm': interval.Interval{1, 4000}, 'a': interval.Interval{1, 4000}, 's': interval.Interval{1, 4000}}
+	res := propagate(rules, c, "in")
+	return res
 }
 
 func main() {

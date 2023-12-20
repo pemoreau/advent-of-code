@@ -70,38 +70,21 @@ func (b *box) init(table map[string]*box) {
 	}
 }
 
-//var nbLow int
-//var nbHigh int
-
-//func (b *box) push(from string, signal bool, table map[string]*box) {
-//	b.inputs[from] = append(b.inputs[from], signal)
-//	if signal {
-//		nbHigh++
-//	} else {
-//		nbLow++
-//	}
-//	fmt.Printf("%s -%v-> %s(%d)\n", from, signal, b.name, b.model)
-//	b.step(from, table)
-//}
-
-func (b *box) step(from string, signal bool, table map[string]*box, w *wires) {
+func (b *box) step(from string, signal bool, table map[string]*box, w *wires) bool {
 	switch b.model {
 	case FLIP:
-		fmt.Printf("%s -%v-> %s (%v)\n", from, signal, b.name, b.state)
+		//fmt.Printf("%s -%v-> %s (%v)\n", from, signal, b.name, b.state)
 		if signal {
 			// ignore
-			return
+			return false
 		}
 		b.state = !b.state
 		for _, name := range b.outputs {
 			w.push(pulse{b.name, b.state, name})
 		}
-		//for _, name := range b.outputs {
-		//	table[name].step(b.name, table)
-		//}
 
 	case CONJ:
-		fmt.Printf("%s -%v-> %s(%d)\n", from, signal, b.name, b.model)
+		//fmt.Printf("%s -%v-> %s(%d)\n", from, signal, b.name, b.model)
 		b.remember[from] = signal
 		// check all state
 		var res bool
@@ -114,19 +97,19 @@ func (b *box) step(from string, signal bool, table map[string]*box, w *wires) {
 		for _, name := range b.outputs {
 			w.push(pulse{b.name, res, name})
 		}
-		//for _, name := range b.outputs {
-		//	table[name].step(b.name, table)
-		//}
 	case WIRE:
-		fmt.Printf("%s -%v-> %s(%d)\n", from, signal, b.name, b.model)
+		//fmt.Printf("%s -%v-> %s(%d)\n", from, signal, b.name, b.model)
+
+		if b.name == "rx" && !signal {
+			fmt.Println("******************** rx", b.name, signal)
+			return true
+		}
+
 		for _, name := range b.outputs {
 			w.push(pulse{b.name, signal, name})
 		}
-		//for _, name := range b.outputs {
-		//	table[name].step(b.name, table)
-		//}
 	}
-
+	return false
 }
 
 func Part1(input string) int {
@@ -182,6 +165,59 @@ func Part1(input string) int {
 }
 
 func Part2(input string) int {
+	input = strings.TrimSpace(input)
+	lines := strings.Split(input, "\n")
+
+	table := make(map[string]*box)
+	q := make([]pulse, 0)
+	w := &wires{queue: &q}
+
+	var names []string
+	for _, line := range lines {
+		name, after, _ := strings.Cut(line, " -> ")
+		outputs := strings.Split(after, ", ")
+		names = append(names, outputs...)
+		if name[0] == '%' {
+			name = name[1:]
+			//fmt.Printf("flip %s -> %v\n", name, outputs)
+			table[name] = NewBox(name, FLIP, outputs)
+		} else if name[0] == '&' {
+			name = name[1:]
+			//fmt.Printf("conj %s -> %v\n", name, outputs)
+			table[name] = NewBox(name, CONJ, outputs)
+		} else {
+			//fmt.Printf("wire %s -> %v\n", name, outputs)
+			table[name] = NewBox(name, WIRE, outputs)
+		}
+	}
+
+	for _, name := range names {
+		if _, ok := table[name]; !ok {
+			fmt.Println("not found", name)
+			table[name] = NewBox(name, WIRE, []string{})
+		}
+	}
+
+	for _, box := range table {
+		box.init(table)
+	}
+
+	var cpt = 0
+	for {
+		cpt++
+		if cpt%1000000 == 0 {
+			fmt.Println("cpt", cpt)
+		}
+		w.push(pulse{"button", false, "broadcaster"})
+		for !w.isEmpty() {
+			p := w.pop()
+			stop := table[p.to].step(p.from, p.value, table, w)
+			if stop {
+				return cpt
+			}
+		}
+	}
+
 	return 0
 }
 

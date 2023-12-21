@@ -27,24 +27,26 @@ func TestPart1_2(t *testing.T) {
 	}
 }
 
-//func TestPart2(t *testing.T) {
-//	result := Part2(inputTest)
-//	expected := 167409079868000
-//	if result != expected {
-//		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+//	func TestPart2(t *testing.T) {
+//		result := Part2(inputTest)
+//		expected := 167409079868000
+//		if result != expected {
+//			t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+//		}
 //	}
-//}
-//func TestPart1Input(t *testing.T) {
-//	result := Part1(inputDay)
-//	expected := 420739
-//	if result != expected {
-//		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-//	}
-//}
+
+func TestPart1Input(t *testing.T) {
+	result := Part1(inputDay)
+	expected := 912199500
+	if result != expected {
+		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+	}
+}
+
 //
 //func TestPart2Input(t *testing.T) {
 //	result := Part2(inputDay)
-//	expected := 130251901420382
+//	expected := 237878264003759
 //	if result != expected {
 //		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 //	}

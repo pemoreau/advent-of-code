@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"strings"
 	"time"
 )
@@ -22,9 +23,6 @@ type box struct {
 	state    bool
 	remember map[string]bool
 	outputs  []string
-	//nbLow   int
-	//nbHigh  int
-	//queue   *[]pulse
 }
 
 type pulse struct {
@@ -41,7 +39,6 @@ type wires struct {
 
 func (w *wires) push(p pulse) {
 	*w.queue = append(*w.queue, p)
-	//fmt.Println("push", *w.queue)
 	if p.value {
 		w.nbHigh++
 	} else {
@@ -84,8 +81,8 @@ func (b *box) step(from string, signal bool, table map[string]*box, w *wires) bo
 		}
 
 	case CONJ:
-		//fmt.Printf("%s -%v-> %s(%d)\n", from, signal, b.name, b.model)
 		b.remember[from] = signal
+
 		// check all state
 		var res bool
 		for _, state := range b.remember {
@@ -97,14 +94,14 @@ func (b *box) step(from string, signal bool, table map[string]*box, w *wires) bo
 		for _, name := range b.outputs {
 			w.push(pulse{b.name, res, name})
 		}
-	case WIRE:
-		//fmt.Printf("%s -%v-> %s(%d)\n", from, signal, b.name, b.model)
-
-		if b.name == "rx" && !signal {
-			fmt.Println("******************** rx", b.name, signal)
+		if b.name == "jq" && signal {
+			// gt, vr, nl, lr -> &jq
+			// one entry is high
 			return true
 		}
 
+	case WIRE:
+		//fmt.Printf("%s -%v-> %s(%d)\n", from, signal, b.name, b.model)
 		for _, name := range b.outputs {
 			w.push(pulse{b.name, signal, name})
 		}
@@ -112,13 +109,13 @@ func (b *box) step(from string, signal bool, table map[string]*box, w *wires) bo
 	return false
 }
 
-func Part1(input string) int {
+func parse(input string) (table map[string]*box, w *wires) {
 	input = strings.TrimSpace(input)
 	lines := strings.Split(input, "\n")
 
-	table := make(map[string]*box)
+	table = make(map[string]*box)
 	q := make([]pulse, 0)
-	w := &wires{queue: &q}
+	w = &wires{queue: &q}
 
 	var names []string
 	for _, line := range lines {
@@ -149,6 +146,11 @@ func Part1(input string) int {
 	for _, box := range table {
 		box.init(table)
 	}
+	return table, w
+}
+
+func Part1(input string) int {
+	table, w := parse(input)
 
 	for i := 0; i < 1000; i++ {
 		w.push(pulse{"button", false, "broadcaster"})
@@ -157,67 +159,36 @@ func Part1(input string) int {
 			table[p.to].step(p.from, p.value, table, w)
 		}
 	}
-	fmt.Printf("nbLow: %d, nbHigh: %d\n", w.nbLow, w.nbHigh)
-	//table["broadcaster"].push("button", false, table)
-	//table["broadcaster"].step("button", table)
-
 	return w.nbLow * w.nbHigh
 }
 
 func Part2(input string) int {
-	input = strings.TrimSpace(input)
-	lines := strings.Split(input, "\n")
-
-	table := make(map[string]*box)
-	q := make([]pulse, 0)
-	w := &wires{queue: &q}
-
-	var names []string
-	for _, line := range lines {
-		name, after, _ := strings.Cut(line, " -> ")
-		outputs := strings.Split(after, ", ")
-		names = append(names, outputs...)
-		if name[0] == '%' {
-			name = name[1:]
-			//fmt.Printf("flip %s -> %v\n", name, outputs)
-			table[name] = NewBox(name, FLIP, outputs)
-		} else if name[0] == '&' {
-			name = name[1:]
-			//fmt.Printf("conj %s -> %v\n", name, outputs)
-			table[name] = NewBox(name, CONJ, outputs)
-		} else {
-			//fmt.Printf("wire %s -> %v\n", name, outputs)
-			table[name] = NewBox(name, WIRE, outputs)
-		}
-	}
-
-	for _, name := range names {
-		if _, ok := table[name]; !ok {
-			fmt.Println("not found", name)
-			table[name] = NewBox(name, WIRE, []string{})
-		}
-	}
-
-	for _, box := range table {
-		box.init(table)
-	}
-
-	var cpt = 0
-	for {
-		cpt++
-		if cpt%1000000 == 0 {
-			fmt.Println("cpt", cpt)
-		}
+	table, w := parse(input)
+	var gt, vr, nl, lr int
+	for i := 1; i < 10000000; i++ {
 		w.push(pulse{"button", false, "broadcaster"})
 		for !w.isEmpty() {
 			p := w.pop()
-			stop := table[p.to].step(p.from, p.value, table, w)
-			if stop {
-				return cpt
+			found := table[p.to].step(p.from, p.value, table, w)
+			if found {
+				if p.from == "gt" && gt == 0 {
+					gt = i
+				}
+				if p.from == "vr" && vr == 0 {
+					vr = i
+				}
+				if p.from == "nl" && nl == 0 {
+					nl = i
+				}
+				if p.from == "lr" && lr == 0 {
+					lr = i
+				}
+				if gt != 0 && vr != 0 && nl != 0 && lr != 0 {
+					return utils.LCM(gt, vr, nl, lr)
+				}
 			}
 		}
 	}
-
 	return 0
 }
 

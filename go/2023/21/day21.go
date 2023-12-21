@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-//go:embed input_test.txt
+//go:embed input.txt
 var inputDay string
 
 func findStart(m game2d.MatrixChar) game2d.Pos {
@@ -98,7 +98,7 @@ func Part2(input string) int {
 	var delta1 []int
 	var delta2 []int
 	n := grid.LenX()
-	for i := 0; i < 300; i++ {
+	for i := 0; i < 1000; i++ {
 		for e := range elves {
 			for _, n := range e.Neighbors4() {
 				m := posModulo(n, grid)
@@ -146,7 +146,7 @@ func Part2(input string) int {
 	fmt.Println("values", values)
 	fmt.Println("delta1", delta1)
 	fmt.Println("delta2", delta2)
-	N := 10 * n
+	N := 500 //10 * n
 	values = values[:N]
 	delta1 = delta1[:N]
 	delta2 = delta2[:N]
@@ -156,7 +156,8 @@ func Part2(input string) int {
 	value_i := values[len(values)-1]
 	fmt.Printf("last values_i(%d)=%d\n", len(values)-1, value_i)
 
-	LAST := 5000
+	//LAST := 5000
+	LAST := 26501365
 	//for i := N + 1; i < N+10*n; i++ {
 	for i := N + 1; i < LAST+1; i++ {
 		delta2_i := delta2[i-n-1]
@@ -166,17 +167,18 @@ func Part2(input string) int {
 		delta1 = append(delta1, delta1_i)
 		delta2 = append(delta2, delta2_i)
 
-		fmt.Printf("values_%d=%d\t", i-1, value_i)
-		fmt.Printf("delta1_%d=%d\t", len(delta1)-1, delta1[len(delta1)-1])
-		fmt.Printf("delta2_%d=%d\n", len(delta2)-1, delta2[len(delta2)-1])
-
-		//values = append(values, values[len(values)-1]+delta_i)
+		//fmt.Printf("values_%d=%d\t", i-1, value_i)
+		//fmt.Printf("delta1_%d=%d\t", len(delta1)-1, delta1[len(delta1)-1])
+		//fmt.Printf("delta2_%d=%d\n", len(delta2)-1, delta2[len(delta2)-1])
 
 	}
 
-	return len(elves)
+	return value_i
 }
 
+// too low 470149643712804
+//
+//	596734624269210
 func main() {
 	fmt.Println("--2023 day 21 solution--")
 	start := time.Now()

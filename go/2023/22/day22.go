@@ -3,7 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils/set"
+	"github.com/pemoreau/advent-of-code/go/utils/interval"
 	"slices"
 	"strings"
 	"time"
@@ -43,42 +43,50 @@ type pos struct {
 //	return cubes
 //}
 
-func (b brick) underBottom() set.Set[pos] {
-	var cubes = set.NewSet[pos]()
-	for x := b.x; x < b.x+b.nx; x++ {
-		for y := b.y; y < b.y+b.ny; y++ {
-			cubes.Add(pos{x, y, b.z - 1})
-		}
-	}
-	return cubes
-}
-
-func (b brick) top() set.Set[pos] {
-	var cubes = set.NewSet[pos]()
-	for x := b.x; x < b.x+b.nx; x++ {
-		for y := b.y; y < b.y+b.ny; y++ {
-			cubes.Add(pos{x, y, b.z + b.nz - 1})
-		}
-	}
-	return cubes
-}
+//func (b brick) underBottom() set.Set[pos] {
+//	var cubes = set.NewSet[pos]()
+//	for x := b.x; x < b.x+b.nx; x++ {
+//		for y := b.y; y < b.y+b.ny; y++ {
+//			cubes.Add(pos{x, y, b.z - 1})
+//		}
+//	}
+//	return cubes
+//}
+//
+//func (b brick) top() set.Set[pos] {
+//	var cubes = set.NewSet[pos]()
+//	for x := b.x; x < b.x+b.nx; x++ {
+//		for y := b.y; y < b.y+b.ny; y++ {
+//			cubes.Add(pos{x, y, b.z + b.nz - 1})
+//		}
+//	}
+//	return cubes
+//}
 
 func (b brick) sustainedBy(b2 brick) bool {
 	if b.z-(b2.z+b2.nz) != 0 {
 		return false
 	}
 
-	under := b.underBottom()
-	top := b2.top()
-	for p := range top {
-		if under.Contains(p) {
-			return true
-		}
+	i1 := interval.Interval{b.x, b.x + b.nx - 1}
+	i2 := interval.Interval{b2.x, b2.x + b2.nx - 1}
+	i3 := interval.Interval{b.y, b.y + b.ny - 1}
+	i4 := interval.Interval{b2.y, b2.y + b2.ny - 1}
+	if i1.Inter(i2) != interval.Empty() && i3.Inter(i4) != interval.Empty() {
+		return true
 	}
+
+	//under := b.underBottom()
+	//top := b2.top()
+	//for p := range top {
+	//	if under.Contains(p) {
+	//		return true
+	//	}
+	//}
 	return false
 }
 
-func dropOneBrick(bricks []brick, b brick) brick {
+func (b brick) drop(bricks []brick) brick {
 	if b.z == 1 {
 		return b
 	}
@@ -87,14 +95,15 @@ func dropOneBrick(bricks []brick, b brick) brick {
 			return b
 		}
 	}
-	return dropOneBrick(bricks, brick{b.x, b.y, b.z - 1, b.nx, b.ny, b.nz})
+	b.z -= 1
+	return b.drop(bricks)
 }
 
 func dropBricks(bricks []brick) ([]brick, int) {
 	var dropped []brick
 	var n int
 	for _, b := range bricks {
-		newBrick := dropOneBrick(dropped, b)
+		newBrick := b.drop(dropped)
 		if newBrick != b {
 			n++
 		}
@@ -103,13 +112,18 @@ func dropBricks(bricks []brick) ([]brick, int) {
 	return dropped, n
 }
 
-func nbFall(bricks []brick, b brick) int {
+func nbFall(bricks []brick, i int, b brick) int {
 	var bricks2 []brick
 	for _, b2 := range bricks {
 		if b2 != b {
 			bricks2 = append(bricks2, b2)
 		}
 	}
+
+	//var bricks2 = make([]brick, i, len(bricks)-1)
+	//copy(bricks2, bricks[:i])
+	//bricks2 = append(bricks2, bricks[i+1:]...)
+
 	_, n := dropBricks(bricks2)
 	return n
 }
@@ -125,22 +139,14 @@ func solve(input string, part2 bool) int {
 		bricks = append(bricks, bb)
 	}
 
-	slices.SortFunc(bricks, func(a brick, b brick) int {
-		if a.z < b.z {
-			return -1
-		} else if a.z > b.z {
-			return 1
-		} else {
-			return 0
-		}
-	})
-
+	slices.SortFunc(bricks, func(a brick, b brick) int { return a.z - b.z })
 	bricks, _ = dropBricks(bricks)
+	slices.SortFunc(bricks, func(a brick, b brick) int { return a.z - b.z })
 
 	var canDesintegrate int
 	var cpt int
-	for _, b := range bricks {
-		nb := nbFall(bricks, b)
+	for i, b := range bricks {
+		nb := nbFall(bricks, i, b)
 		//fmt.Println(b, can)
 		if nb == 0 {
 			canDesintegrate++

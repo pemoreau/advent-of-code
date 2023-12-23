@@ -50,22 +50,22 @@ func exploreSinglePath(grid game2d.Grid, previous game2d.Pos, current game2d.Pos
 	return PosCost{pos: current, cost: cost}, true
 }
 
-func explore(neighbors Graph, p, end game2d.Pos, visited map[game2d.Pos]bool, path int, bestPath int) int {
-	if p == end {
-		if path > bestPath {
-			bestPath = path
+func explore(neighbors Graph, p, goal game2d.Pos, visited map[game2d.Pos]bool, cost int, maxCost int) int {
+	if p == goal {
+		if cost > maxCost {
+			maxCost = cost
 		}
-		return bestPath
+		return maxCost
 	}
 
 	visited[p] = true
 	for _, pc := range neighbors[p] {
 		if !visited[pc.pos] {
-			bestPath = explore(neighbors, pc.pos, end, visited, path+pc.cost, bestPath)
+			maxCost = explore(neighbors, pc.pos, goal, visited, cost+pc.cost, maxCost)
 		}
 	}
 	visited[p] = false
-	return bestPath
+	return maxCost
 }
 
 type Graph map[game2d.Pos][]PosCost

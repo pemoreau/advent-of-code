@@ -3,6 +3,7 @@ package game2d
 import (
 	"fmt"
 	"math"
+	"strings"
 )
 
 // ---------------------------
@@ -19,6 +20,12 @@ func BuildGrid(lines []string) Grid {
 		}
 	}
 	return grid
+}
+
+func BuildGridFromString(s string) Grid {
+	s = strings.TrimSpace(s)
+	lines := strings.Split(s, "\n")
+	return BuildGrid(lines)
 }
 
 func BuildGridUp(lines []string) Grid {

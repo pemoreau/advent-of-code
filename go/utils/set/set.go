@@ -25,6 +25,18 @@ func (s Set[T]) Contains(value T) bool {
 	return ok
 }
 
+func (s Set[T]) ContainsSet(t Set[T]) bool {
+	if len(s) < len(t) {
+		return false
+	}
+	for elem := range t {
+		if !s.Contains(elem) {
+			return false
+		}
+	}
+	return true
+}
+
 func (s Set[T]) Values() []T {
 	res := make([]T, 0, len(s))
 	for value := range s {

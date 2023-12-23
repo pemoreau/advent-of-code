@@ -57,7 +57,7 @@ type state struct {
 	path set.Set[game2d.Pos]
 }
 
-func Part1(input string) int {
+func Part11(input string) int {
 	grid := game2d.BuildGridFromString(input)
 
 	minX, maxX, minY, maxY := game2d.GridBounds(grid)
@@ -96,7 +96,7 @@ type PosCost struct {
 	cost int
 }
 
-func exploreSinglePath(grid game2d.Grid, previous game2d.Pos, current game2d.Pos, cost int) PosCost {
+func exploreSinglePath(grid game2d.Grid, previous game2d.Pos, current game2d.Pos, cost int, part2 bool) (PosCost, bool) {
 	if c, ok := grid[current]; ok && c != '#' {
 		var cpt int
 		for _, ne := range current.Neighbors4() {
@@ -105,34 +105,42 @@ func exploreSinglePath(grid game2d.Grid, previous game2d.Pos, current game2d.Pos
 			}
 		}
 		if cpt > 2 {
-			return PosCost{pos: current, cost: cost}
+			return PosCost{pos: current, cost: cost}, true
+		}
+	}
+
+	if !part2 {
+		// cut branches in part1
+		if c, ok := grid[current]; ok && c != '.' {
+			if current.X > previous.X && c != '>' ||
+				current.X < previous.X && c != '<' ||
+				current.Y > previous.Y && c != 'v' ||
+				current.Y < previous.Y && c != '^' {
+				return PosCost{}, false
+			}
 		}
 	}
 
 	for _, n := range current.Neighbors4() {
 		if c, ok := grid[n]; ok && c != '#' && n != previous {
-			return exploreSinglePath(grid, current, n, cost+1)
+			return exploreSinglePath(grid, current, n, cost+1, part2)
 		}
 	}
-	return PosCost{pos: current, cost: cost}
-}
 
-//var bestPath int
+	return PosCost{pos: current, cost: cost}, true
+}
 
 func explore(neighbors Graph, p, end game2d.Pos, visited map[game2d.Pos]bool, path int, bestPath int) int {
 	if p == end {
 		if path > bestPath {
-			//fmt.Println("found new bestPath", path)
 			bestPath = path
 		}
 		return bestPath
 	}
 
 	visited[p] = true
-
 	for _, pc := range neighbors[p] {
-		if v, ok := visited[pc.pos]; !v || !ok {
-			//fmt.Printf("visit %d, %d - %d\n", pc.pos.Y+1, pc.pos.X+1, pc.cost)
+		if !visited[pc.pos] {
 			bestPath = explore(neighbors, pc.pos, end, visited, path+pc.cost, bestPath)
 		}
 	}
@@ -142,7 +150,7 @@ func explore(neighbors Graph, p, end game2d.Pos, visited map[game2d.Pos]bool, pa
 
 type Graph map[game2d.Pos][]PosCost
 
-func buildGraph(grid game2d.Grid, start game2d.Pos) Graph {
+func buildGraph(grid game2d.Grid, start game2d.Pos, part2 bool) Graph {
 	var res = make(map[game2d.Pos][]PosCost)
 
 	var todo = []game2d.Pos{}
@@ -151,15 +159,17 @@ func buildGraph(grid game2d.Grid, start game2d.Pos) Graph {
 	for len(todo) > 0 {
 		p := todo[0]
 		todo = todo[1:]
-		if c, ok := grid[p]; ok && c != '#' {
-			for _, n := range p.Neighbors4() {
-				if c, ok := grid[n]; ok && c != '#' {
-					pc := exploreSinglePath(grid, p, n, 1)
-					if !slices.Contains(res[p], pc) {
-						res[p] = append(res[p], pc)
-						todo = append(todo, pc.pos)
-					}
-				}
+		if c, ok := grid[p]; !ok || c == '#' {
+			continue
+		}
+		for _, n := range p.Neighbors4() {
+			if c, ok := grid[n]; !ok || c == '#' {
+				continue
+			}
+			pc, ok := exploreSinglePath(grid, p, n, 1, part2)
+			if ok && !slices.Contains(res[p], pc) {
+				res[p] = append(res[p], pc)
+				todo = append(todo, pc.pos)
 			}
 		}
 	}
@@ -167,14 +177,14 @@ func buildGraph(grid game2d.Grid, start game2d.Pos) Graph {
 	return res
 }
 
-func Part2(input string) int {
+func solve(input string, part2 bool) int {
 	grid := game2d.BuildGridFromString(input)
 
 	minX, maxX, minY, maxY := game2d.GridBounds(grid)
 	start := game2d.Pos{X: minX + 1, Y: minY}
 	end := game2d.Pos{X: maxX - 1, Y: maxY}
 
-	neighbors := buildGraph(grid, start)
+	neighbors := buildGraph(grid, start, part2)
 	//for k, v := range neighbors {
 	//	fmt.Printf("%d, %d\n", k.Y+1, k.X+1)
 	//	for _, pc := range v {
@@ -184,6 +194,14 @@ func Part2(input string) int {
 
 	visited := make(map[game2d.Pos]bool)
 	return explore(neighbors, start, end, visited, 0, 0)
+}
+
+func Part1(input string) int {
+	return solve(input, false)
+}
+
+func Part2(input string) int {
+	return solve(input, true)
 }
 
 func main() {

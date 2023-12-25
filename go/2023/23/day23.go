@@ -3,93 +3,13 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/oleiade/lane/v2"
 	"github.com/pemoreau/advent-of-code/go/utils/game2d"
-	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"slices"
 	"time"
 )
 
 //go:embed input.txt
 var inputDay string
-
-func neighbors1(grid game2d.Grid, s state) []state {
-	p := s.pos
-	c, _ := grid[p]
-	if c == '#' {
-		return nil
-	}
-
-	var tmp []game2d.Pos
-	switch c {
-	case '.':
-		tmp = append(tmp, p.Neighbors4()...)
-	case '>':
-		tmp = append(tmp, game2d.Pos{X: p.X + 1, Y: p.Y})
-	case '<':
-		tmp = append(tmp, game2d.Pos{X: p.X - 1, Y: p.Y})
-	case '^':
-		tmp = append(tmp, game2d.Pos{X: p.X, Y: p.Y - 1})
-	case 'v':
-		tmp = append(tmp, game2d.Pos{X: p.X, Y: p.Y + 1})
-	}
-
-	var res []state
-	for _, n := range tmp {
-		if c, ok := grid[n]; ok && c != '#' && !s.path.Contains(n) {
-			copyPath := set.NewSet[game2d.Pos]()
-			for p := range s.path {
-				copyPath.Add(p)
-			}
-			copyPath.Add(n)
-			newState := state{
-				pos:  n,
-				path: copyPath,
-			}
-			res = append(res, newState)
-		}
-	}
-	return res
-}
-
-type state struct {
-	pos  game2d.Pos
-	path set.Set[game2d.Pos]
-}
-
-func Part11(input string) int {
-	grid := game2d.BuildGridFromString(input)
-
-	minX, maxX, minY, maxY := game2d.GridBounds(grid)
-	start := game2d.Pos{X: minX + 1, Y: minY}
-	end := game2d.Pos{X: maxX - 1, Y: maxY}
-	//fmt.Printf("start: %v - %c\n", start, grid[start])
-	//fmt.Printf("end:   %v - %c\n", end, grid[end])
-
-	var costSoFar = make(map[game2d.Pos]int)
-	costSoFar[start] = 0
-
-	var todo = lane.NewMaxPriorityQueue[state, int]()
-
-	todo.Push(state{pos: start, path: set.NewSet[game2d.Pos]()}, 0)
-
-	for todo.Size() > 0 {
-		s, _, _ := todo.Pop()
-		p := s.pos
-
-		//fmt.Printf("visit %d, %d", p.Y+1, p.X+1)
-		for _, n := range neighbors1(grid, s) {
-			newCost := costSoFar[p] + 1
-			if _, ok := costSoFar[n.pos]; !ok || newCost > costSoFar[n.pos] {
-				costSoFar[n.pos] = newCost
-				todo.Push(n, newCost)
-				//fmt.Printf(" - Push %d, %d cost:%d\n", n.Y+1, n.X+1, newCost)
-			}
-		}
-	}
-
-	return costSoFar[end]
-}
 
 type PosCost struct {
 	pos  game2d.Pos
@@ -130,22 +50,22 @@ func exploreSinglePath(grid game2d.Grid, previous game2d.Pos, current game2d.Pos
 	return PosCost{pos: current, cost: cost}, true
 }
 
-func explore(neighbors Graph, p, end game2d.Pos, visited map[game2d.Pos]bool, path int, bestPath int) int {
-	if p == end {
-		if path > bestPath {
-			bestPath = path
+func explore(neighbors Graph, p, goal game2d.Pos, visited map[game2d.Pos]bool, cost int, maxCost int) int {
+	if p == goal {
+		if cost > maxCost {
+			maxCost = cost
 		}
-		return bestPath
+		return maxCost
 	}
 
 	visited[p] = true
 	for _, pc := range neighbors[p] {
 		if !visited[pc.pos] {
-			bestPath = explore(neighbors, pc.pos, end, visited, path+pc.cost, bestPath)
+			maxCost = explore(neighbors, pc.pos, goal, visited, cost+pc.cost, maxCost)
 		}
 	}
 	visited[p] = false
-	return bestPath
+	return maxCost
 }
 
 type Graph map[game2d.Pos][]PosCost
@@ -192,8 +112,17 @@ func solve(input string, part2 bool) int {
 	//	}
 	//}
 
+	var goal = end
+	var path = 0
+
+	if part2 && len(neighbors[end]) > 0 {
+		// skip last path
+		goal = neighbors[end][0].pos
+		path = neighbors[end][0].cost
+	}
+
 	visited := make(map[game2d.Pos]bool)
-	return explore(neighbors, start, end, visited, 0, 0)
+	return explore(neighbors, start, goal, visited, path, 0)
 }
 
 func Part1(input string) int {

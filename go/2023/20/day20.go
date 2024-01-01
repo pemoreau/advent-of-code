@@ -138,7 +138,7 @@ func parse(input string) (table map[string]*box, w *wires) {
 
 	for _, name := range names {
 		if _, ok := table[name]; !ok {
-			fmt.Println("not found", name)
+			//fmt.Println("not found", name)
 			table[name] = NewBox(name, WIRE, []string{})
 		}
 	}

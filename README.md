@@ -1,15 +1,8 @@
 # Advent Of Code
 
-Mostly written in Rust and Go
+Mostly written in Go and Rust
 
 # Commands
-
-## Rust
-
-- `cd rust/<n>` and `cargo run`
-- `cargo run --release` to run the puzzle in release mode
-- `cargo test` to run unit tests
-- `cargo bench` to run benchmarks
 
 ## Go
 
@@ -17,8 +10,20 @@ Mostly written in Rust and Go
 - `go test` to run unit tests
 - `go test -bench .` to run benchmarks
 - `go test ./...` to run unit tests in all subdirectories
+- 
+## Rust
 
-# Year 2023
+- `cd rust/<n>` and `cargo run`
+- `cargo run --release` to run the puzzle in release mode
+- `cargo test` to run unit tests
+- `cargo bench` to run benchmarks
+
+
+# [Year 2023](README-2023.md)
+
+<a href="https://adventofcode.com"><img src="assets/calendar_2023.png" width="80%" /></a>
+
+## Comments: [Here](README-2023.md)
 
 Execution time on an MacBook Air M2
 
@@ -43,12 +48,12 @@ Execution time on an MacBook Air M2
 | [day 17](./go/2023/17/day17.go) | ` 8.1 ms`   | ` 181 ms`   |
 | [day 18](./go/2023/18/day18.go) | ` 17 μs`    | ` 18 μs`    |
 | [day 19](./go/2023/19/day19.go) | ` 280 μs `  | ` 657 μs`   |
-| [day 20](./go/2023/20/day20.go) | ` 0.000 ms` | ` 0.000 ms` |
-| [day 21](./go/2023/21/day21.go) | ` 0.000 ms` | ` 0.000 ms` |
-| [day 22](./go/2023/22/day22.go) | ` 0.000 ms` | ` 0.000 ms` |
-| [day 23](./go/2023/23/day23.go) | ` 0.000 ms` | ` 0.000 ms` |
-| [day 24](./go/2023/24/day24.go) | ` 0.000 ms` | ` 0.000 ms` |
-| [day 25](./go/2023/25/day25.go) | ` 0.000 ms` |             |
+| [day 20](./go/2023/20/day20.go) | ` 2.5 ms`   | ` 10.3 ms`  |
+| [day 21](./go/2023/21/day21.go) | ` 8.2 ms`   | ` 2.48 s`   |
+| [day 22](./go/2023/22/day22.go) | ` 6.7 s`    | ` 6.7 ms`   |
+| [day 23](./go/2023/23/day23.go) | ` 4.1 ms`   | ` 1.12 s`   |
+| [day 24](./go/2023/24/day24.go) | ` 2.5 ms`   | ` 37.0 ms`  |
+| [day 25](./go/2023/25/day25.go) | graphviz    |             |
 
 # [Year 2022](README-2022.md)
 
@@ -158,10 +163,3 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                             |             |             | [day 24](./go/2020/24/day24.go) | ` 1.120 ms`  | ` 164.1 ms` |
 |                             |             |             | [day 25](./go/2020/25/day25.go) | ` 164.4 ms`  |             |
 
-# Comments
-
-## [README for year 2022](README-2022.md)
-
-## [README for year 2021](README-2021.md)
-
-## [README for year 2020](README-2020.md)

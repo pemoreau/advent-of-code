@@ -10,7 +10,7 @@ Mostly written in Go and Rust
 - `go test` to run unit tests
 - `go test -bench .` to run benchmarks
 - `go test ./...` to run unit tests in all subdirectories
-- 
+
 ## Rust
 
 - `cd rust/<n>` and `cargo run`
@@ -21,7 +21,7 @@ Mostly written in Go and Rust
 
 # [Year 2023](README-2023.md)
 
-<a href="https://adventofcode.com"><img src="assets/calendar_2023.png" width="80%" /></a>
+<a href="https://adventofcode.com"><img src="assets/calendar_2023.png" width="60%" /></a>
 
 ## Comments: [Here](README-2023.md)
 
@@ -49,15 +49,15 @@ Execution time on an MacBook Air M2
 | [day 18](./go/2023/18/day18.go) | ` 0.017 ms` | ` 0.018 ms` |
 | [day 19](./go/2023/19/day19.go) | ` 0.280 ms` | ` 0.657 ms` |
 | [day 20](./go/2023/20/day20.go) | ` 2.500 ms` | ` 10.30 ms` |
-| [day 21](./go/2023/21/day21.go) | ` 8200. ms` | ` 2480. ms` |
-| [day 22](./go/2023/22/day22.go) | ` 6700. ms` | ` 6.700 ms` |
-| [day 23](./go/2023/23/day23.go) | ` 4.100 ms` | ` 1120. ms` |
+| [day 21](./go/2023/21/day21.go) | ` 8200  ms` | ` 2480  ms` |
+| [day 22](./go/2023/22/day22.go) | ` 6700  ms` | ` 6.700 ms` |
+| [day 23](./go/2023/23/day23.go) | ` 4.100 ms` | ` 1120  ms` |
 | [day 24](./go/2023/24/day24.go) | ` 2.500 ms` | ` 37.00 ms` |
 | [day 25](./go/2023/25/day25.go) | graphviz    |             |
 
 # [Year 2022](README-2022.md)
 
-<a href="https://adventofcode.com"><img src="assets/calendar_2022.png" width="80%" /></a>
+<a href="https://adventofcode.com"><img src="assets/calendar_2022.png" width="60%" /></a>
 
 ## Comments: [Here](README-2022.md)
 
@@ -93,7 +93,7 @@ Execution time on an MacBook Air M2
 
 # [Year 2021](README-2021.md)
 
-<a href="https://adventofcode.com"><img src="assets/calendar_2021.png" width="80%" /></a>
+<a href="https://adventofcode.com"><img src="assets/calendar_2021.png" width="60%" /></a>
 
 ## Comments: [Here](README-2021.md)
 
@@ -129,7 +129,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 
 # [Year 2020](README-2020.md)
 
-<a href="https://adventofcode.com"><img src="assets/calendar_2020.png" width="80%" /></a>
+<a href="https://adventofcode.com"><img src="assets/calendar_2020.png" width="60%" /></a>
 
 ## Comments: [Here](README-2020.md)
 
@@ -159,7 +159,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                             |             |             | [day 20](./go/2020/20/day20.go) | ` 36.66 ms`  | ` 44.65 ms` |
 |                             |             |             | [day 21](./go/2020/21/day21.go) | ` 0.802 ms`  | ` 0.718 ms` |
 |                             |             |             | [day 22](./go/2020/22/day22.go) | ` 0.008 ms`  | ` 173.1 ms` |
-|                             |             |             | [day 23](./go/2020/23/day23.go) | ` 0.003 ms`  | ` 1986 ms`  |
+|                             |             |             | [day 23](./go/2020/23/day23.go) | ` 0.003 ms`  | ` 1986  ms` |
 |                             |             |             | [day 24](./go/2020/24/day24.go) | ` 1.120 ms`  | ` 164.1 ms` |
 |                             |             |             | [day 25](./go/2020/25/day25.go) | ` 164.4 ms`  |             |
 

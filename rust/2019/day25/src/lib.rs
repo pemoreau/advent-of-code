@@ -333,6 +333,17 @@ impl Cabinet {
     }
 }
 
+fn powerset<T>(s: &[T]) -> Vec<Vec<&T>> {
+    (0..2usize.pow(s.len() as u32))
+        .map(|i| {
+            s.iter()
+                .enumerate()
+                .filter(|&(t, _)| (i >> t) % 2 == 1)
+                .map(|(_, element)| element)
+                .collect()
+        })
+        .collect()
+}
 pub fn part1(input: String) -> i64 {
     let code = comma_separated_to_numbers(input);
 
@@ -341,26 +352,38 @@ pub fn part1(input: String) -> i64 {
     cabinet.explore_right_hand();
     cabinet.display();
 
+    // move to Sensor
     for command in vec![
-        "inv", "east", "east", "east", "south", "south", "east", "east",
+        "east", "east", "east", "south", "south", "east", "east", "inv",
     ] {
         cabinet.send_command(command);
     }
 
-    // let mut machine = Machine::new(code, vec![]);
-    // machine.run();
-    //
-    // display_output(&mut machine);
-    //
-    // send_command(&mut machine, "east");
-    // send_command(&mut machine, "west");
-    // // send_command(&mut machine, "take infinite loop");
-    // send_command(&mut machine, "east");
-    // send_command(&mut machine, "south");
-    // send_command(&mut machine, "east");
-    // send_command(&mut machine, "south");
-    // send_command(&mut machine, "take semiconductor");
-    // send_command(&mut machine, "east");
+    for tuple in powerset(&vec![
+        "food ration",
+        "weather machine",
+        "antenna",
+        "space law space brochure",
+        "jam",
+        "semiconductor",
+        "planetoid",
+        "monolith",
+    ]) {
+        println!("{:?}", tuple);
+        for command in tuple.clone() {
+            let mut buf: String = "".to_owned();
+            buf.push_str("drop ");
+            buf.push_str(command);
+            cabinet.send_command(&buf);
+        }
+        cabinet.send_command("east");
+        for command in tuple {
+            let mut buf: String = "".to_owned();
+            buf.push_str("take ");
+            buf.push_str(command);
+            cabinet.send_command(&buf);
+        }
+    }
 
     0
 }

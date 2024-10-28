@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 )
@@ -40,17 +41,13 @@ func totalHeight(claim Claim) int {
 }
 
 func maxClaims(claims []Claim) (int, int) {
-	maxH := totalHeight(claims[0])
-	maxW := totalWidth(claims[0])
-	for _, c := range claims {
-		if maxW < totalWidth(c) {
-			maxW = totalWidth(c)
-		}
-		if maxH < totalHeight(c) {
-			maxH = totalHeight(c)
-		}
+	var maxH = make([]int, len(claims))
+	var maxW = make([]int, len(claims))
+	for i := range len(claims) {
+		maxH[i] = totalHeight(claims[i])
+		maxW[i] = totalWidth(claims[i])
 	}
-	return maxH, maxW
+	return slices.Max(maxH), slices.Max(maxW)
 }
 
 func fillMatrix(list []Claim) [][]int {
@@ -60,8 +57,8 @@ func fillMatrix(list []Claim) [][]int {
 		matrix[i] = make([]int, maxH)
 	}
 	for _, c := range list {
-		for i := 0; i < c.width; i++ {
-			for j := 0; j < c.height; j++ {
+		for i := range c.width {
+			for j := range c.height {
 				matrix[c.x+i][c.y+j]++
 			}
 		}

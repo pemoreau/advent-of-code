@@ -40,22 +40,46 @@ func normalize(s []byte) []byte {
 	return s
 }
 
+func stackReduce(input string, skip int32) int {
+	var stack []byte
+	for _, c := range input {
+		if c == skip || c == skip-32 {
+			continue
+		}
+		if len(stack) > 0 {
+			var top = stack[len(stack)-1]
+			if top == byte(c+32) || top == byte(c-32) {
+				stack = stack[:len(stack)-1]
+			} else {
+				stack = append(stack, byte(c))
+			}
+		} else {
+			stack = append(stack, byte(c))
+		}
+	}
+	return len(stack)
+}
+
 func Part1(input string) int {
-	var s = []byte(input)
-	return len(normalize(s))
+	//var s = []byte(input)
+	//return len(normalize(s))
+	return stackReduce(input, 0)
 }
 
 func Part2(input string) int {
 	var minLen = len(input)
+	//for letter := 'a'; letter <= 'z'; letter++ {
+	//	var s []byte
+	//	for _, c := range input {
+	//		if c != letter && c != letter-32 {
+	//			s = append(s, byte(c))
+	//		}
+	//	}
+	//	s = normalize(s)
+	//	minLen = min(minLen, len(s))
+	//}
 	for letter := 'a'; letter <= 'z'; letter++ {
-		var s []byte
-		for _, c := range input {
-			if c != letter && c != letter-32 {
-				s = append(s, byte(c))
-			}
-		}
-		s = normalize(s)
-		minLen = min(minLen, len(s))
+		minLen = min(minLen, stackReduce(input, letter))
 	}
 
 	return minLen

@@ -41,23 +41,26 @@ func normalize(s []byte) []byte {
 }
 
 func stackReduce(input string, skip int32) int {
-	var stack []byte
+	var stack = make([]int32, len(input))
+	var sp = 0
 	for _, c := range input {
 		if c == skip || c == skip-32 {
 			continue
 		}
-		if len(stack) > 0 {
-			var top = stack[len(stack)-1]
-			if top == byte(c+32) || top == byte(c-32) {
-				stack = stack[:len(stack)-1]
+		if sp > 0 {
+			var top = stack[sp-1]
+			if top == c+32 || top == c-32 {
+				sp = sp - 1
 			} else {
-				stack = append(stack, byte(c))
+				stack[sp] = c
+				sp = sp + 1
 			}
 		} else {
-			stack = append(stack, byte(c))
+			stack[sp] = c
+			sp = sp + 1
 		}
 	}
-	return len(stack)
+	return sp
 }
 
 func Part1(input string) int {

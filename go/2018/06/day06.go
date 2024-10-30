@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/pemoreau/advent-of-code/go/utils/game2d"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"math"
 	"strings"
 	"time"
@@ -42,43 +43,36 @@ func Part1(input string) int {
 	var minX, maxX, minY, maxY = minmax(coords)
 
 	var area = make(map[game2d.Pos]int)
-	var infinite = make(map[game2d.Pos]bool)
+	var infinite = set.NewSet[game2d.Pos]()
 	for x := minX; x <= maxX; x++ {
 		for y := minY; y <= maxY; y++ {
 			p := game2d.Pos{X: x, Y: y}
 			minDist := math.MaxInt
 			var closest game2d.Pos
-			var multiple bool
 			for _, c := range coords {
 				dist := game2d.ManhattanDistance(p, c)
 				if dist < minDist {
 					minDist = dist
 					closest = c
-					multiple = false
 				} else if dist == minDist {
 					closest = game2d.Pos{X: -1, Y: -1}
-					multiple = true
 				}
 			}
-			if !multiple {
+			if closest != (game2d.Pos{X: -1, Y: -1}) {
 				area[closest]++
 			}
 			if x == minX || x == maxX || y == minY || y == maxY {
-				infinite[closest] = true
+				infinite.Add(closest)
 			}
 		}
 	}
 
 	var maxArea int
-	for a, c := range area {
-		if infinite[a] {
-			continue
-		}
-		if c > maxArea {
-			maxArea = c
+	for a, size := range area {
+		if size > maxArea && !infinite.Contains(a) {
+			maxArea = size
 		}
 	}
-
 	return maxArea
 }
 

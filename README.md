@@ -166,31 +166,31 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 # Year 2019
 | Rust                              | part A      | part B      |
 |---------------------------------|-------------|-------------|
-| [day 01](./rust/2019/01/day01)  |||
-| [day 02](./rust/2019/02/day02) |||
-| [day 03](./rust/2019/03/day03) |||
-| [day 04](./rust/2019/04/day04) |||
-| [day 05](./rust/2019/05/day05) |||
-| [day 06](./rust/2019/06/day06) |||
-| [day 07](./rust/2019/07/day07) |||
-| [day 08](./rust/2019/08/day08) |||
-| [day 09](./rust/2019/09/day09) |||
-| [day 10](./rust/2019/10/day10) |||
-| [day 11](./rust/2019/11/day11) |||
-| [day 12](./rust/2019/12/day12) |||
-| [day 13](./rust/2019/13/day13) |||
-| [day 14](./rust/2019/14/day14) |||
-| [day 15](./rust/2019/15/day15) |||
-| [day 16](./rust/2019/16/day16) |||
-| [day 17](./rust/2019/17/day17) |||
-| [day 18](./rust/2019/18/day18) |||
-| [day 19](./rust/2019/19/day19) |||
-| [day 20](./rust/2019/20/day20) |||
-| [day 21](./rust/2019/21/day21) |||
-| [day 22](./rust/2019/22/day22) |||
-| [day 23](./rust/2019/23/day23) |||
-| [day 24](./rust/2019/24/day24) |||
-| [day 25](./rust/2019/25/day25) |||
+| [day 01](./rust/2019/day01)  |||
+| [day 02](./rust/2019/day02) |||
+| [day 03](./rust/2019/day03) |||
+| [day 04](./rust/2019/day04) |||
+| [day 05](./rust/2019/day05) |||
+| [day 06](./rust/2019/day06) |||
+| [day 07](./rust/2019/day07) |||
+| [day 08](./rust/2019/day08) |||
+| [day 09](./rust/2019/day09) |||
+| [day 10](./rust/2019/day10) |||
+| [day 11](./rust/2019/day11) |||
+| [day 12](./rust/2019/day12) |||
+| [day 13](./rust/2019/day13) |||
+| [day 14](./rust/2019/day14) |||
+| [day 15](./rust/2019/day15) |||
+| [day 16](./rust/2019/day16) |||
+| [day 17](./rust/2019/day17) |||
+| [day 18](./rust/2019/day18) |||
+| [day 19](./rust/2019/day19) |||
+| [day 20](./rust/2019/day20) |||
+| [day 21](./rust/2019/day21) |||
+| [day 22](./rust/2019/day22) |||
+| [day 23](./rust/2019/day23) |||
+| [day 24](./rust/2019/day24) |||
+| [day 25](./rust/2019/day25) |||
 
 # Year 2018
 | Rust                              | part A      | part B      |

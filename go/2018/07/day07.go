@@ -38,28 +38,35 @@ func parseInput(input string) Graph {
 	return graph
 }
 
+func selectNextTask(graph Graph) uint8 {
+	var smallest uint8 = math.MaxUint8
+	// select the smallest activable
+	for k, previous := range graph {
+		if len(previous) == 0 && k < smallest {
+			smallest = k
+		}
+	}
+	return smallest
+}
+
+func removeTaskFromPrevious(graph Graph, task uint8) {
+	for k, previous := range graph {
+		if slices.Contains(previous, task) {
+			index := slices.Index(previous, task)
+			graph[k] = append(previous[:index], previous[index+1:]...)
+		}
+	}
+}
+
 func Part1(input string) string {
 	var graph = parseInput(input)
 	var res = ""
 	for len(graph) > 0 {
-		var smallest uint8 = math.MaxUint8
-		// select the smallest activable
-		for k, previous := range graph {
-			if len(previous) == 0 && k < smallest {
-				smallest = k
-			}
-		}
-		res += string(smallest)
-		delete(graph, smallest)
-		// remove the smallest from all previous
-		for k, previous := range graph {
-			if slices.Contains(previous, smallest) {
-				index := slices.Index(previous, smallest)
-				graph[k] = append(previous[:index], previous[index+1:]...)
-			}
-		}
+		var task = selectNextTask(graph)
+		res += string(task)
+		delete(graph, task)
+		removeTaskFromPrevious(graph, task)
 	}
-
 	return res
 }
 
@@ -81,9 +88,7 @@ func (w Worker) String() string {
 func Part2(input string) int {
 	var graph = parseInput(input)
 
-	//var offset, nbWorkers = 0, 2
 	var offset, nbWorkers = 60, 5
-
 	var time = 0
 	var workers = make([]*Worker, nbWorkers)
 	for i := range workers {
@@ -91,48 +96,30 @@ func Part2(input string) int {
 	}
 
 	for len(graph) > 0 {
-		// while there are workers available
+		// assign tasks to available workers
 		for _, worker := range workers {
-			if worker.durationLeft == 0 {
-				//fmt.Printf("worker %d is available\n", worker.number)
-				// select the taskId activable
-				var taskId uint8 = math.MaxUint8
-				for id, previous := range graph {
-					if len(previous) == 0 && id < taskId {
-						taskId = id
-					}
+			if worker.durationLeft == 0 { // worker is avalaible
+				var taskId = selectNextTask(graph)
+				if taskId < math.MaxUint8 { // assign a task to worker
+					worker.taskId = taskId
+					worker.start = time
+					worker.durationLeft = duration(taskId, offset)
+					delete(graph, taskId)
 				}
-				if taskId == math.MaxUint8 {
-					break
-				}
-				//fmt.Printf("worker %d is working on %c\n", worker.number, taskId)
-				worker.taskId = taskId
-				worker.start = time
-				worker.durationLeft = duration(taskId, offset)
-				delete(graph, taskId)
 			}
 		}
 
-		// advance time
 		time++
-		//fmt.Printf("time: %d\n", time)
 		for _, worker := range workers {
 			if worker.durationLeft > 0 {
 				worker.durationLeft--
-				//fmt.Println(worker)
-				if worker.durationLeft == 0 {
-					//fmt.Printf("worker %d finished %c\n", worker.number, worker.taskId)
-					// remove the task from all previous
-					for k, previous := range graph {
-						if slices.Contains(previous, worker.taskId) {
-							index := slices.Index(previous, worker.taskId)
-							graph[k] = append(previous[:index], previous[index+1:]...)
-						}
-					}
+				if worker.durationLeft == 0 { // worker finished
+					removeTaskFromPrevious(graph, worker.taskId)
 				}
 			}
 		}
 	}
+
 	var maxDuration = 0
 	var workerWithMaxDurationLeft Worker
 	for _, worker := range workers {

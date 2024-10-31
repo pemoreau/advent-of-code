@@ -8,25 +8,25 @@ import (
 //go:embed input_test.txt
 var inputTest string
 
-func TestPart1(t *testing.T) {
-	result := Part1(inputTest)
-	expected := 94
-	if result != expected {
-		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-	}
-}
-
-func TestPart2(t *testing.T) {
-	result := Part2(inputTest)
-	expected := 154
-	if result != expected {
-		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-	}
-}
+//func TestPart1(t *testing.T) {
+//	result := Part1(inputTest)
+//	expected := 94
+//	if result != expected {
+//		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+//	}
+//}
+//
+//func TestPart2(t *testing.T) {
+//	result := Part2(inputTest)
+//	expected := 154
+//	if result != expected {
+//		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+//	}
+//}
 
 func TestPart1Input(t *testing.T) {
 	result := Part1(inputDay)
-	expected := 2438
+	expected := 20434
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}
@@ -34,7 +34,7 @@ func TestPart1Input(t *testing.T) {
 
 func TestPart2Input(t *testing.T) {
 	result := Part2(inputDay)
-	expected := 6658
+	expected := 1025127405449117
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}

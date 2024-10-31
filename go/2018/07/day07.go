@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	_ "embed"
 	"fmt"
 	"math"
@@ -77,12 +78,11 @@ func duration(c uint8, offset int) int {
 type Worker struct {
 	number       int
 	taskId       uint8
-	start        int
 	durationLeft int
 }
 
 func (w Worker) String() string {
-	return fmt.Sprintf("worker #%d: task: %c start at: %d duration left: %d", w.number, w.taskId, w.start, w.durationLeft)
+	return fmt.Sprintf("worker #%d: task: %c duration left: %d", w.number, w.taskId, w.durationLeft)
 }
 
 func Part2(input string) int {
@@ -90,49 +90,40 @@ func Part2(input string) int {
 
 	var offset, nbWorkers = 60, 5
 	var time = 0
-	var workers = make([]*Worker, nbWorkers)
-	for i := range workers {
-		workers[i] = &Worker{number: i}
+	var available, active []*Worker
+	for i := range nbWorkers {
+		available = append(available, &Worker{number: i})
 	}
 
 	for len(graph) > 0 {
 		// assign tasks to available workers
-		for _, worker := range workers {
-			if worker.durationLeft == 0 { // worker is avalaible
-				var taskId = selectNextTask(graph)
-				if taskId < math.MaxUint8 { // assign a task to worker
-					worker.taskId = taskId
-					worker.start = time
-					worker.durationLeft = duration(taskId, offset)
-					delete(graph, taskId)
-				}
-			}
+		for task := selectNextTask(graph); len(available) > 0 && task < math.MaxUint8; task = selectNextTask(graph) {
+			var worker = available[0]
+			worker.taskId = task
+			worker.durationLeft = duration(worker.taskId, offset)
+			available = available[1:]
+			active = append(active, worker)
+			delete(graph, worker.taskId)
 		}
 
 		time++
-		for _, worker := range workers {
-			if worker.durationLeft > 0 {
-				worker.durationLeft--
-				if worker.durationLeft == 0 { // worker finished
-					removeTaskFromPrevious(graph, worker.taskId)
-				}
+		var newActive []*Worker
+		for _, worker := range active {
+			worker.durationLeft--
+			if worker.durationLeft == 0 { // worker finished
+				removeTaskFromPrevious(graph, worker.taskId)
+				available = append(available, worker)
+			} else {
+				newActive = append(newActive, worker)
 			}
 		}
+		active = newActive
 	}
 
-	var maxDuration = 0
-	var workerWithMaxDurationLeft Worker
-	for _, worker := range workers {
-		if worker.durationLeft > maxDuration {
-			maxDuration = worker.durationLeft
-			workerWithMaxDurationLeft = *worker
-		}
-	}
-	time += workerWithMaxDurationLeft.durationLeft
+	time += slices.MaxFunc(active, func(a, b *Worker) int { return cmp.Compare(a.durationLeft, b.durationLeft) }).durationLeft
 	return time
 }
 
-// too high 1126
 func main() {
 	fmt.Println("--2018 day 07 solution--")
 	start := time.Now()

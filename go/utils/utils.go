@@ -48,7 +48,7 @@ func ReadNumbers(filename string) []int {
 	return numbers
 }
 
-func stringsToNumbers(inputs []string) []int {
+func StringsToNumbers(inputs []string) []int {
 	numbers := make([]int, 0, len(inputs))
 	for _, input := range inputs {
 		numbers = append(numbers, ToInt(input))
@@ -58,9 +58,9 @@ func stringsToNumbers(inputs []string) []int {
 
 func LinesToNumbers(input string) []int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
-	return stringsToNumbers(lines)
+	return StringsToNumbers(lines)
 }
 func CommaSeparatedToNumbers(input string) []int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), ",")
-	return stringsToNumbers(lines)
+	return StringsToNumbers(lines)
 }

@@ -3,88 +3,149 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"github.com/pemoreau/advent-of-code/go/utils/set"
+	"math"
 	"slices"
 	"strings"
 	"time"
 )
 
-//go:embed input_test.txt
+//go:embed input.txt
 var inputDay string
 
-type Graph map[uint8]struct {
-	previous []uint8
-	next     []uint8
+type Graph map[uint8][]uint8
+
+func (g Graph) String() string {
+	var res = ""
+	for k, v := range g {
+		res += fmt.Sprintf("%c: %c\n", k, v)
+	}
+	return res
 }
 
-func parseInput(input string) (map[uint8][]uint8, uint8) {
+func parseInput(input string) Graph {
 	input = strings.TrimSuffix(input, "\n")
 	lines := strings.Split(input, "\n")
-	var res = make(map[uint8][]uint8)
-	var appearsRhs = set.NewSet[uint8]()
+	var graph = make(Graph)
 	for _, line := range lines {
-		// Step C must be finished before step A can begin.
-		var step, nt uint8
-		fmt.Sscanf(line, "Step %c must be finished before step %c can begin.", &step, &nt)
-		res[nt] = append(res[nt], step)
-		appearsRhs.Add(step)
-	}
-	var root uint8
-	for k, v := range res {
-		res[k] = sortAndRemoveDouble(v)
-		if !appearsRhs.Contains(k) {
-			root = k
+		// Step <previous> must be finished before step <next> can begin.
+		var previous, next uint8
+		fmt.Sscanf(line, "Step %c must be finished before step %c can begin.", &previous, &next)
+		if _, ok := graph[previous]; !ok {
+			graph[previous] = []uint8{}
 		}
+		graph[next] = append(graph[next], previous)
 	}
-	return res, root
+	return graph
 }
 
-func sortAndRemoveDouble(steps []uint8) []uint8 {
-	var res = slices.Clone(steps)
-	slices.Sort(res)
-	for i := 0; i < len(res)-1; {
-		if res[i] == res[i+1] {
-			res = append(res[:i], res[i+1:]...)
-		} else {
-			i++
-		}
-	}
-	return res
-}
-
-func generate(grammar map[uint8][]uint8, root uint8) string {
+func Part1(input string) string {
+	var graph = parseInput(input)
 	var res = ""
-	var todo = make([]uint8, 0)
-	var visited = set.NewSet[uint8]()
-	todo = append(todo, root)
-	for len(todo) > 0 {
-		var newTodo = make([]uint8, 0)
-		for i := len(todo) - 1; i >= 0; i-- {
-			if visited.Contains(todo[i]) {
-				continue
+	for len(graph) > 0 {
+		var smallest uint8 = math.MaxUint8
+		// select the smallest activable
+		for k, previous := range graph {
+			if len(previous) == 0 && k < smallest {
+				smallest = k
 			}
-			res += string(todo[i])
-			visited.Add(todo[i])
-			newTodo = slices.Concat(newTodo, grammar[todo[i]])
 		}
-		fmt.Println(todo, newTodo)
-		todo = sortAndRemoveDouble(newTodo)
+		res += string(smallest)
+		delete(graph, smallest)
+		// remove the smallest from all previous
+		for k, previous := range graph {
+			if slices.Contains(previous, smallest) {
+				index := slices.Index(previous, smallest)
+				graph[k] = append(previous[:index], previous[index+1:]...)
+			}
+		}
 	}
+
 	return res
 }
 
-func Part1(input string) int {
-	var grammar, root = parseInput(input)
+func duration(c uint8, offset int) int {
+	return offset + int(c) - 'A' + 1
+}
 
-	fmt.Println(grammar, root)
-	fmt.Println(generate(grammar, root))
-	return 0
+type Worker struct {
+	number       int
+	taskId       uint8
+	start        int
+	durationLeft int
+}
+
+func (w Worker) String() string {
+	return fmt.Sprintf("worker #%d: task: %c start at: %d duration left: %d", w.number, w.taskId, w.start, w.durationLeft)
 }
 
 func Part2(input string) int {
-	return 0
+	var graph = parseInput(input)
+
+	//var offset, nbWorkers = 0, 2
+	var offset, nbWorkers = 60, 5
+
+	var time = 0
+	var workers = make([]*Worker, nbWorkers)
+	for i := range workers {
+		workers[i] = &Worker{number: i}
+	}
+
+	for len(graph) > 0 {
+		// while there are workers available
+		for _, worker := range workers {
+			if worker.durationLeft == 0 {
+				//fmt.Printf("worker %d is available\n", worker.number)
+				// select the taskId activable
+				var taskId uint8 = math.MaxUint8
+				for id, previous := range graph {
+					if len(previous) == 0 && id < taskId {
+						taskId = id
+					}
+				}
+				if taskId == math.MaxUint8 {
+					break
+				}
+				//fmt.Printf("worker %d is working on %c\n", worker.number, taskId)
+				worker.taskId = taskId
+				worker.start = time
+				worker.durationLeft = duration(taskId, offset)
+				delete(graph, taskId)
+			}
+		}
+
+		// advance time
+		time++
+		//fmt.Printf("time: %d\n", time)
+		for _, worker := range workers {
+			if worker.durationLeft > 0 {
+				worker.durationLeft--
+				//fmt.Println(worker)
+				if worker.durationLeft == 0 {
+					//fmt.Printf("worker %d finished %c\n", worker.number, worker.taskId)
+					// remove the task from all previous
+					for k, previous := range graph {
+						if slices.Contains(previous, worker.taskId) {
+							index := slices.Index(previous, worker.taskId)
+							graph[k] = append(previous[:index], previous[index+1:]...)
+						}
+					}
+				}
+			}
+		}
+	}
+	var maxDuration = 0
+	var workerWithMaxDurationLeft Worker
+	for _, worker := range workers {
+		if worker.durationLeft > maxDuration {
+			maxDuration = worker.durationLeft
+			workerWithMaxDurationLeft = *worker
+		}
+	}
+	time += workerWithMaxDurationLeft.durationLeft
+	return time
 }
 
+// too high 1126
 func main() {
 	fmt.Println("--2018 day 07 solution--")
 	start := time.Now()

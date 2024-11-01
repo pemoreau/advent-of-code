@@ -12,6 +12,10 @@ import (
 
 type Grid map[Pos]uint8
 
+func New() Grid {
+	return make(Grid)
+}
+
 func BuildGrid(lines []string) Grid {
 	grid := make(Grid)
 	for j, l := range lines {

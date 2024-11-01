@@ -11,18 +11,36 @@ import (
 //go:embed input.txt
 var inputDay string
 
-func sum(numbers []int, index int, accu int) (int, int) {
+func sum(numbers []int, index int) (int, int) {
 	var nbChild = numbers[index]
 	var nbMeta = numbers[index+1]
 	index += 2
+	var res = 0
 	for range nbChild {
-		index, accu = sum(numbers, index, accu)
+		var accu int
+		index, accu = sum(numbers, index)
+		res += accu
 	}
 	for range nbMeta {
-		accu += numbers[index]
+		res += numbers[index]
 		index++
 	}
-	return index, accu
+	return index, res
+}
+
+func sum2(numbers []int, index *int) int {
+	var nbChild = numbers[*index]
+	var nbMeta = numbers[*index+1]
+	*index += 2
+	var res = 0
+	for range nbChild {
+		res += sum2(numbers, index)
+	}
+	for range nbMeta {
+		res += numbers[*index]
+		*index++
+	}
+	return res
 }
 
 func value(numbers []int, index int) (int, int) {
@@ -30,12 +48,12 @@ func value(numbers []int, index int) (int, int) {
 	var nbMeta = numbers[index+1]
 	index += 2
 	if nbChild == 0 {
-		var accu = 0
-		for i := 0; i < nbMeta; i++ {
-			accu += numbers[index]
+		var res = 0
+		for range nbMeta {
+			res += numbers[index]
 			index++
 		}
-		return index, accu
+		return index, res
 	}
 
 	var childs []int
@@ -45,23 +63,25 @@ func value(numbers []int, index int) (int, int) {
 		childs = append(childs, accu)
 	}
 
-	var accu = 0
+	var res = 0
 	for range nbMeta {
 		var meta = numbers[index]
 		index++
 		if meta > 0 && meta <= nbChild {
-			accu += childs[meta-1]
+			res += childs[meta-1]
 		}
 	}
 
-	return index, accu
+	return index, res
 }
 
 func Part1(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	parts := strings.Split(input, " ")
 	var numbers = utils.StringsToNumbers(parts)
-	_, res := sum(numbers, 0, 0)
+	var index = 0
+	//_, res := sum(numbers, 0)
+	res := sum2(numbers, &index)
 	return res
 }
 

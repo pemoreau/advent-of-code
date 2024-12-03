@@ -27,10 +27,11 @@ func CurrentDate() (year, day int, err error) {
 
 	dateDir := abs //filepath.Dir(abs)
 	//fmt.Printf("dateDir: %s\n", dateDir)
-	if name := filepath.Base(dateDir); regexp.MustCompile(`^\d\d?$`).MatchString(name) {
-		day, _ = strconv.Atoi(name)
+	if name := filepath.Base(dateDir); regexp.MustCompile(`^\d\d`).MatchString(name) {
+		day, _ = strconv.Atoi(name[:2])
 	} else {
 		err = fmt.Errorf("parent directory /%s/. must be format /DD/. representing the AOC day", name)
+		fmt.Println(err)
 		return
 	}
 	yearDir := filepath.Dir(dateDir)

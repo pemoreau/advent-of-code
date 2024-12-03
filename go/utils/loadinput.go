@@ -73,6 +73,9 @@ func GetWith(uri string, headers map[string]string) (io.ReadCloser, error) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
+
+	time.Sleep(1 * time.Second)
+
 	resp, err := http.DefaultClient.Do(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
@@ -81,6 +84,7 @@ func GetWith(uri string, headers map[string]string) (io.ReadCloser, error) {
 }
 
 func fetchUserInput(year, day int, session string) (string, error) {
+
 	url := fmt.Sprintf("https://adventofcode.com/%d/day/%d/input", year, day)
 	rc, err := GetWith(url, map[string]string{
 		"Cookie": "session=" + session,

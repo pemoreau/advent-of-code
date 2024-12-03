@@ -1,0 +1,10 @@
+[package]
+name = "day02"
+version = "0.1.0"
+authors = ["PEM"]
+edition = "2021"
+
+[dependencies]
+utils = { path = "../../utils" }
+regex = "1.5.5"
+peg = "0.6.3"

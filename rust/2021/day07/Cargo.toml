@@ -1,0 +1,15 @@
+[package]
+name = "day07"
+version = "0.1.0"
+authors = ["PEM"]
+edition = "2021"
+
+[dependencies]
+utils = { path = "../../utils" }
+
+[dev-dependencies]
+criterion = "0.3.5"
+
+[[bench]]
+name = "benchmark"
+harness = false

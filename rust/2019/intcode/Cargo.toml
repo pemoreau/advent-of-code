@@ -1,0 +1,7 @@
+[package]
+name = "intcode"
+version = "0.1.0"
+authors = ["PEM"]
+edition = "2021"
+
+[dependencies]

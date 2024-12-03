@@ -1,0 +1,8 @@
+# Specifies which edition is used by the parser.
+edition = "2021"
+
+# Prevent carriage returns
+newline_style = "Unix"
+
+# Use field initialize shorthand if possible.
+use_field_init_shorthand = true

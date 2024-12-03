@@ -1,0 +1,10 @@
+[package]
+name = "day22"
+version = "0.1.0"
+authors = ["PEM"]
+edition = "2021"
+
+[dependencies]
+utils = { path = "../../utils" }
+intcode = { path = "../intcode" }
+num = "0.4.0"

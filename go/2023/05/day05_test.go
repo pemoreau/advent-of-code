@@ -2,11 +2,9 @@ package main
 
 import (
 	_ "embed"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"testing"
 )
-
-//go:embed input_test.txt
-var inputTest string
 
 func equals(a, b []Interval) bool {
 	if len(a) != len(b) {
@@ -100,6 +98,7 @@ func TestPart2(t *testing.T) {
 }
 
 func TestPart1Input(t *testing.T) {
+	var inputDay = utils.Input()
 	result := Part1(inputDay)
 	expected := 157211394
 	if result != expected {
@@ -108,6 +107,7 @@ func TestPart1Input(t *testing.T) {
 }
 
 func TestPart2Input(t *testing.T) {
+	var inputDay = utils.Input()
 	result := Part2(inputDay)
 	expected := 50855035
 	if result != expected {
@@ -116,11 +116,13 @@ func TestPart2Input(t *testing.T) {
 }
 
 func BenchmarkPart1(b *testing.B) {
+	var inputDay = utils.Input()
 	for range b.N {
 		Part1(inputDay)
 	}
 }
 func BenchmarkPart2(b *testing.B) {
+	var inputDay = utils.Input()
 	for range b.N {
 		Part2(inputDay)
 	}

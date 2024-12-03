@@ -3,13 +3,11 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"strings"
 	"time"
 	"unicode"
 )
-
-//go:embed input.txt
-var inputDay string
 
 type Graph struct {
 	nodes map[string]*Node
@@ -85,6 +83,7 @@ func Part2(input string) int {
 
 func main() {
 
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

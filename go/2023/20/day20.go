@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 const (
 	FLIP = iota
@@ -194,6 +194,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2023 day 20 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

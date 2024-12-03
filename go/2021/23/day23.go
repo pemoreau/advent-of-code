@@ -4,13 +4,11 @@ import (
 	"container/heap"
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"strings"
 	"time"
 	"unicode"
 )
-
-//go:embed input.txt
-var inputDay string
 
 const hallwayY int = 1
 
@@ -569,6 +567,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2021 day 23 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

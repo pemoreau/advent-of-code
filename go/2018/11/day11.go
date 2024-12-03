@@ -3,12 +3,10 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"strconv"
 	"time"
 )
-
-//go:embed input.txt
-var inputDay string
 
 func powerLevel(x, y, serial int) int {
 	var rackID = x + 10
@@ -98,6 +96,7 @@ func Part2(input string) string {
 
 func main() {
 	fmt.Println("--2018 day 11 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

@@ -3,14 +3,15 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"strconv"
 	"strings"
 	"text/scanner"
 	"time"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 func Part1(input string) int {
 	var s scanner.Scanner
@@ -92,6 +93,7 @@ func Part2Slow(input string) int {
 
 func main() {
 	fmt.Println("--2022 day 04 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

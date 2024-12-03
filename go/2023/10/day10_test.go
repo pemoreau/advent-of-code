@@ -2,19 +2,17 @@ package main
 
 import (
 	_ "embed"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"testing"
 )
 
-//go:embed input_test.txt
-var inputTest string
-
-//go:embed input_test2_1.txt
+//go:embed sample2_1.txt
 var inputTest21 string
 
-//go:embed input_test2_2.txt
+//go:embed sample2_2.txt
 var inputTest22 string
 
-//go:embed input_test2_3.txt
+//go:embed sample2_3.txt
 var inputTest23 string
 
 func TestPart1(t *testing.T) {
@@ -50,6 +48,7 @@ func TestPart23(t *testing.T) {
 }
 
 func TestPart1Input(t *testing.T) {
+	var inputDay = utils.Input()
 	result := Part1(inputDay)
 	expected := 6968
 	if result != expected {
@@ -58,6 +57,7 @@ func TestPart1Input(t *testing.T) {
 }
 
 func TestPart2Input(t *testing.T) {
+	var inputDay = utils.Input()
 	result := Part2(inputDay)
 	expected := 413
 	if result != expected {
@@ -66,11 +66,13 @@ func TestPart2Input(t *testing.T) {
 }
 
 func BenchmarkPart1(b *testing.B) {
+	var inputDay = utils.Input()
 	for range b.N {
 		Part1(inputDay)
 	}
 }
 func BenchmarkPart2(b *testing.B) {
+	var inputDay = utils.Input()
 	for range b.N {
 		Part2(inputDay)
 	}

@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"github.com/pemoreau/advent-of-code/go/utils/interval"
 	"math"
 	"strconv"
@@ -10,9 +11,6 @@ import (
 	"sync"
 	"time"
 )
-
-//go:embed input.txt
-var inputDay string
 
 type Instr interface {
 	isInstr()
@@ -295,6 +293,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2021 day 24 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

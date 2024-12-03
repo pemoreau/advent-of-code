@@ -3,13 +3,11 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"regexp"
 	"strconv"
 	"time"
 )
-
-//go:embed input.txt
-var inputDay string
 
 type Pos struct{ x, y int }
 type Area struct{ upperLeft, lowerRight Pos }
@@ -108,6 +106,7 @@ func Part2(input string) int {
 }
 
 func main() {
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

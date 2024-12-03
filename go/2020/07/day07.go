@@ -3,13 +3,11 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"strconv"
 	"strings"
 	"time"
 )
-
-//go:embed input.txt
-var inputDay string
 
 type Color struct {
 	name    string
@@ -44,8 +42,8 @@ func parseLine(line string) Color {
 
 type Store = map[string][]ColorWithMultiplicity
 
-func readFile() Store {
-	lines := strings.Split(strings.TrimSuffix(inputDay, "\n"), "\n")
+func readFile(input string) Store {
+	lines := strings.Split(strings.TrimSuffix(input, "\n"), "\n")
 	res := make(Store)
 	for _, line := range lines {
 		color := parseLine(line)
@@ -77,7 +75,7 @@ func countBags(s Store, name string) int {
 }
 
 func Part1(input string) (res int) {
-	colors := readFile()
+	colors := readFile(input)
 	for key := range colors {
 		b := containsColor(colors, key, "shiny gold")
 		if b {
@@ -88,12 +86,13 @@ func Part1(input string) (res int) {
 }
 
 func Part2(input string) int {
-	colors := readFile()
+	colors := readFile(input)
 	return countBags(colors, "shiny gold") - 1
 }
 
 func main() {
 	fmt.Println("--2020 day 07 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

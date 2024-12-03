@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 func sum(numbers []int, index int) (int, int) {
 	var nbChild = numbers[index]
@@ -95,6 +95,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2018 day 08 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

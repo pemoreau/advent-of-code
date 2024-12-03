@@ -3,12 +3,10 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"strings"
 	"time"
 )
-
-//go:embed input.txt
-var inputDay string
 
 func check2(s string) bool {
 	for _, b := range check(s) {
@@ -85,6 +83,7 @@ func Part2(input string) string {
 
 func main() {
 	fmt.Println("--2018 day 02 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

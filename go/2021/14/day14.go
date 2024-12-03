@@ -3,13 +3,14 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"math"
 	"strings"
 	"time"
 )
 
-//go:embed input.txt
-var input string
+//go:embed sample.txt
+var inputTest string
 
 type matrix [26][26]byte
 
@@ -90,11 +91,12 @@ func Part2(input string) int {
 }
 
 func main() {
+	var inputDay = utils.Input()
 	start := time.Now()
-	fmt.Println("part1: ", Part1(string(input)))
+	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
 
 	start = time.Now()
-	fmt.Println("part2: ", Part2(string(input)))
+	fmt.Println("part2: ", Part2(inputDay))
 	fmt.Println(time.Since(start))
 }

@@ -3,11 +3,12 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"time"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 func findRedex(s []byte, fromIndex int) int {
 	if fromIndex < 0 {
@@ -90,6 +91,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2018 day 05 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 func explore(input string) *game2d.GridChar {
 	var grid = game2d.NewGridChar()
@@ -114,6 +114,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2018 day 20 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

@@ -1,6 +1,8 @@
 package wip
 
 import (
+	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"testing"
 )
 

@@ -10,6 +10,9 @@ import (
 	"time"
 )
 
+//go:embed sample.txt
+var inputTest string
+
 func parse(input string) (left []int, right []int) {
 	var lines = strings.Split(input, "\n")
 	for _, line := range lines {
@@ -51,9 +54,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2024 day 01 solution--")
-
 	var inputDay = utils.Input()
-
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

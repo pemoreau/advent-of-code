@@ -3,11 +3,9 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"time"
 )
-
-//go:embed input.txt
-var inputDay string
 
 func computeRecipes(n int) []int {
 	recipes := []int{3, 7}
@@ -58,6 +56,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2018 day 14 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

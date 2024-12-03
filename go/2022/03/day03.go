@@ -3,14 +3,15 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	set2 "github.com/pemoreau/advent-of-code/go/utils/set"
 	"strings"
 	"time"
 	"unicode"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 func set(s string) set2.Set[uint8] {
 	res := make(set2.Set[uint8], len(s))
@@ -117,6 +118,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2022 day 03 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

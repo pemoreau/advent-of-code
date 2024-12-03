@@ -30,8 +30,8 @@ Nothing special except the use of `windows` function
 Used the following construct to embed the input file as a string in the source code:
 
 ```go
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 ```
 
 ## [Day 02: Dive!](https://adventofcode.com/2021/day/2)

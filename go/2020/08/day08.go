@@ -3,14 +3,12 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"strconv"
 	"strings"
 	"time"
 )
-
-//go:embed input.txt
-var inputDay string
 
 type Instr struct {
 	op  string
@@ -102,6 +100,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2020 day 08 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

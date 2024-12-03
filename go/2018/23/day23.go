@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 type pos struct {
 	x, y, z int
@@ -172,6 +172,7 @@ func nbInRange(p pos, bots []bot) int {
 
 func main() {
 	fmt.Println("--2018 day 23 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

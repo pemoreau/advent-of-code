@@ -3,13 +3,14 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"github.com/pemoreau/advent-of-code/go/utils/stack"
 	"strings"
 	"time"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 func BuildStacks(part0 string) []stack.Stack[uint8] {
 	lines := strings.Split(part0, "\n")
@@ -101,6 +102,7 @@ func Part2(input string) string {
 
 func main() {
 	fmt.Println("--2022 day 05 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

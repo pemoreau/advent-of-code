@@ -4,14 +4,12 @@ import (
 	_ "embed"
 	"encoding/hex"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"log"
 	"math"
 	"strings"
 	"time"
 )
-
-//go:embed input.txt
-var inputDay string
 
 func bit(b []byte, i uint32) (bool, uint32) {
 	idx, offset := (i / 8), (i % 8)
@@ -216,6 +214,7 @@ func Part2(input string) int {
 }
 
 func main() {
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

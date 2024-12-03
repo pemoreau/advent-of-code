@@ -3,13 +3,14 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"slices"
 	"time"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 type Cart struct {
 	pos          game2d.Pos
@@ -150,6 +151,7 @@ func Part2(input string) string {
 
 func main() {
 	fmt.Println("--2018 day 13 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

@@ -3,13 +3,14 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"sort"
 	"time"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 func neighboors(m game2d.MatrixDigit, p game2d.Pos) []game2d.Pos {
 	var res []game2d.Pos
@@ -76,6 +77,7 @@ func Part2(input string) int {
 
 func main() {
 
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

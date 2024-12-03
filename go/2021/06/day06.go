@@ -3,13 +3,12 @@ package main
 import (
 	_ "embed"
 	"fmt"
-	"time"
-
 	"github.com/pemoreau/advent-of-code/go/utils"
+	"time"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 func simulate(values []int, n int) int {
 	mult := make([]int, 9)
@@ -46,6 +45,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2021 day 06 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

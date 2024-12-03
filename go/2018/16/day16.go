@@ -3,12 +3,13 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"strings"
 	"time"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 var opcodes = []string{"addr", "addi", "mulr", "muli", "banr", "bani", "borr", "bori", "setr", "seti", "gtir", "gtri", "gtrr", "eqir", "eqri", "eqrr"}
 var decode = []int{13, 6, 0, 11, 3, 10, 2, 4, 7, 14, 15, 5, 8, 12, 1, 9}
@@ -118,6 +119,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2018 day 16 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

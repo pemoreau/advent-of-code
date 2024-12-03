@@ -3,13 +3,14 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils"
 	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"strings"
 	"time"
 )
 
-//go:embed input.txt
-var inputDay string
+//go:embed sample.txt
+var inputTest string
 
 func virtualPos(pos game2d.Pos, emptyLines []int, emptyColumns []int, factor int) game2d.Pos {
 	var addX, addY int
@@ -77,6 +78,7 @@ func Part2(input string) int {
 
 func main() {
 	fmt.Println("--2023 day 11 solution--")
+	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))

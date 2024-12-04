@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: main
 
     - name: Set up Go
       uses: actions/setup-go@v4
@@ -31,7 +33,7 @@ jobs:
         repository: 'pemoreau/aoc-inputs'
         ref: 'main'
         token: ${{ secrets.ACCESS_AOC_INPUTS }}
-        path: 'advent-of-code'
+        path: 'aoc-inputs'
 
     - name: Test
       working-directory: go/2024

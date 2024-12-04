@@ -32,6 +32,13 @@ jobs:
         ref: 'main'
         token: ${{ secrets.ACCESS_AOC_INPUTS }}
         path: 'advent-of-code/'
+
+     - name: Test
+      working-directory: go/2024
+      run: |
+        export AOC_SESSION='${{ secrets.AOC_SESSION }}'
+        export AOC_INPUTS='aoc-inputs'
+        go test -v ./...
         
  #   - name: Test
  #     working-directory: go

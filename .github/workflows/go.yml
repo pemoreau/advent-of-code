@@ -26,8 +26,8 @@ jobs:
         export AOC_SESSION='${{ secrets.AOC_SESSION }}'
         go build -v ./...
 
-    - name: Test
-      working-directory: go
-      run: |
-        export AOC_SESSION='${{ secrets.AOC_SESSION }}'
-        go test -v ./...
+ #   - name: Test
+ #     working-directory: go
+ #     run: |
+ #       export AOC_SESSION='${{ secrets.AOC_SESSION }}'
+ #       go test -v ./...

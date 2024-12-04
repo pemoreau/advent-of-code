@@ -172,12 +172,12 @@ func Input() string {
 	// then in AOC_INPUTS dir
 	// otherwise, download file
 
-	var abs, _ = filepath.Abs(filename)
 	//var currentDir = filepath.Dir(abs)
-	fmt.Println("trying", abs)
+	//var abs, _ = filepath.Abs(filename)
+	//fmt.Println("trying", abs)
 	if b, err := tryReadfile(filename); err == nil {
-		abs, _ = filepath.Abs(filename)
-		fmt.Println("found:", abs)
+		//abs, _ = filepath.Abs(filename)
+		//fmt.Println("found:", abs)
 		return string(b)
 	}
 
@@ -192,14 +192,14 @@ func Input() string {
 		filename = filepath.Join(inputsDir, syear, sday, filename)
 
 		for range 4 {
-			//currentDir, _ = filepath.Abs(filepath.Join(currentDir, ".."))
 			filename = filepath.Join("..", filename)
-			abs, _ := filepath.Abs(filename)
-			fmt.Println("trying", abs)
+			//abs, _ := filepath.Abs(filename)
+			//fmt.Println("trying", abs)
+			//currentDir, _ = filepath.Abs(filepath.Join(currentDir, ".."))
 			//listfiles(filepath.Dir(currentDir))
 			if b, err := tryReadfile(filename); err == nil {
-				abs, _ = filepath.Abs(filename)
-				fmt.Println("found:", abs)
+				//abs, _ = filepath.Abs(filename)
+				//fmt.Println("found:", abs)
 				return string(b)
 			}
 		}

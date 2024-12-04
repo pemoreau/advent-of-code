@@ -11,23 +11,21 @@ import (
 //go:embed sample.txt
 var inputTest string
 
-func xmas(grid *game2d.GridChar, p game2d.Pos, neighbor game2d.Pos, index int) bool {
-	var letters = []uint8("XMAS")
-	letter, ok := grid.GetPos(p)
-	if !ok {
-		return false
+func xmas(grid *game2d.GridChar, p game2d.Pos, dir game2d.Pos) bool {
+	var letters = []uint8("MAS") // X already checked
+	for _, l := range letters {
+		if !grid.Contains(p, l) {
+			return false
+		}
+		p = p.Add(dir)
 	}
-	if index == 0 {
-		return letter == letters[index]
-	}
-	var nextNeighbor = neighbor.Add(neighbor.Sub(p))
-	return letter == letters[index] && xmas(grid, neighbor, nextNeighbor, index-1)
+	return true
 }
 
 func check2(grid *game2d.GridChar, config []game2d.Pos) bool {
 	var letters = []uint8("AMSMS")
 	for i, c := range config {
-		if letter, ok := grid.GetPos(c); !ok || letter != letters[i] {
+		if !grid.Contains(c, letters[i]) {
 			return false
 		}
 	}
@@ -38,9 +36,12 @@ func Part1(input string) int {
 	var grid = game2d.BuildGridCharFromString(input)
 	var res int
 	for p := range grid.All() {
-		for dir := range p.Neighbors8() {
-			if xmas(grid, p, dir, 3) {
-				res++
+		if l, ok := grid.GetPos(p); ok && l == 'X' {
+			for n := range p.Neighbors8() {
+				dir := n.Sub(p)
+				if xmas(grid, n, dir) {
+					res++
+				}
 			}
 		}
 	}

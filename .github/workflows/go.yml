@@ -34,7 +34,7 @@ jobs:
         path: 'aoc-inputs'
 
     - name: Test
-      working-directory: go/2024
+      working-directory: go
       run: |
         export AOC_SESSION='${{ secrets.AOC_SESSION }}'
         export AOC_INPUTS='aoc-inputs'

@@ -154,6 +154,7 @@ func tryReadfile(filename string) ([]byte, error) {
 }
 
 func listfiles(dir string) {
+	fmt.Println("listing", dir)
 	files, err := os.ReadDir(dir)
 	if err != nil {
 		fmt.Println(err)
@@ -171,7 +172,9 @@ func Input() string {
 	// then in AOC_INPUTS dir
 	// otherwise, download file
 
-	fmt.Println(filepath.Abs(filename))
+	var abs, _ = filepath.Abs(filename)
+	var currentDir = filepath.Dir(abs)
+	fmt.Println("trying", abs)
 	if b, err := tryReadfile(filename); err == nil {
 		fmt.Println("found", filename)
 		return string(b)
@@ -182,15 +185,17 @@ func Input() string {
 		if err != nil {
 			panic(err)
 		}
+
 		syear := fmt.Sprintf("%4d", year)
 		sday := fmt.Sprintf("%02d", day)
 		filename = filepath.Join(inputsDir, syear, sday, filename)
 
 		for range 4 {
+			currentDir = filepath.Join("..", currentDir)
 			filename = filepath.Join("..", filename)
 			abs, _ := filepath.Abs(filename)
 			fmt.Println("trying", abs)
-			listfiles(filepath.Dir(abs))
+			listfiles(filepath.Dir(currentDir))
 			if b, err := tryReadfile(filename); err == nil {
 				fmt.Println("found", filename)
 				return string(b)

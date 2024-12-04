@@ -38,6 +38,10 @@ func (p Pos) Add(p2 Pos) Pos {
 	return Pos{X: p.X + p2.X, Y: p.Y + p2.Y}
 }
 
+func (p Pos) Sub(p2 Pos) Pos {
+	return Pos{X: p.X - p2.X, Y: p.Y - p2.Y}
+}
+
 func (p Pos) Neighbors4() iter.Seq[Pos] {
 	return func(yield func(Pos) bool) {
 		if !yield(p.N()) {

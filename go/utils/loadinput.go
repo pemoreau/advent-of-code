@@ -95,7 +95,7 @@ func fetchUserInput(year, day int, session string) (string, error) {
 	defer rc.Close()
 	b, err := io.ReadAll(rc)
 	if err != nil {
-		return "", errors.New("failed to read aoc input")
+		return "", errors.New(fmt.Sprintf("failed to read aoc input: %v", err))
 	}
 	return strings.TrimSpace(string(b)), nil
 }

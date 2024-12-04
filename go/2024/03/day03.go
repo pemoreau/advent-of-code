@@ -8,33 +8,30 @@ import (
 	"time"
 )
 
-func parse(lines []string, part2 bool) int {
+func parse(input string, part2 bool) int {
 	var res int
 	var x, y int
 	var enable = true
-	for _, line := range lines {
-		for i := 0; i < len(line)-7; i++ {
-			if part2 && line[i:i+4] == "do()" {
-				enable = true
-			} else if part2 && line[i:i+7] == "don't()" {
-				enable = false
-			} else if _, err := fmt.Sscanf(line[i:], "mul(%d,%d)", &x, &y); err == nil && enable {
+	for i := 0; i < len(input); i++ {
+		if part2 && strings.HasPrefix(input[i:], "do()") {
+			enable = true
+		} else if part2 && strings.HasPrefix(input[i:], "don't()") {
+			enable = false
+		} else if strings.HasPrefix(input[i:], "mul(") {
+			if _, err := fmt.Sscanf(input[i+4:], "%d,%d)", &x, &y); err == nil && enable {
 				res += x * y
 			}
 		}
 	}
-
 	return res
 }
 
 func Part1(input string) int {
-	var lines = strings.Split(input, "\n")
-	return parse(lines, false)
+	return parse(input, false)
 }
 
 func Part2(input string) int {
-	var lines = strings.Split(input, "\n")
-	return parse(lines, true)
+	return parse(input, true)
 }
 
 func main() {

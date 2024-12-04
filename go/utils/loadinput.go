@@ -153,6 +153,17 @@ func tryReadfile(filename string) ([]byte, error) {
 	return nil, err
 }
 
+func listfiles(dir string) {
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	for _, file := range files {
+		fmt.Println(file.Name())
+	}
+}
+
 func Input() string {
 	inputsDir := os.Getenv("AOC_INPUTS")
 	var filename = "input.txt"
@@ -174,9 +185,11 @@ func Input() string {
 		syear := fmt.Sprintf("%4d", year)
 		sday := fmt.Sprintf("%02d", day)
 		filename = filepath.Join(inputsDir, syear, sday, filename)
+
 		for range 4 {
 			filename = filepath.Join("..", filename)
 			fmt.Println(filepath.Abs(filename))
+			listfiles(filepath.Base(filename))
 			if b, err := tryReadfile(filename); err == nil {
 				fmt.Println("found", filename)
 				return string(b)

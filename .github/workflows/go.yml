@@ -26,6 +26,11 @@ jobs:
         export AOC_SESSION='${{ secrets.AOC_SESSION }}'
         go build -v ./...
 
+    - uses: actions/checkout@v4
+      with: 
+        repository: 'aoc-inputs'
+        path: 'advent-of-code/'
+        
  #   - name: Test
  #     working-directory: go
  #     run: |

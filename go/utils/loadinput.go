@@ -161,16 +161,12 @@ func Input() string {
 	// otherwise, download file
 
 	fmt.Println(filepath.Abs(filename))
-
 	if b, err := tryReadfile(filename); err == nil {
 		fmt.Println("found", filename)
 		return string(b)
 	}
 
 	if inputsDir != "" {
-		//abs, _ := filepath.Abs(".")
-		//fmt.Println(abs)
-
 		year, day, err := CurrentDate()
 		if err != nil {
 			panic(err)
@@ -188,6 +184,7 @@ func Input() string {
 		}
 	}
 
+	fmt.Println("downloading input")
 	if b, err := DownloadInput(); err == nil {
 		return string(b)
 	} else {

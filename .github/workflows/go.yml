@@ -27,11 +27,11 @@ jobs:
         go build -v ./...
 
     - uses: actions/checkout@v4
-      with: 
+      with:
         repository: 'pemoreau/aoc-inputs'
         ref: 'main'
         token: ${{ secrets.ACCESS_AOC_INPUTS }}
-        path: '.'
+        path: 'advent-of-code'
 
     - name: Test
       working-directory: go/2024

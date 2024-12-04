@@ -191,7 +191,7 @@ func Input() string {
 		filename = filepath.Join(inputsDir, syear, sday, filename)
 
 		for range 4 {
-			currentDir = filepath.Join("..", currentDir)
+			currentDir, _ = filepath.Abs(filepath.Join(currentDir, ".."))
 			filename = filepath.Join("..", filename)
 			abs, _ := filepath.Abs(filename)
 			fmt.Println("trying", abs)

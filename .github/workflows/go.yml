@@ -30,6 +30,7 @@ jobs:
       with: 
         repository: 'pemoreau/aoc-inputs'
         ref: 'main'
+        token: ${{ secrets.GITHUB_TOKEN }}
         path: 'advent-of-code/'
         
  #   - name: Test

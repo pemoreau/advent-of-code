@@ -29,6 +29,7 @@ jobs:
     - uses: actions/checkout@v4
       with: 
         repository: 'pemoreau/aoc-inputs'
+        ref: 'main'
         path: 'advent-of-code/'
         
  #   - name: Test

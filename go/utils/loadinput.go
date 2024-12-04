@@ -189,7 +189,7 @@ func Input() string {
 		for range 4 {
 			filename = filepath.Join("..", filename)
 			fmt.Println(filepath.Abs(filename))
-			listfiles(filepath.Base(filename))
+			listfiles(filepath.Dir(filename))
 			if b, err := tryReadfile(filename); err == nil {
 				fmt.Println("found", filename)
 				return string(b)

@@ -36,7 +36,7 @@ func Part1(input string) int {
 	var grid = game2d.BuildGridCharFromString(input)
 	var res int
 	for p := range grid.All() {
-		if l, ok := grid.GetPos(p); ok && l == 'X' {
+		if grid.Contains(p, 'X') {
 			for n := range p.Neighbors8() {
 				dir := n.Sub(p)
 				if xmas(grid, n, dir) {

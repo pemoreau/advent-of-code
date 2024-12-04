@@ -129,6 +129,7 @@ func DownloadInput() ([]byte, error) {
 	year, day, err := CurrentDate()
 
 	session := os.Getenv("AOC_SESSION")
+
 	if session != "" {
 		//fmt.Printf("session: %s\n", session)
 		var fetch = func() (string, error) { return fetchUserInput(year, day, session) }
@@ -141,10 +142,55 @@ func DownloadInput() ([]byte, error) {
 	}
 }
 
+func tryReadfile(filename string) ([]byte, error) {
+	s, err := os.Stat(filename)
+	if err == nil && !s.IsDir() {
+		b, err := os.ReadFile(filename)
+		if err == nil {
+			return b, nil
+		}
+	}
+	return nil, err
+}
+
 func Input() string {
-	b, err := DownloadInput()
-	if err != nil {
+	inputsDir := os.Getenv("AOC_INPUTS")
+	var filename = "input.txt"
+	// try to open file name in current dir first
+	// then in AOC_INPUTS dir
+	// otherwise, download file
+
+	fmt.Println(filepath.Abs(filename))
+
+	if b, err := tryReadfile(filename); err == nil {
+		fmt.Println("found", filename)
+		return string(b)
+	}
+
+	if inputsDir != "" {
+		//abs, _ := filepath.Abs(".")
+		//fmt.Println(abs)
+
+		year, day, err := CurrentDate()
+		if err != nil {
+			panic(err)
+		}
+		syear := fmt.Sprintf("%4d", year)
+		sday := fmt.Sprintf("%02d", day)
+		filename = filepath.Join(inputsDir, syear, sday, filename)
+		for range 4 {
+			filename = filepath.Join("..", filename)
+			fmt.Println(filepath.Abs(filename))
+			if b, err := tryReadfile(filename); err == nil {
+				fmt.Println("found", filename)
+				return string(b)
+			}
+		}
+	}
+
+	if b, err := DownloadInput(); err == nil {
+		return string(b)
+	} else {
 		panic(err)
 	}
-	return string(b)
 }

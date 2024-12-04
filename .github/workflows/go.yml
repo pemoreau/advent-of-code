@@ -31,7 +31,7 @@ jobs:
         repository: 'pemoreau/aoc-inputs'
         ref: 'main'
         token: ${{ secrets.ACCESS_AOC_INPUTS }}
-        path: ''
+        path: '.'
 
     - name: Test
       working-directory: go/2024

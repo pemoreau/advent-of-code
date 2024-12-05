@@ -66,8 +66,6 @@ func Part1(input string) int {
 			//fmt.Println("good update", lines[i])
 			var middle, _ = strconv.Atoi(lines[i][len(lines[i])/2])
 			res += middle
-		} else {
-			//fmt.Println("bad update", lines[i])
 		}
 	}
 	return res
@@ -82,7 +80,6 @@ func Part2(input string) int {
 			//fmt.Println("good update", line)
 			continue
 		}
-		//fmt.Println("bad update", line)
 		var cmp = func(a, b string) int {
 			if orders[a].Contains(b) {
 				return -1

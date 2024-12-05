@@ -61,18 +61,18 @@ func Part1(input string) int {
 
 func Part2(input string) int {
 	var orders, updates = parse(input)
+	var cmp = func(a, b string) int {
+		if _, ok := orders[pair{a, b}]; ok {
+			return -1
+		}
+		if _, ok := orders[pair{b, a}]; ok {
+			return 1
+		}
+		return 0
+	}
 	var res int
 	for _, update := range updates {
 		if !checkUpdate(orders, update) {
-			var cmp = func(a, b string) int {
-				if _, ok := orders[pair{a, b}]; ok {
-					return -1
-				}
-				if _, ok := orders[pair{b, a}]; ok {
-					return 1
-				}
-				return 0
-			}
 			slices.SortFunc(update, cmp)
 			var middle, _ = strconv.Atoi(update[len(update)/2])
 			res += middle
@@ -82,7 +82,7 @@ func Part2(input string) int {
 }
 
 func main() {
-	fmt.Println("--2024 day 04 solution--")
+	fmt.Println("--2024 day 05 solution--")
 	var inputDay = utils.Input()
 	//var inputDay = inputTest
 	start := time.Now()

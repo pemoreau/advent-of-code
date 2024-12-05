@@ -25,7 +25,7 @@ func Part2(input string) int {
 }
 
 func main() {
-	fmt.Println("--2024 day 04 solution--")
+	fmt.Println("--2024 day 06 solution--")
 	var inputDay = utils.Input()
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))

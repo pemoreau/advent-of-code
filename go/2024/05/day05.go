@@ -63,7 +63,6 @@ func Part1(input string) int {
 	var res int
 	for i, update := range updates {
 		if checkUpdate(orders, update, lines[i]) {
-			//fmt.Println("good update", lines[i])
 			var middle, _ = strconv.Atoi(lines[i][len(lines[i])/2])
 			res += middle
 		}
@@ -73,22 +72,21 @@ func Part1(input string) int {
 
 func Part2(input string) int {
 	var orders, updates, lines = parse(input)
-
+	var cmp = func(a, b string) int {
+		if orders[a].Contains(b) {
+			return -1
+		}
+		if orders[b].Contains(a) {
+			return 1
+		}
+		return 0
+	}
 	var res int
 	for i, line := range lines {
 		if checkUpdate(orders, updates[i], lines[i]) {
-			//fmt.Println("good update", line)
 			continue
 		}
-		var cmp = func(a, b string) int {
-			if orders[a].Contains(b) {
-				return -1
-			}
-			if orders[b].Contains(a) {
-				return 1
-			}
-			return 0
-		}
+
 		slices.SortFunc(line, cmp)
 		var middle, _ = strconv.Atoi(lines[i][len(lines[i])/2])
 		res += middle
@@ -97,7 +95,7 @@ func Part2(input string) int {
 }
 
 func main() {
-	fmt.Println("--2024 day 04 solution--")
+	fmt.Println("--2024 day 05 solution--")
 	var inputDay = utils.Input()
 	//var inputDay = inputTest
 	start := time.Now()

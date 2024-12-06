@@ -24,15 +24,6 @@ type Guard struct {
 	dir int
 }
 
-func findStart(grid *game2d.GridChar) Guard {
-	for p, e := range grid.All() {
-		if e == '^' {
-			return Guard{p, north}
-		}
-	}
-	return Guard{}
-}
-
 func front(grid game2d.GridChar, guard Guard) (game2d.Pos, uint8, bool) {
 	var nextPos = []game2d.Pos{guard.Pos.N(), guard.Pos.E(), guard.Pos.S(), guard.Pos.W()}
 	v, inside := grid.GetPos(nextPos[guard.dir])
@@ -51,48 +42,56 @@ func move(grid *game2d.GridChar, g Guard, path set.Set[Guard]) (guard Guard, ins
 	}
 }
 
-func run(grid *game2d.GridChar, g Guard, path set.Set[Guard]) bool {
+func run(grid *game2d.GridChar, g Guard) (set.Set[Guard], bool) {
+	var path = set.NewSet[Guard]()
+	path.Add(g)
 	// returns true if loop
 	for {
 		var inside, loop bool
 		g, inside, loop = move(grid, g, path)
 		if loop {
-			return true
+			return path, true
 		} else if !inside {
-			return false
+			return path, false
 		}
 		path.Add(g)
 	}
 }
 
-func computeTrack(grid *game2d.GridChar, guard Guard, path set.Set[Guard]) set.Set[game2d.Pos] {
+func computeTrack(grid *game2d.GridChar, guard Guard) set.Set[game2d.Pos] {
 	var plot = set.NewSet[game2d.Pos]()
-	run(grid, guard, path)
+	path, _ := run(grid, guard)
 	for p := range path.All() {
 		plot.Add(p.Pos)
 	}
 	return plot
 }
 
+func findStart(grid *game2d.GridChar) Guard {
+	for p, e := range grid.All() {
+		if e == '^' {
+			return Guard{p, north}
+		}
+	}
+	return Guard{}
+}
+
 func Part1(input string) int {
 	var grid = game2d.BuildGridCharFromString(input)
-	var path = set.NewSet[Guard]()
 	var guard = findStart(grid)
-	path.Add(guard)
-	return computeTrack(grid, guard, path).Len()
+	return computeTrack(grid, guard).Len()
 }
 
 func Part2(input string) int {
 	var grid = game2d.BuildGridCharFromString(input)
-	var plot = set.NewSet[game2d.Pos]()
-
 	var guard = findStart(grid)
-	var track = computeTrack(grid, guard, set.NewSet[Guard]())
+	var track = computeTrack(grid, guard)
 
+	var plot = set.NewSet[game2d.Pos]()
 	for p := range track.All() {
 		if v, _ := grid.GetPos(p); v == '.' {
 			grid.SetPos(p, '#')
-			if loop := run(grid, guard, set.NewSet[Guard]()); loop {
+			if _, loop := run(grid, guard); loop {
 				plot.Add(p)
 			}
 			grid.SetPos(p, '.')

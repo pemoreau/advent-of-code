@@ -24,18 +24,18 @@ type Matrix[T comparable] struct {
 type MatrixChar = Matrix[uint8]
 type MatrixDigit = Matrix[uint8]
 
-func NewMatrix[T comparable](width, height int) Matrix[T] {
-	return Matrix[T]{width: width, height: height, data: make([]T, width*height)}
+func NewMatrix[T comparable](width, height int) *Matrix[T] {
+	return &Matrix[T]{width: width, height: height, data: make([]T, width*height)}
 }
 
-func Clone[T comparable](m Matrix[T]) Matrix[T] {
+func Clone[T comparable](m Matrix[T]) *Matrix[T] {
 	var m2 = NewMatrix[T](m.width, m.height)
 	m2.toString = m.toString
 	copy(m2.data, m.data)
 	return m2
 }
 
-func BuildMatrixFunc[T comparable](lines []string, convert func(c int32) T, toString func(c T) string) Matrix[T] {
+func BuildMatrixFunc[T comparable](lines []string, convert func(c int32) T, toString func(c T) string) *Matrix[T] {
 	if len(lines) == 0 {
 		panic("matrix: empty input")
 	}
@@ -50,19 +50,19 @@ func BuildMatrixFunc[T comparable](lines []string, convert func(c int32) T, toSt
 	return m
 }
 
-func BuildMatrixInt[T constraints.Integer](lines []string) Matrix[T] {
+func BuildMatrixInt[T constraints.Integer](lines []string) *Matrix[T] {
 	var toString = func(c T) string { return fmt.Sprintf("%d", c) }
 	return BuildMatrixFunc[T](lines, func(c int32) T { return T(c) }, toString)
 }
 
-func BuildMatrixCharFromString(s string) MatrixChar {
+func BuildMatrixCharFromString(s string) *MatrixChar {
 	//s = strings.TrimSpace(s)
 	lines := strings.Split(s, "\n")
 	var toString = func(c uint8) string { return fmt.Sprintf("%c", c) }
 	return BuildMatrixFunc(lines, func(c int32) uint8 { return uint8(c) }, toString)
 }
 
-func BuildMatrixDigitFromString(s string) MatrixDigit {
+func BuildMatrixDigitFromString(s string) *MatrixDigit {
 	//s = strings.TrimSpace(s)
 	lines := strings.Split(s, "\n")
 	var toString = func(c uint8) string { return string('0' + c) }

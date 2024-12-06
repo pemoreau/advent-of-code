@@ -95,6 +95,10 @@ func (g *Grid[T]) GetPos(pos Pos) (T, bool) {
 	return v, ok
 }
 
+func (g *Grid[T]) ClearPos(pos Pos) {
+	delete(g.m, pos)
+}
+
 func (g *Grid[T]) SetPos(pos Pos, value T) {
 	if _, ok := g.m[pos]; !ok {
 		g.minX = min(pos.X, g.minX)

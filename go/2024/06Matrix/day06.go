@@ -19,55 +19,64 @@ const (
 	west  = 3
 )
 
+type Grid = game2d.MatrixChar
+
 type Guard struct {
 	game2d.Pos
 	dir int
 }
 
-func front(grid game2d.GridChar, guard Guard) (game2d.Pos, uint8, bool) {
-	var nextPos = []game2d.Pos{guard.Pos.N(), guard.Pos.E(), guard.Pos.S(), guard.Pos.W()}
-	v, inside := grid.GetPos(nextPos[guard.dir])
-	return nextPos[guard.dir], v, inside
+func (g *Guard) front(grid *Grid) (game2d.Pos, uint8, bool) {
+	var neighbors = []game2d.Pos{g.Pos.N(), g.Pos.E(), g.Pos.S(), g.Pos.W()}
+	var nextPos = neighbors[g.dir]
+	//v, inside := grid.GetPos(nextPos)
+	var x, y = nextPos.X, nextPos.Y
+	if inside := x >= 0 && x <= grid.MaxX() && y >= 0 && y <= grid.MaxY(); inside {
+		return nextPos, grid.Get(x, y), true
+	}
+	return nextPos, 0, false
 }
 
-func move(grid *game2d.GridChar, g Guard, path set.Set[Guard]) (guard Guard, inside bool, loop bool) {
-	if p, v, inside := front(*grid, g); !inside {
-		return g, false, false
+func (g *Guard) move(grid *Grid, path set.Set[Guard]) (inside bool, loop bool) {
+	if p, v, inside := g.front(grid); !inside {
+		return false, false
 	} else if v != '#' && path.Contains(Guard{p, g.dir}) {
-		return g, true, true
+		return true, true
 	} else if v == '#' {
-		return Guard{g.Pos, (g.dir + 1) % 4}, true, false
+		g.dir = (g.dir + 1) % 4
+		return true, false
 	} else {
-		return Guard{p, g.dir}, true, false
+		g.Pos = p
+		return true, false
 	}
 }
 
-func run(grid *game2d.GridChar, g Guard) (set.Set[Guard], bool) {
+func (g *Guard) run(grid *Grid) (set.Set[Guard], bool) {
 	var path = set.NewSet[Guard]()
-	path.Add(g)
+	path.Add(*g)
 	// returns true if loop
 	for {
 		var inside, loop bool
-		g, inside, loop = move(grid, g, path)
+		inside, loop = g.move(grid, path)
 		if loop {
 			return path, true
 		} else if !inside {
 			return path, false
 		}
-		path.Add(g)
+		path.Add(*g)
 	}
 }
 
-func computeTrack(grid *game2d.GridChar, guard Guard) set.Set[game2d.Pos] {
+func (g *Guard) computeTrack(grid *Grid) set.Set[game2d.Pos] {
 	var plot = set.NewSet[game2d.Pos]()
-	path, _ := run(grid, guard)
+	path, _ := g.run(grid)
 	for p := range path.All() {
 		plot.Add(p.Pos)
 	}
 	return plot
 }
 
-func findStart(grid *game2d.GridChar) Guard {
+func findStart(grid *Grid) Guard {
 	for p, e := range grid.All() {
 		if e == '^' {
 			return Guard{p, north}
@@ -77,26 +86,28 @@ func findStart(grid *game2d.GridChar) Guard {
 }
 
 func Part1(input string) int {
-	var grid = game2d.BuildGridCharFromString(input)
+	var grid = game2d.BuildMatrixCharFromString(input)
 	var guard = findStart(grid)
-	return computeTrack(grid, guard).Len()
+	return guard.computeTrack(grid).Len()
 }
 
 func Part2(input string) int {
-	var grid = game2d.BuildGridCharFromString(input)
-	var guard = findStart(grid)
-	var track = computeTrack(grid, guard)
+	var grid = game2d.BuildMatrixCharFromString(input)
+	var start = findStart(grid)
+	var guard = start
+	var track = guard.computeTrack(grid)
 
 	var plot = set.NewSet[game2d.Pos]()
 	var tried = set.NewSet[game2d.Pos]()
 	for p := range track.All() {
-		if v, _ := grid.GetPos(p); v != '#' {
+		var guard = start
+		if v := grid.GetPos(p); v != '#' {
 			if tried.Contains(p) {
 				continue
 			}
 			tried.Add(p)
 			grid.SetPos(p, '#')
-			if _, loop := run(grid, guard); loop {
+			if _, loop := guard.run(grid); loop {
 				plot.Add(p)
 			}
 			grid.SetPos(p, '.')

@@ -42,25 +42,20 @@ func check(goal int, elements []int, part2 bool) bool {
 
 	var head = elements[0]
 	var tail = elements[1:]
-	var subgoal1 = goal - head
-	var subgoal2 = goal / head
 
-	if subgoal1 >= 0 && check(subgoal1, tail, part2) {
+	if next := goal - head; next >= 0 && check(next, tail, part2) {
 		return true
 	}
-	if subgoal2*head == goal && check(subgoal2, tail, part2) {
+	if next := goal / head; next*head == goal && check(next, tail, part2) {
 		return true
 	}
 	if part2 {
 		// p = 10^(len(head))
-		var h = head
 		var p = 1
-		for h > 0 {
-			h /= 10
+		for h := head; h > 0; h /= 10 {
 			p *= 10
 		}
-		var subgoal3 = (goal - head) / p
-		if subgoal3*p+head == goal && check(subgoal3, tail, part2) {
+		if next := (goal - head) / p; next*p+head == goal && check(next, tail, part2) {
 			return true
 		}
 	}

@@ -12,7 +12,7 @@ import (
 //go:embed sample.txt
 var inputTest string
 
-func neighboors(m game2d.MatrixDigit, p game2d.Pos) []game2d.Pos {
+func neighboors(m *game2d.MatrixDigit, p game2d.Pos) []game2d.Pos {
 	var res []game2d.Pos
 	for n := range p.Neighbors4() {
 		if m.IsValidPos(n) && m.GetPos(n) != 9 {
@@ -23,7 +23,7 @@ func neighboors(m game2d.MatrixDigit, p game2d.Pos) []game2d.Pos {
 	return res
 }
 
-func collectNeighboors(p game2d.Pos, m game2d.MatrixDigit) int {
+func collectNeighboors(p game2d.Pos, m *game2d.MatrixDigit) int {
 	toVisit := []game2d.Pos{p}
 	collected := 0
 	for len(toVisit) > 0 {
@@ -40,7 +40,7 @@ func collectNeighboors(p game2d.Pos, m game2d.MatrixDigit) int {
 	return collected
 }
 
-func smallerThanNeighboors(m game2d.MatrixDigit, p game2d.Pos) bool {
+func smallerThanNeighboors(m *game2d.MatrixDigit, p game2d.Pos) bool {
 	for n := range p.Neighbors4() {
 		if m.IsValidPos(n) && !(m.GetPos(p) < m.GetPos(n)) {
 			return false

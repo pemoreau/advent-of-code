@@ -125,24 +125,40 @@ func (m *Matrix[T]) IsValidPos(pos Pos) bool {
 	return pos.Y >= 0 && pos.Y < m.LenY() && pos.X >= 0 && pos.X < m.LenX()
 }
 
-func (m *Matrix[T]) RotateLeft() Matrix[T] {
-	var m2 = Matrix[T]{width: m.height, height: m.width, data: make([]T, len(m.data)), toString: m.toString}
+func (m *Matrix[T]) RotateLeft() {
+	//var m2 = Matrix[T]{width: m.height, height: m.width, data: make([]T, len(m.data)), toString: m.toString}
+	//for j := range m.LenY() {
+	//	for i := range m.LenX() {
+	//		m2.setUnchecked(j, m.width-i-1, m.getUnchecked(i, j))
+	//	}
+	//}
+	//return m2
+	var data = make([]T, len(m.data))
 	for j := range m.LenY() {
 		for i := range m.LenX() {
-			m2.setUnchecked(j, m.width-i-1, m.getUnchecked(i, j))
+			data[j+m.height*(m.width-i-1)] = m.getUnchecked(i, j)
 		}
 	}
-	return m2
+	m.width, m.height = m.height, m.width
+	m.data = data
 }
 
-func (m *Matrix[T]) RotateRight() Matrix[T] {
-	var m2 = Matrix[T]{width: m.height, height: m.width, data: make([]T, len(m.data)), toString: m.toString}
+func (m *Matrix[T]) RotateRight() {
+	//var m2 = Matrix[T]{width: m.height, height: m.width, data: make([]T, len(m.data)), toString: m.toString}
+	//for j := range m.LenY() {
+	//	for i := range m.LenX() {
+	//		m2.setUnchecked(m.height-j-1, i, m.getUnchecked(i, j))
+	//	}
+	//}
+	//return m2
+	var data = make([]T, len(m.data))
 	for j := range m.LenY() {
 		for i := range m.LenX() {
-			m2.setUnchecked(m.height-j-1, i, m.getUnchecked(i, j))
+			data[m.height-j-1+m.height*i] = m.getUnchecked(i, j)
 		}
 	}
-	return m2
+	m.width, m.height = m.height, m.width
+	m.data = data
 }
 
 func (m *Matrix[T]) Transpose() {

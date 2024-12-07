@@ -27,7 +27,7 @@ const (
 	WEST
 )
 
-func step(grid game2d.MatrixChar, pos game2d.Pos, from int) (newPos game2d.Pos, newFrom int, ok bool) {
+func step(grid *game2d.MatrixChar, pos game2d.Pos, from int) (newPos game2d.Pos, newFrom int, ok bool) {
 	if !grid.IsValidPos(pos) {
 		return pos, from, false
 	}
@@ -77,7 +77,7 @@ func step(grid game2d.MatrixChar, pos game2d.Pos, from int) (newPos game2d.Pos, 
 	return pos, from, false
 }
 
-func findLoop(grid game2d.MatrixChar, pos game2d.Pos, from int) (path set.Set[game2d.Pos], ok bool) {
+func findLoop(grid *game2d.MatrixChar, pos game2d.Pos, from int) (path set.Set[game2d.Pos], ok bool) {
 	if !grid.IsValidPos(pos) {
 		return path, false
 	}
@@ -103,7 +103,7 @@ func findLoop(grid game2d.MatrixChar, pos game2d.Pos, from int) (path set.Set[ga
 	}
 }
 
-func findStart(grid game2d.MatrixChar) game2d.Pos {
+func findStart(grid *game2d.MatrixChar) game2d.Pos {
 	if start, ok := grid.Find(START); ok {
 		return start
 	}

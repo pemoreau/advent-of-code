@@ -33,10 +33,10 @@ func solve(input string, part2 bool) int {
 }
 
 func check(goal int, elements []int, part2 bool) bool {
-	if len(elements) == 1 && elements[0] == goal {
-		return true
-	}
 	if len(elements) == 1 {
+		if elements[0] == goal {
+			return true
+		}
 		return false
 	}
 

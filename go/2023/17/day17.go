@@ -25,7 +25,7 @@ type state struct {
 	dir int
 }
 
-func neighboors(grid game2d.MatrixDigit, s state, mini, maxi int) []state {
+func neighboors(grid *game2d.MatrixDigit, s state, mini, maxi int) []state {
 	var res []state
 	dirs := [2]int{(s.dir + 1) % 4, (s.dir + 3) % 4}
 	for _, d := range dirs {
@@ -41,7 +41,7 @@ func neighboors(grid game2d.MatrixDigit, s state, mini, maxi int) []state {
 	return res
 }
 
-func cost(grid game2d.MatrixDigit, from, to state) int {
+func cost(grid *game2d.MatrixDigit, from, to state) int {
 	x1, y1 := from.pos.X, from.pos.Y
 	x2, y2 := to.pos.X, to.pos.Y
 	var res int

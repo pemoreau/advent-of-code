@@ -1,11 +1,26 @@
 package set
 
-import "iter"
+import (
+	"fmt"
+	"iter"
+)
 
 type Set[T comparable] map[T]struct{}
 
 func NewSet[T comparable]() Set[T] {
 	return make(Set[T])
+}
+
+func (s Set[T]) String() string {
+	var res string
+	res = res + "{"
+
+	for elem := range s {
+		var e = fmt.Sprintf("%v", elem)
+		res = res + e + ", "
+	}
+	res = res + "}"
+	return res
 }
 
 func (s Set[T]) Add(value T) {

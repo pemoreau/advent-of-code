@@ -12,7 +12,7 @@ import (
 //go:embed sample.txt
 var inputTest string
 
-func findStart(m game2d.MatrixChar) (game2d.Pos, bool) {
+func findStart(m *game2d.MatrixChar) (game2d.Pos, bool) {
 	if p, ok := m.Find('S'); ok {
 		return p, true
 	}
@@ -61,7 +61,7 @@ func mod(a, b int) int {
 	return m % b
 }
 
-func posModulo(p game2d.Pos, m game2d.MatrixChar) game2d.Pos {
+func posModulo(p game2d.Pos, m *game2d.MatrixChar) game2d.Pos {
 	lx := m.LenX()
 	ly := m.LenY()
 	return game2d.Pos{X: mod(p.X, lx), Y: mod(p.Y, ly)}

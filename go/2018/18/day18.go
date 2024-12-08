@@ -15,7 +15,7 @@ const LUMBER = '#'
 const TREE = '|'
 const OPEN = '.'
 
-func step(m game2d.MatrixChar) game2d.MatrixChar {
+func step(m *game2d.MatrixChar) *game2d.MatrixChar {
 	var newM = game2d.NewMatrix[uint8](m.LenX(), m.LenY())
 
 	for p := range m.AllPos() {
@@ -45,7 +45,7 @@ func step(m game2d.MatrixChar) game2d.MatrixChar {
 	return newM
 }
 
-func countTreeLumber(m game2d.MatrixChar) (int, int) {
+func countTreeLumber(m *game2d.MatrixChar) (int, int) {
 	var countLumber = 0
 	var countTree = 0
 	for p := range m.AllPos() {

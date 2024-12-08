@@ -76,7 +76,7 @@ type state struct {
 	dir int
 }
 
-func solve(grid game2d.MatrixChar, current state) int {
+func solve(grid *game2d.MatrixChar, current state) int {
 	var todo []state
 	var visited = set.NewSet[state]()
 	var energized = set.NewSet[game2d.Pos]()

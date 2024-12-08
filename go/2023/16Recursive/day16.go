@@ -76,7 +76,7 @@ type state struct {
 	dir int
 }
 
-func solve(grid game2d.MatrixChar, visited set.Set[state], energized set.Set[game2d.Pos], s state) {
+func solve(grid *game2d.MatrixChar, visited set.Set[state], energized set.Set[game2d.Pos], s state) {
 
 	if visited.Contains(s) || !grid.IsValidPos(s.pos) {
 		return

@@ -11,7 +11,7 @@ import (
 //go:embed sample.txt
 var inputTest string
 
-func moveNorth(m game2d.MatrixChar) {
+func moveNorth(m *game2d.MatrixChar) {
 	for x := range m.LenX() {
 		var last int
 		for y := range m.LenY() {
@@ -31,15 +31,8 @@ func moveNorth(m game2d.MatrixChar) {
 	}
 }
 
-func totalLoad(m game2d.MatrixChar) int {
+func totalLoad(m *game2d.MatrixChar) int {
 	var res int
-	//for y := range m.LenY() {
-	//	for x := range m.LenX() {
-	//		if m.Get(x, y) == 'O' {
-	//			res += m.MaxY() - y + 1
-	//		}
-	//	}
-	//}
 	for p, v := range m.All() {
 		if v == 'O' {
 			res += m.MaxY() - p.Y + 1
@@ -48,15 +41,15 @@ func totalLoad(m game2d.MatrixChar) int {
 	return res
 }
 
-func cycle(m game2d.MatrixChar) game2d.MatrixChar {
+func cycle(m *game2d.MatrixChar) *game2d.MatrixChar {
 	moveNorth(m)
-	m = m.RotateRight()
+	m.RotateRight()
 	moveNorth(m)
-	m = m.RotateRight()
+	m.RotateRight()
 	moveNorth(m)
-	m = m.RotateRight()
+	m.RotateRight()
 	moveNorth(m)
-	m = m.RotateRight()
+	m.RotateRight()
 	return m
 
 	//moveNorth(m)
@@ -71,7 +64,7 @@ func Part1(input string) int {
 	return totalLoad(m)
 }
 
-func repeatWithCycle(m game2d.MatrixChar, n int) game2d.MatrixChar {
+func repeatWithCycle(m *game2d.MatrixChar, n int) *game2d.MatrixChar {
 	var valueToIndex = make(map[string]int)
 	var indexToValue []string
 	for i := 0; i < n; i++ {

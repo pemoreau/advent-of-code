@@ -59,7 +59,7 @@ func main() {
 	fmt.Println(time.Since(start))
 }
 
-func search(v int, m game2d.Matrix[int]) game2d.Pos {
+func search(v int, m *game2d.Matrix[int]) game2d.Pos {
 	for pos, e := range m.All() {
 		if e == v {
 			return pos
@@ -68,7 +68,7 @@ func search(v int, m game2d.Matrix[int]) game2d.Pos {
 	return game2d.Pos{}
 }
 
-func neighbors(m game2d.Matrix[int], i, j int) []game2d.Pos {
+func neighbors(m *game2d.Matrix[int], i, j int) []game2d.Pos {
 	pos := []game2d.Pos{{i - 1, j}, {i + 1, j}, {i, j - 1}, {i, j + 1}}
 	var res []game2d.Pos
 	for _, p := range pos {
@@ -83,7 +83,7 @@ func neighbors(m game2d.Matrix[int], i, j int) []game2d.Pos {
 	return res
 }
 
-func neighbors2(m game2d.Matrix[int], i, j int) []game2d.Pos {
+func neighbors2(m *game2d.Matrix[int], i, j int) []game2d.Pos {
 	n := neighbors(m, i, j)
 	if m.Get(i, j) == 'a' {
 		a := search('a', m)
@@ -92,7 +92,7 @@ func neighbors2(m game2d.Matrix[int], i, j int) []game2d.Pos {
 	return n
 }
 
-func cost2(from, to game2d.Pos, m game2d.Matrix[int]) int {
+func cost2(from, to game2d.Pos, m *game2d.Matrix[int]) int {
 	if m.Get(from.X, from.Y) == 'a' && m.Get(to.X, to.Y) == 'a' {
 		return 0
 	}

@@ -77,10 +77,8 @@ func (g *Guard) computeTrack(grid *Grid) set.Set[game2d.Pos] {
 }
 
 func findStart(grid *Grid) Guard {
-	for p, e := range grid.All() {
-		if e == '^' {
-			return Guard{p, north}
-		}
+	if p, ok := grid.Find('^'); ok {
+		return Guard{p, north}
 	}
 	return Guard{}
 }

@@ -8,7 +8,7 @@ import (
 
 func TestPart1(t *testing.T) {
 	result := Part1(inputTest)
-	expected := 1928
+	expected := 0
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}
@@ -16,7 +16,7 @@ func TestPart1(t *testing.T) {
 
 func TestPart2(t *testing.T) {
 	result := Part2(inputTest)
-	expected := 2858
+	expected := 0
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}
@@ -25,7 +25,7 @@ func TestPart2(t *testing.T) {
 func TestPart1Input(t *testing.T) {
 	var inputDay = utils.Input()
 	result := Part1(inputDay)
-	expected := 6330095022244
+	expected := 0
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}
@@ -34,7 +34,7 @@ func TestPart1Input(t *testing.T) {
 func TestPart2Input(t *testing.T) {
 	var inputDay = utils.Input()
 	result := Part2(inputDay)
-	expected := 6359491814941
+	expected := 0
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}

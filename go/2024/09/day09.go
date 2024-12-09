@@ -65,12 +65,15 @@ func findFreeBlock1(blocks []block, indexFree int, maxIndex int) int {
 	return -1
 }
 
+var start [10]int
+
 func findFreeBlock2(blocks []block, maxIndex int, size int) int {
-	for i := 0; i < maxIndex; i++ {
+	for i := start[size]; i < maxIndex; i++ {
 		var b = blocks[i]
 		if len(b) > 0 {
 			var last = b[len(b)-1]
 			if last.id == -1 && last.len >= size {
+				start[last.len] = i
 				return i
 			}
 		}

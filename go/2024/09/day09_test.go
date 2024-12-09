@@ -26,6 +26,7 @@ func TestPart1Input(t *testing.T) {
 	var inputDay = utils.Input()
 	result := Part1(inputDay)
 	expected := 6330095022244
+	//expected := 4620970906611856
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}
@@ -35,6 +36,7 @@ func TestPart2Input(t *testing.T) {
 	var inputDay = utils.Input()
 	result := Part2(inputDay)
 	expected := 6359491814941
+	//expected := 5799706413896802
 	if result != expected {
 		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
 	}

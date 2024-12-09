@@ -26,20 +26,6 @@ func (f file) String() string {
 
 type block = []*file
 
-//type block struct {
-//	files []file
-//}
-//
-//func (b block) String() string {
-//	var res strings.Builder
-//	res.WriteString("[")
-//	for _, f := range b.files {
-//		res.WriteString(f.String())
-//	}
-//	res.WriteString("]")
-//	return res.String()
-//}
-
 func parse(input string) []block {
 	var blocks = make([]block, 0, len(input))
 	var adr, id int
@@ -59,7 +45,7 @@ func parse(input string) []block {
 	return blocks
 }
 
-func findNextFree(blocks []block, indexFree int) int {
+func findFreeBlock1(blocks []block, indexFree int) int {
 	if indexFree < 0 || indexFree >= len(blocks) {
 		panic("indexFree out of range")
 	}
@@ -72,114 +58,7 @@ func findNextFree(blocks []block, indexFree int) int {
 	panic("no free block")
 }
 
-//func compact(blocks []block) bool {
-//	for lastIndex := len(blocks) - 1; lastIndex >= 1; lastIndex-- {
-//		if len(blocks[lastIndex]) == 0 || blocks[lastIndex][0].id == -1 {
-//			continue
-//		}
-//		var f = blocks[lastIndex][0]
-//		var ff = blocks[lastIndex-1][len(blocks[lastIndex-1])-1]
-//		if ff.id == -1 || ff.id != f.id {
-//			return false
-//		}
-//		ff.len += f.len
-//		f.id = -1
-//
-//	}
-//
-//}
-
-func defragFile(blocks []block, indexFree int, f *file) bool {
-	if indexFree < 0 || indexFree >= len(blocks) {
-		return false
-	}
-	var freeBlock = blocks[indexFree]
-	var freeFile = freeBlock[len(freeBlock)-1]
-	if freeFile.id != -1 {
-		fmt.Println("freeFile.id != -1")
-		return false
-	}
-
-	if f.len > freeFile.len {
-		// fill freeFile and split f
-		freeFile.id = f.id
-		f.len -= freeFile.len
-		indexFree = findNextFree(blocks, indexFree)
-		return true
-	} else if f.len == freeFile.len {
-		// fill freeFile and make f free
-		freeFile.id = f.id
-		f.id = -1
-		indexFree = findNextFree(blocks, indexFree)
-		return true
-	} else if f.len < freeFile.len {
-		// fill freeFile, split freeFile and make f free
-		var newFile = &file{f.id, f.len, freeFile.adr}
-		freeFile.len -= f.len
-		freeFile.adr += f.len
-		f.id = -1
-		// insert f in freeBlock before last position
-		freeBlock = append(freeBlock[:len(freeBlock)-1], newFile, freeBlock[len(freeBlock)-1])
-		blocks[indexFree] = freeBlock
-		return true
-	}
-
-	return false
-
-}
-
-func checksum(blocks []block) int {
-	var res int
-	var adr int
-	for _, b := range blocks {
-		for _, f := range b {
-			if f.id != -1 {
-				for i := 0; i < f.len; i++ {
-					res += (adr * f.id)
-					adr++
-				}
-			}
-		}
-	}
-	return res
-}
-
-func Part1(input string) int {
-	input = strings.TrimSpace(input)
-	var blocks = parse(input)
-
-	fmt.Println(blocks)
-
-	var lastIndex = len(blocks) - 1
-	if lastIndex%2 != 0 {
-		lastIndex--
-	}
-
-	var freeIndex = 1
-	var ok = true
-	for ok {
-		fmt.Printf("freeIndex: %d lastIndex: %d\n", freeIndex, lastIndex)
-		var f = blocks[lastIndex][0]
-		fmt.Printf("file to defrag: %v\n", f)
-		ok = defragFile(blocks, freeIndex, f)
-		freeIndex = findNextFree(blocks, freeIndex)
-		if freeIndex >= lastIndex {
-			break
-		}
-		if !ok {
-			break
-		}
-		if f.id == -1 {
-			lastIndex -= 2
-		}
-	}
-
-	fmt.Println(blocks)
-
-	return checksum(blocks)
-}
-
-func findFreeBlock(blocks []block, maxIndex int, size int) int {
+func findFreeBlock2(blocks []block, maxIndex int, size int) int {
 	for i := 0; i < maxIndex; i++ {
 		var b = blocks[i]
 		if len(b) > 0 {
@@ -192,17 +71,11 @@ func findFreeBlock(blocks []block, maxIndex int, size int) int {
 	return -1
 }
 
-func defragFile2(blocks []block, maxIndex int, f *file) bool {
-	var indexFree = findFreeBlock(blocks, maxIndex, f.len)
-	if indexFree == -1 {
-		return false
-	}
-
+func defragFile(blocks []block, indexFree int, f *file) bool {
 	var freeBlock = blocks[indexFree]
-	fmt.Printf("found free block: %v\n", freeBlock)
 	var freeFile = freeBlock[len(freeBlock)-1]
 	if freeFile.id != -1 {
-		fmt.Println("freeFile.id != -1")
+		// no free file
 		return false
 	}
 
@@ -227,23 +100,20 @@ func defragFile2(blocks []block, maxIndex int, f *file) bool {
 		blocks[indexFree] = freeBlock
 		return true
 	}
-
 	return false
-
 }
 
-func checksum2(blocks []block) int {
+func checksum(blocks []block) int {
 	var res int
 	var adr int
 	for _, b := range blocks {
 		for _, f := range b {
 			if f.id != -1 {
 				for i := 0; i < f.len; i++ {
-					res += (adr * f.id)
+					res += adr * f.id
 					adr++
 				}
-			}
-			if f.id == -1 {
+			} else {
 				adr += f.len
 			}
 		}
@@ -251,11 +121,36 @@ func checksum2(blocks []block) int {
 	return res
 }
 
-func Part2(input string) int {
+func Part1(input string) int {
 	input = strings.TrimSpace(input)
 	var blocks = parse(input)
 
-	fmt.Println(blocks)
+	var lastIndex = len(blocks) - 1
+	if lastIndex%2 != 0 {
+		lastIndex--
+	}
+
+	var freeIndex = 1
+	for {
+		var f = blocks[lastIndex][0]
+		ok := defragFile(blocks, freeIndex, f)
+		if !ok {
+			break
+		}
+		freeIndex = findFreeBlock1(blocks, freeIndex)
+		if freeIndex < 0 || freeIndex >= lastIndex {
+			break
+		}
+		if f.id == -1 {
+			lastIndex -= 2
+		}
+	}
+	return checksum(blocks)
+}
+
+func Part2(input string) int {
+	input = strings.TrimSpace(input)
+	var blocks = parse(input)
 
 	var lastIndex = len(blocks) - 1
 	if lastIndex%2 != 0 {
@@ -263,16 +158,14 @@ func Part2(input string) int {
 	}
 
 	for lastIndex >= 1 {
-		fmt.Printf("lastIndex: %d\n", lastIndex)
 		var f = blocks[lastIndex][0]
-		fmt.Printf("file to move: %v\n", f)
-		defragFile2(blocks, lastIndex, f)
+		var indexFree = findFreeBlock2(blocks, lastIndex, f.len)
+		if indexFree >= 0 {
+			defragFile(blocks, indexFree, f)
+		}
 		lastIndex -= 2
 	}
-
-	fmt.Println(blocks)
-
-	return checksum2(blocks)
+	return checksum(blocks)
 }
 
 func main() {

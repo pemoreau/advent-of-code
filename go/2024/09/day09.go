@@ -73,7 +73,7 @@ func findFreeBlock2(blocks []block, maxIndex int, size int) int {
 		if len(b) > 0 {
 			var last = b[len(b)-1]
 			if last.id == -1 && last.len >= size {
-				start[last.len] = i
+				start[last.len] = i // this is a mega optimization
 				return i
 			}
 		}

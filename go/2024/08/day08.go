@@ -18,7 +18,7 @@ func solve(input string, addAntinodes func(ax, ay int, dx, dy int, maxX, maxY in
 	var maxX = len(lines[0]) - 1
 	var maxY = len(lines) - 1
 	//var antenna = make(map[uint8][]game2d.Pos)
-	var antenna [256][]game2d.Pos
+	var antenna [256][]game2d.Pos // use an array to see if it is faster than a map
 	var antinodes = set.NewSet[game2d.Pos]()
 	for j, l := range lines {
 		for i, c := range l {

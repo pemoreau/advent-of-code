@@ -30,9 +30,6 @@ func nbFaces(piece *Piece) int {
 	var res int
 	for range 4 {
 		var minX, maxX, minY, maxY = piece.GetBounds()
-		//fmt.Printf("bounds %d %d %d %d size: %d\n", minX, maxX, minY, maxY, piece.Size())
-		//fmt.Println(piece.String())
-
 		for y := minY - 1; y <= maxY+1; y++ {
 			res += northFrontY(piece, minX, maxX, y)
 		}
@@ -47,7 +44,6 @@ func northFrontY(piece *Piece, minX, maxX, y int) int {
 	for x := minX - 1; x <= maxX+1; x++ {
 		var p = game2d.Pos{x, y}
 		var cond = !piece.ContainsPos(p) && piece.ContainsPos(p.S())
-
 		if front == false && cond {
 			front = true
 			res++
@@ -58,31 +54,30 @@ func northFrontY(piece *Piece, minX, maxX, y int) int {
 	return res
 }
 
-func Part1(input string) int {
+func solve(input string, part2 bool) int {
 	var grid = game2d.BuildGridCharFromString(input)
 
 	var res int
 	var components = grid.ExtractComponents()
 	for _, c := range components {
 		var area, perimeter = areaPerimeter(c)
-		res += area * perimeter
+		if part2 {
+			var nb = nbFaces(c)
+			res += area * nb
+		} else {
+			res += area * perimeter
+		}
 	}
 
 	return res
 }
 
+func Part1(input string) int {
+	return solve(input, false)
+}
+
 func Part2(input string) int {
-	var grid = game2d.BuildGridCharFromString(input)
-	var components = grid.ExtractComponents()
-
-	var res int
-	for _, c := range components {
-		var area, _ = areaPerimeter(c)
-		var nb = nbFaces(c)
-		res += area * nb
-	}
-
-	return res
+	return solve(input, true)
 }
 
 func main() {

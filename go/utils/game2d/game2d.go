@@ -2,6 +2,7 @@ package game2d
 
 import (
 	"fmt"
+	"github.com/pemoreau/advent-of-code/go/utils/set"
 	"iter"
 	"math"
 	"strings"
@@ -109,6 +110,10 @@ func (g *Grid[T]) SetPos(pos Pos, value T) {
 	g.m[pos] = value
 }
 
+func (g *Grid[T]) ContainsPos(pos Pos) bool {
+	_, ok := g.GetPos(pos)
+	return ok
+}
 func (g *Grid[T]) Contains(pos Pos, value T) bool {
 	v, ok := g.GetPos(pos)
 	return ok && v == value
@@ -116,6 +121,10 @@ func (g *Grid[T]) Contains(pos Pos, value T) bool {
 
 func (g *Grid[T]) GetBounds() (minX, maxX, minY, maxY int) {
 	return g.minX, g.maxX, g.minY, g.maxY
+}
+
+func (g *Grid[T]) Size() int {
+	return len(g.m)
 }
 
 func (g *Grid[T]) All() iter.Seq2[Pos, T] {
@@ -150,4 +159,64 @@ func (g *Grid[T]) AllByRow() iter.Seq2[Pos, T] {
 			}
 		}
 	}
+}
+
+func (g *Grid[T]) ExtractComponents() []*Grid[T] {
+	var res []*Grid[T]
+	var visited = set.NewSet[Pos]()
+	for pos := range g.AllByRow() {
+		if visited.Contains(pos) {
+			continue
+		}
+		var piece = g.collectComponent(pos)
+		for p := range piece.AllPos() {
+			visited.Add(p)
+		}
+		res = append(res, piece)
+	}
+	return res
+}
+
+func (g *Grid[T]) collectComponent(pos Pos) *Grid[T] {
+	var firstValue, _ = g.GetPos(pos)
+
+	var res = NewGrid[T](g.ToString)
+	var visited = set.NewSet[Pos]()
+
+	var todo = []Pos{pos}
+	for len(todo) > 0 {
+		var p = todo[0]
+		todo = todo[1:]
+		if visited.Contains(p) {
+			continue
+		}
+		visited.Add(p)
+		if v, ok := g.GetPos(p); ok && v == firstValue {
+			res.SetPos(p, v)
+			for n := range p.Neighbors4() {
+				if !visited.Contains(n) {
+					todo = append(todo, n)
+				}
+			}
+		}
+	}
+	return res
+}
+
+func (m *Grid[T]) RotateLeft() {
+	var data = make(map[Pos]T)
+	for p := range m.AllPos() {
+		data[Pos{m.maxY - p.Y, p.X}] = m.m[p]
+	}
+	m.m = data
+	m.minX, m.maxX, m.minY, m.maxY = m.maxX-m.maxY, m.maxX-m.minY, m.minX, m.maxX
+}
+
+func (m *Grid[T]) RotateRight() {
+	var data = make(map[Pos]T)
+	for p := range m.AllPos() {
+		data[Pos{p.Y, m.maxX - p.X}] = m.m[p]
+	}
+	m.m = data
+	m.minX, m.maxX, m.minY, m.maxY = m.minY, m.maxY, m.maxX-m.maxX, m.maxX-m.minX
 }

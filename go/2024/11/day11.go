@@ -34,8 +34,7 @@ func produce(value int, n int) int {
 		return res
 	}
 
-	var s = strconv.Itoa(value)
-	if len(s)%2 == 0 {
+	if s := strconv.Itoa(value); len(s)%2 == 0 {
 		a, _ := strconv.Atoi(s[:len(s)/2])
 		b, _ := strconv.Atoi(s[len(s)/2:])
 		res := produce(a, n-1) + produce(b, n-1)

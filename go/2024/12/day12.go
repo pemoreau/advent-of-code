@@ -13,7 +13,7 @@ var inputTest string
 
 type Piece = game2d.GridChar
 
-func areaPerimeter(piece *game2d.GridChar) (int, int) {
+func areaPerimeter(piece *Piece) (int, int) {
 	var area = piece.Size()
 	var perimeter int
 	for p := range piece.AllPos() {

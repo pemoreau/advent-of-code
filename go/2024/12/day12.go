@@ -13,24 +13,23 @@ var inputTest string
 
 type Piece = game2d.GridChar
 
-func areaPerimeter(piece *Piece) (int, int) {
-	var area = piece.Size()
-	var perimeter int
+func perimeter(piece *Piece) int {
+	var res int
 	for p := range piece.AllPos() {
 		for n := range p.Neighbors4() {
 			if !piece.ContainsPos(n) {
-				perimeter++
+				res++
 			}
 		}
 	}
-	return area, perimeter
+	return res
 }
 
 func nbFaces(piece *Piece) int {
 	var res int
 	for range 4 {
 		var minX, maxX, minY, maxY = piece.GetBounds()
-		for y := minY - 1; y <= maxY+1; y++ {
+		for y := minY - 1; y <= maxY-1; y++ {
 			res += northFrontY(piece, minX, maxX, y)
 		}
 		piece.RotateRight()
@@ -41,7 +40,7 @@ func nbFaces(piece *Piece) int {
 func northFrontY(piece *Piece, minX, maxX, y int) int {
 	var res int
 	var front = false
-	for x := minX - 1; x <= maxX+1; x++ {
+	for x := minX - 1; x <= maxX; x++ {
 		var p = game2d.Pos{x, y}
 		var cond = !piece.ContainsPos(p) && piece.ContainsPos(p.S())
 		if front == false && cond {
@@ -60,12 +59,11 @@ func solve(input string, part2 bool) int {
 	var res int
 	var components = grid.ExtractComponents()
 	for _, c := range components {
-		var area, perimeter = areaPerimeter(c)
+		var area = c.Size()
 		if part2 {
-			var nb = nbFaces(c)
-			res += area * nb
+			res += area * nbFaces(c)
 		} else {
-			res += area * perimeter
+			res += area * perimeter(c)
 		}
 	}
 

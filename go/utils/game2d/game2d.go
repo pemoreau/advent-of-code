@@ -96,6 +96,16 @@ func (g *Grid[T]) GetPos(pos Pos) (T, bool) {
 	return v, ok
 }
 
+func (g *Grid[T]) ContainsPos(pos Pos) bool {
+	_, ok := g.m[pos]
+	return ok
+}
+
+func (g *Grid[T]) Contains(pos Pos, value T) bool {
+	v, ok := g.m[pos]
+	return ok && v == value
+}
+
 func (g *Grid[T]) ClearPos(pos Pos) {
 	delete(g.m, pos)
 }
@@ -108,15 +118,6 @@ func (g *Grid[T]) SetPos(pos Pos, value T) {
 		g.maxY = max(pos.Y, g.maxY)
 	}
 	g.m[pos] = value
-}
-
-func (g *Grid[T]) ContainsPos(pos Pos) bool {
-	_, ok := g.GetPos(pos)
-	return ok
-}
-func (g *Grid[T]) Contains(pos Pos, value T) bool {
-	v, ok := g.GetPos(pos)
-	return ok && v == value
 }
 
 func (g *Grid[T]) GetBounds() (minX, maxX, minY, maxY int) {
@@ -161,6 +162,12 @@ func (g *Grid[T]) AllByRow() iter.Seq2[Pos, T] {
 	}
 }
 
+// Extract connected components from a grid
+// AAAA
+// BBCD              BB  C
+// BBCC  ==>  [AAAA, BB, CC, D, EEE]
+// EEEC                   C
+
 func (g *Grid[T]) ExtractComponents() []*Grid[T] {
 	var res []*Grid[T]
 	var visited = set.NewSet[Pos]()
@@ -168,21 +175,15 @@ func (g *Grid[T]) ExtractComponents() []*Grid[T] {
 		if visited.Contains(pos) {
 			continue
 		}
-		var piece = g.collectComponent(pos)
-		for p := range piece.AllPos() {
-			visited.Add(p)
-		}
+		var piece = g.collectComponent(pos, visited)
 		res = append(res, piece)
 	}
 	return res
 }
 
-func (g *Grid[T]) collectComponent(pos Pos) *Grid[T] {
+func (g *Grid[T]) collectComponent(pos Pos, visited set.Set[Pos]) *Grid[T] {
 	var firstValue, _ = g.GetPos(pos)
-
 	var res = NewGrid[T](g.ToString)
-	var visited = set.NewSet[Pos]()
-
 	var todo = []Pos{pos}
 	for len(todo) > 0 {
 		var p = todo[0]
@@ -190,9 +191,9 @@ func (g *Grid[T]) collectComponent(pos Pos) *Grid[T] {
 		if visited.Contains(p) {
 			continue
 		}
-		visited.Add(p)
-		if v, ok := g.GetPos(p); ok && v == firstValue {
-			res.SetPos(p, v)
+		if g.Contains(p, firstValue) {
+			visited.Add(p)
+			res.SetPos(p, firstValue)
 			for n := range p.Neighbors4() {
 				if !visited.Contains(n) {
 					todo = append(todo, n)

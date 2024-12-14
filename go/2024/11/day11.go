@@ -17,9 +17,7 @@ type config struct {
 	n int
 }
 
-var cache = make(map[config]int)
-
-func produce(value int, n int) int {
+func produce(value int, n int, cache map[config]int) int {
 	if n == 0 {
 		return 1
 	}
@@ -29,7 +27,7 @@ func produce(value int, n int) int {
 	}
 
 	if value == 0 {
-		res := produce(1, n-1)
+		res := produce(1, n-1, cache)
 		cache[config{value, n}] = res
 		return res
 	}
@@ -37,22 +35,24 @@ func produce(value int, n int) int {
 	if s := strconv.Itoa(value); len(s)%2 == 0 {
 		a, _ := strconv.Atoi(s[:len(s)/2])
 		b, _ := strconv.Atoi(s[len(s)/2:])
-		res := produce(a, n-1) + produce(b, n-1)
+		res := produce(a, n-1, cache) + produce(b, n-1, cache)
 		cache[config{value, n}] = res
 		return res
 	}
 
-	res := produce(value*2024, n-1)
+	res := produce(value*2024, n-1, cache)
 	cache[config{value, n}] = res
 	return res
 }
 
 func solve(input string, n int) int {
+	var cache = make(map[config]int)
+
 	var line = strings.Split(input, " ")
 	var res int
 	for _, e := range line {
 		v, _ := strconv.Atoi(e)
-		res += produce(v, n)
+		res += produce(v, n, cache)
 	}
 	return res
 }

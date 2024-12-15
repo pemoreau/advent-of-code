@@ -11,12 +11,14 @@ import (
 //go:embed sample.txt
 var inputTest string
 
-const LUMBER = '#'
-const TREE = '|'
-const OPEN = '.'
+const (
+	LUMBER = '#'
+	TREE   = '|'
+	OPEN   = '.'
+)
 
 func step(m *game2d.MatrixChar) *game2d.MatrixChar {
-	var newM = game2d.NewMatrix[uint8](m.LenX(), m.LenY())
+	var newM = game2d.NewMatrixChar(m.LenX(), m.LenY())
 
 	for p := range m.AllPos() {
 		var countLumber = 0

@@ -24,13 +24,16 @@ type Matrix[T comparable] struct {
 type MatrixChar = Matrix[uint8]
 type MatrixDigit = Matrix[uint8]
 
-func NewMatrix[T comparable](width, height int) *Matrix[T] {
-	return &Matrix[T]{width: width, height: height, data: make([]T, width*height)}
+func NewMatrix[T comparable](width, height int, toString func(c T) string) *Matrix[T] {
+	return &Matrix[T]{width: width, height: height, data: make([]T, width*height), toString: toString}
+}
+
+func NewMatrixChar(width, height int) *MatrixChar {
+	return NewMatrix(width, height, func(c uint8) string { return string(c) })
 }
 
 func Clone[T comparable](m Matrix[T]) *Matrix[T] {
-	var m2 = NewMatrix[T](m.width, m.height)
-	m2.toString = m.toString
+	var m2 = NewMatrix[T](m.width, m.height, m.toString)
 	copy(m2.data, m.data)
 	return m2
 }
@@ -39,8 +42,7 @@ func BuildMatrixFunc[T comparable](lines []string, convert func(c int32) T, toSt
 	if len(lines) == 0 {
 		panic("matrix: empty input")
 	}
-	var m = NewMatrix[T](len(lines[0]), len(lines))
-	m.toString = toString
+	var m = NewMatrix[T](len(lines[0]), len(lines), toString)
 	for j, l := range lines {
 		l = strings.TrimSpace(l)
 		for i, c := range l {

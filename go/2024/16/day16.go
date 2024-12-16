@@ -47,12 +47,10 @@ func cost(from, to state) int {
 }
 
 func heuristic(from, to game2d.Pos) int {
-	//return 0
-	var res int
 	if from.X != to.X || from.Y != to.Y {
-		res += 1000
+		return 1000 + game2d.ManhattanDistance(from, to)
 	}
-	return res + game2d.ManhattanDistance(from, to)
+	return game2d.ManhattanDistance(from, to)
 }
 
 func Part1(input string) int {
@@ -86,6 +84,7 @@ func Part2(input string) int {
 	var toExplore = set.Set[game2d.Pos]{}
 
 	for _, s := range path {
+		// select positions which have at least 3 neighbors with '.'
 		var count = 0
 		for q := range s.Pos.Neighbors4() {
 			if m.GetPos(q) == '.' {
@@ -102,6 +101,8 @@ func Part2(input string) int {
 	}
 
 	var deltaIn = []game2d.Pos{{0, 1}, {-1, 0}, {0, -1}, {1, 0}}
+	heuristicF2 := func(s state) int { return heuristic(s.Pos, to) }
+
 	for p := range toExplore {
 		if res.Contains(p) {
 			continue
@@ -112,7 +113,6 @@ func Part2(input string) int {
 
 		//fmt.Println("p: ", p)
 		heuristicF1 := func(s state) int { return heuristic(s.Pos, p) }
-		heuristicF2 := func(s state) int { return heuristic(s.Pos, to) }
 
 		for dir := 0; dir < 4; dir++ {
 			if m.GetPos(p.Add(deltaIn[dir])) == '#' {

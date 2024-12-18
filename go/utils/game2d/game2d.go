@@ -20,6 +20,7 @@ type Grid[T comparable] struct {
 }
 
 type GridChar = Grid[uint8]
+type GridInt = Grid[int]
 
 func NewGrid[T comparable](toString func(c T) string) *Grid[T] {
 	return &Grid[T]{
@@ -34,6 +35,10 @@ func NewGrid[T comparable](toString func(c T) string) *Grid[T] {
 
 func NewGridChar() *GridChar {
 	return NewGrid(func(c uint8) string { return string(c) })
+}
+
+func NewGridInt() *GridInt {
+	return NewGrid(func(c int) string { return fmt.Sprintf("%d", c) })
 }
 
 func BuildGridFunc[T comparable](lines []string, convert func(c int32) T, toString func(c T) string) *Grid[T] {
@@ -122,6 +127,22 @@ func (g *Grid[T]) SetPos(pos Pos, value T) {
 
 func (g *Grid[T]) GetBounds() (minX, maxX, minY, maxY int) {
 	return g.minX, g.maxX, g.minY, g.maxY
+}
+
+func (g *Grid[T]) MaxX() int {
+	return g.maxX
+}
+
+func (g *Grid[T]) MaxY() int {
+	return g.maxY
+}
+
+func (g *Grid[T]) MinX() int {
+	return g.minX
+}
+
+func (g *Grid[T]) MinY() int {
+	return g.minY
 }
 
 func (g *Grid[T]) Size() int {

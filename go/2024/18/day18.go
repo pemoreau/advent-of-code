@@ -38,31 +38,21 @@ func parse(input string) (grid *game2d.GridInt, positions []game2d.Pos) {
 	return
 }
 
-func connected(grid *game2d.GridInt, start, goal game2d.Pos, t int) bool {
+func minimumCost(grid *game2d.GridInt, start, goal game2d.Pos, t int) int {
 	neighborsF := func(s game2d.Pos) []game2d.Pos { return neighbors(s, grid, t) }
 	costF := func(from, to game2d.Pos) int { return 1 }
 	goalF := func(s game2d.Pos) bool { return s == goal }
 	heuristicF := func(s game2d.Pos) int { return 0 }
 
 	_, cost := utils.Astar[game2d.Pos](start, goalF, neighborsF, costF, heuristicF)
-	return cost > 0
+	return cost
 }
 
 func Part1(input string) int {
 	var grid, _ = parse(input)
-
 	var start = game2d.Pos{0, 0}
 	var goal = game2d.Pos{grid.MaxX(), grid.MaxY()}
-	var t = 1024
-
-	neighborsF := func(s game2d.Pos) []game2d.Pos { return neighbors(s, grid, t) }
-	costF := func(from, to game2d.Pos) int { return 1 }
-	goalF := func(s game2d.Pos) bool { return s == goal }
-	heuristicF := func(s game2d.Pos) int { return 0 }
-
-	_, cost := utils.Astar[game2d.Pos](start, goalF, neighborsF, costF, heuristicF)
-
-	return cost
+	return minimumCost(grid, start, goal, 1024)
 }
 
 func Part2(input string) string {
@@ -72,7 +62,7 @@ func Part2(input string) string {
 	var goal = game2d.Pos{grid.MaxX(), grid.MaxY()}
 
 	// find the smallest t such that connected is false using binary search
-	var res = sort.Search(len(positions), func(t int) bool { return !connected(grid, start, goal, t) })
+	var res = sort.Search(len(positions), func(t int) bool { return minimumCost(grid, start, goal, t) == 0 })
 	return fmt.Sprintf("%d,%d", positions[res-1].X, positions[res-1].Y)
 
 	//var t = 1024

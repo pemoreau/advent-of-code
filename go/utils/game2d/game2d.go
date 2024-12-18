@@ -125,6 +125,10 @@ func (g *Grid[T]) SetPos(pos Pos, value T) {
 	g.m[pos] = value
 }
 
+func (m *Grid[T]) IsValidPos(pos Pos) bool {
+	return pos.Y >= 0 && pos.Y <= m.MaxY() && pos.X >= 0 && pos.X <= m.MaxX()
+}
+
 func (g *Grid[T]) GetBounds() (minX, maxX, minY, maxY int) {
 	return g.minX, g.maxX, g.minY, g.maxY
 }

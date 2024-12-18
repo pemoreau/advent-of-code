@@ -13,19 +13,6 @@ import (
 //go:embed sample.txt
 var inputTest string
 
-func neighbors(p game2d.Pos, grid *game2d.GridInt, t int) []game2d.Pos {
-	var res []game2d.Pos
-	var minX, maxX, minY, maxY = grid.GetBounds()
-	for n := range p.Neighbors4() {
-		if n.X >= minX && n.X <= maxX && n.Y >= minY && n.Y <= maxY {
-			if v, ok := grid.GetPos(n); !ok || v > t {
-				res = append(res, n)
-			}
-		}
-	}
-	return res
-}
-
 func parse(input string) (grid *game2d.GridInt, positions []game2d.Pos) {
 	var lines = strings.Split(input, "\n")
 	grid = game2d.NewGridInt()
@@ -36,6 +23,18 @@ func parse(input string) (grid *game2d.GridInt, positions []game2d.Pos) {
 		positions = append(positions, p)
 	}
 	return
+}
+
+func neighbors(p game2d.Pos, grid *game2d.GridInt, t int) []game2d.Pos {
+	var res []game2d.Pos
+	for n := range p.Neighbors4() {
+		if grid.IsValidPos(n) {
+			if v, ok := grid.GetPos(n); !ok || v > t {
+				res = append(res, n)
+			}
+		}
+	}
+	return res
 }
 
 func minimumCost(grid *game2d.GridInt, start, goal game2d.Pos, t int) int {
@@ -57,7 +56,6 @@ func Part1(input string) int {
 
 func Part2(input string) string {
 	var grid, positions = parse(input)
-
 	var start = game2d.Pos{0, 0}
 	var goal = game2d.Pos{grid.MaxX(), grid.MaxY()}
 

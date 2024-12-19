@@ -32,13 +32,7 @@ func parse(input string) ([]instruction, int, int, int) {
 
 func findN(m *Machine, start int, end int, goal []int) int {
 	for i := start; i <= end; i++ {
-		m.init()
-		m.SetRegister(A, i)
-		m.SetRegister(B, 0)
-		m.SetRegister(C, 0)
-		var o = Output{}
-		for m.Run(&o, false) {
-		}
+		o := m.Run(i, 0, 0, false)
 		if slices.Equal(o.out, goal) {
 			//fmt.Printf("found a=%d out=%v goal=%v\n", i, o.out, goal)
 			return i
@@ -51,10 +45,8 @@ func findN(m *Machine, start int, end int, goal []int) int {
 
 func Part1(input string) string {
 	var inst, a, b, c = parse(input)
-	var m = CreateMachine(inst, a, b, c)
-	var o = Output{}
-	for m.Run(&o, false) {
-	}
+	var m = CreateMachine(inst)
+	var o = m.Run(a, b, c, false)
 	var res string
 	for i, e := range o.out {
 		if i > 0 {
@@ -78,16 +70,15 @@ func solveSlow(m *Machine, expected []int, start int) int {
 	return res
 }
 
-func solveFast(m *Machine, index int, expected []int, start int) int {
+func solveFast(m *Machine, a int, index int, expected []int) int {
 	//fmt.Println("index", index, "start", start)
 	if index < 0 {
-		return start
+		return a
 	}
 	for i := 0; i < 8; i++ {
-		var a = 8*start + i
-		var res = findN(m, a, a, expected[index:])
-		if res >= 0 {
-			if v := solveFast(m, index-1, expected, a); v >= 0 {
+		var nextA = 8*a + i
+		if o := m.Run(nextA, 0, 0, false); slices.Equal(o.out, expected[index:]) {
+			if v := solveFast(m, nextA, index-1, expected); v >= 0 {
 				return v
 			}
 		}
@@ -95,11 +86,27 @@ func solveFast(m *Machine, index int, expected []int, start int) int {
 	return -1
 }
 
+func solveFast2(m *Machine, a int, index int, expected []int) int {
+	var o = m.Run(a, 0, 0, false)
+	if slices.Equal(o.out, expected) {
+		return a
+	}
+	if index == 0 || slices.Equal(o.out, expected[len(expected)-index:]) {
+		for digit := 0; digit < 8; digit++ {
+			if a := solveFast2(m, 8*a+digit, index+1, expected); a >= 0 {
+				return a
+			}
+		}
+	}
+	return -1
+}
+
 func Part2(input string) int {
-	var inst, a, b, c = parse(input)
-	var m = CreateMachine(inst, a, b, c)
+	var inst, _, _, _ = parse(input)
+	var m = CreateMachine(inst)
 	//return solveSlow(m, inst, 1)
-	return solveFast(m, len(inst)-1, inst, 0)
+	return solveFast(m, 0, len(inst)-1, inst)
+	//return solveFast2(m, 0, 0, inst)
 }
 
 func main() {

@@ -3,6 +3,7 @@ package set
 import (
 	"fmt"
 	"iter"
+	"strings"
 )
 
 type Set[T comparable] map[T]struct{}
@@ -12,15 +13,20 @@ func NewSet[T comparable]() Set[T] {
 }
 
 func (s Set[T]) String() string {
-	var res string
-	res = res + "{"
+	var sb strings.Builder
+	sb.WriteString("{")
 
+	var cpt = 0
 	for elem := range s {
 		var e = fmt.Sprintf("%v", elem)
-		res = res + e + ", "
+		sb.WriteString(e)
+		cpt++
+		if cpt < len(s) {
+			sb.WriteString(", ")
+		}
 	}
-	res = res + "}"
-	return res
+	sb.WriteString("}")
+	return sb.String()
 }
 
 func (s Set[T]) Add(value T) {

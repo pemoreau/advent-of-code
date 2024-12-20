@@ -17,6 +17,11 @@ type state struct {
 	dir int
 }
 
+func (s state) String() string {
+	var dir = []string{"^", ">", "v", "<"}
+	return fmt.Sprintf("(%d,%d,%s)", s.X, s.Y, dir[s.dir])
+}
+
 const (
 	N = iota
 	E
@@ -69,6 +74,27 @@ func Part1(input string) int {
 }
 
 func Part2(input string) int {
+	m := game2d.BuildMatrixCharFromString(input)
+	from, _ := m.Find('S')
+	to, _ := m.Find('E')
+	var start = state{from, E}
+
+	neighborsF := func(s state) []state { return neighbors(m, s) }
+	costF := func(from, to state) int { return cost(from, to) }
+	goalF := func(s state) bool { return s.Pos == to }
+
+	var pairs = utils.DijkstraAll(start, goalF, neighborsF, costF)
+	var res = set.Set[game2d.Pos]{}
+	for _, pair := range pairs {
+		for _, p := range pair.Path {
+			res.Add(p.Pos)
+		}
+	}
+
+	return res.Len()
+}
+
+func Part2Slow(input string) int {
 	m := game2d.BuildMatrixCharFromString(input)
 	from, _ := m.Find('S')
 	to, _ := m.Find('E')

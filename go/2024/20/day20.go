@@ -19,10 +19,10 @@ func cheatN(grid *game2d.MatrixChar, pos game2d.Pos, n int) set.Set[game2d.Pos] 
 		for deltaY := 0; deltaY <= n-deltaX; deltaY++ {
 			if deltaX+deltaY >= 2 && deltaX+deltaY <= n {
 				var positions = []game2d.Pos{
-					game2d.Pos{X: pos.X + deltaX, Y: pos.Y + deltaY},
-					game2d.Pos{X: pos.X - deltaX, Y: pos.Y - deltaY},
-					game2d.Pos{X: pos.X + deltaX, Y: pos.Y - deltaY},
-					game2d.Pos{X: pos.X - deltaX, Y: pos.Y + deltaY},
+					{X: pos.X + deltaX, Y: pos.Y + deltaY},
+					{X: pos.X - deltaX, Y: pos.Y - deltaY},
+					{X: pos.X + deltaX, Y: pos.Y - deltaY},
+					{X: pos.X - deltaX, Y: pos.Y + deltaY},
 				}
 				for _, p := range positions {
 					if grid.IsValidPos(p) && grid.GetPos(p) != '#' {
@@ -35,7 +35,7 @@ func cheatN(grid *game2d.MatrixChar, pos game2d.Pos, n int) set.Set[game2d.Pos] 
 	return res
 }
 
-func solve(input string, n int) int {
+func solve(input string, n int, m int) int {
 	var grid = game2d.BuildMatrixCharFromString(input)
 	var start, _ = grid.Find('S')
 	var end, _ = grid.Find('E')
@@ -65,12 +65,28 @@ func solve(input string, n int) int {
 	}
 
 	var res int
-	for i, pos := range path {
-		var cheat = cheatN(grid, pos, n)
-		for c := range cheat {
-			var index2, _ = visited[c]
-			var win = index2 - i - game2d.ManhattanDistance(pos, c)
-			if win >= 100 {
+	//for i, pos := range path[:len(path)-m] {
+	//	//for c := range cheatN(grid, pos, n) {
+	//	for _, c := range path[i+m:] {
+	//		if game2d.ManhattanDistance(pos, c) > n {
+	//			continue
+	//		}
+	//		var index2, _ = visited[c]
+	//		var win = index2 - i - game2d.ManhattanDistance(pos, c)
+	//		if win >= m {
+	//			res++
+	//		}
+	//	}
+	//}
+	for i, pos := range path[:len(path)-m] {
+		for j, c := range path[i+m:] {
+			var dist = game2d.ManhattanDistance(pos, c)
+			if dist > n {
+				continue
+			}
+			var index2 = i + m + j
+			var win = index2 - i - dist
+			if win >= m {
 				res++
 			}
 		}
@@ -80,11 +96,11 @@ func solve(input string, n int) int {
 }
 
 func Part1(input string) int {
-	return solve(input, 2)
+	return solve(input, 2, 100)
 }
 
 func Part2(input string) int {
-	return solve(input, 20)
+	return solve(input, 20, 100)
 }
 
 func main() {

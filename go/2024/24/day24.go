@@ -12,9 +12,6 @@ import (
 //go:embed sample.txt
 var inputTest string
 
-//go:embed sample2.txt
-var inputTest2 string
-
 type Node struct {
 	op  string
 	lhs string
@@ -22,42 +19,23 @@ type Node struct {
 	val int
 }
 
-func eval(variable string, values map[string]Node, visited map[string]int) (int, error) {
-	if visited[variable] > 100 {
-		return 0, fmt.Errorf("circular reference %s", variable)
-	}
-	//fmt.Printf("eval %s\n", variable)
+func eval(variable string, values map[string]Node) int {
 	if v, ok := values[variable]; ok {
-		visited[variable]++
-		if v.op == "" && (v.val == 1 || v.val == 0) {
-			//fmt.Printf("return %d\n", v.val)
-			return v.val, nil
-		}
-		var lhs, rhs int
-		var err error
-
-		if lhs, err = eval(v.lhs, values, visited); err != nil {
-			return 0, err
-		}
-		if rhs, err = eval(v.rhs, values, visited); err != nil {
-			return 0, err
-		}
 		switch v.op {
+		case "":
+			return v.val
 		case "AND":
-			//fmt.Printf("return %d & %d = %d\n", lhs, rhs, lhs&rhs)
-			return lhs & rhs, nil
+			return eval(v.lhs, values) & eval(v.rhs, values)
 		case "OR":
-			//fmt.Printf("return %d | %d = %d\n", lhs, rhs, lhs|rhs)
-			return lhs | rhs, nil
+			return eval(v.lhs, values) | eval(v.rhs, values)
 		case "XOR":
-			//fmt.Printf("return %d ^ %d = %d\n", lhs, rhs, lhs^rhs)
-			return lhs ^ rhs, nil
+			return eval(v.lhs, values) ^ eval(v.rhs, values)
 		}
 	}
-	return 0, fmt.Errorf("variable %s not found", variable)
+	return 0
 }
 
-func run(wires map[string]Node) (int, error) {
+func run(wires map[string]Node) int {
 	var z []string
 	for k, _ := range wires {
 		if strings.HasPrefix(k, "z") {
@@ -66,28 +44,12 @@ func run(wires map[string]Node) (int, error) {
 	}
 	slices.Sort(z)
 
-	//fmt.Println(z)
-
 	var res int
 	for _, k := range slices.Backward(z) {
-		var b, err = eval(k, wires, map[string]int{})
-		if err != nil {
-			return 0, err
-		}
-		//fmt.Println(k, b)
+		var b = eval(k, wires)
 		res = res<<1 + b
 	}
-	return res, nil
-}
-
-func setValue(name string, value int, wires map[string]Node) {
-	var index = 0
-	for value != 0 {
-		wires[fmt.Sprintf("%s%02d", name, index)] = Node{val: value % 2}
-		//fmt.Printf("%s%02d = %d\n", name, index, value%2)
-		value = value >> 1
-		index++
-	}
+	return res
 }
 
 func swapWires(w1, w2 string, wires map[string]Node) {
@@ -98,16 +60,13 @@ func swapWires(w1, w2 string, wires map[string]Node) {
 
 func parse(input string) map[string]Node {
 	var parts = strings.Split(input, "\n\n")
-
 	var wires = make(map[string]Node)
 
 	for _, line := range strings.Split(parts[0], "\n") {
 		var value int
 		var variable string
-		//fmt.Println(line)
 		fmt.Sscanf(line, "%s %d", &variable, &value)
 		wires[variable[:len(variable)-1]] = Node{val: value}
-		//fmt.Printf("add %s %d: %v\n", variable, value, wires[variable])
 	}
 
 	for _, line := range strings.Split(parts[1], "\n") {
@@ -119,17 +78,26 @@ func parse(input string) map[string]Node {
 	return wires
 }
 
-func checkZ(z string, wires map[string]Node) bool {
-	xor_output, ok := wires[z]
-	// z output
+// x01 XOR y01 -> A
+// y01 AND x01 -> B
+// A AND C -> D
+// A XOR C -> z01
+// B OR D -> E
+
+func checkZ(zname string, wires map[string]Node) bool {
+	xname := "x" + zname[1:]
+	yname := "y" + zname[1:]
+
+	xor_output, ok := wires[zname]
+	// zname output
 	if !ok || xor_output.op != "XOR" {
-		fmt.Printf("%s: bad output expected XOR got: %v\n", z, xor_output)
+		fmt.Printf("%s: bad output expected XOR got: %v\n", zname, xor_output)
 		return false
 	}
 	var lhs = wires[xor_output.lhs]
 	var rhs = wires[xor_output.rhs]
 	if !((lhs.op == "XOR" && rhs.op == "OR") || (lhs.op == "OR" && rhs.op == "XOR")) {
-		fmt.Printf("%s: bad input for xor_output expected: XOR and OR got: %v %v\n", z, lhs, rhs)
+		fmt.Printf("%s: bad input for xor_output expected: XOR and OR got: %v %v\n", zname, lhs, rhs)
 		return false
 	}
 	var xor_input, and_input Node
@@ -142,14 +110,13 @@ func checkZ(z string, wires map[string]Node) bool {
 	}
 
 	// check xor inputs
-	xname := "x" + z[1:]
-	yname := "y" + z[1:]
+
 	if !((and_input.lhs == xname && and_input.rhs == yname) || (and_input.lhs == yname && and_input.rhs == xname)) {
-		fmt.Printf("%s: bad input for and_input expected:%s %s got: %v\n", z, xname, yname, and_input)
+		fmt.Printf("%s: bad input for and_input expected:%s %s got: %v\n", zname, xname, yname, and_input)
 		return false
 	}
 	if !((xor_input.lhs == xname && xor_input.rhs == yname) || (xor_input.lhs == yname && xor_input.rhs == xname)) {
-		fmt.Printf("%s: bad input for xor_input expected:%s %s got: %v\n", z, xname, yname, xor_input)
+		fmt.Printf("%s: bad input for xor_input expected:%s %s got: %v\n", zname, xname, yname, xor_input)
 		return false
 	}
 	return true
@@ -158,40 +125,24 @@ func checkZ(z string, wires map[string]Node) bool {
 func checkSomme(zname string, wires map[string]Node) bool {
 	xname := "x" + zname[1:]
 	yname := "y" + zname[1:]
-	xvalue := wires[xname]
-	yvalue := wires[yname]
 	inputsX := []int{0, 0, 1, 1}
 	inputsY := []int{0, 1, 0, 1}
 	expected := []int{0, 1, 1, 0}
-	var res = true
 	for i, inputX := range inputsX {
 		inputY := inputsY[i]
 		wires[xname] = Node{val: inputX}
 		wires[yname] = Node{val: inputY}
-		var b, err = eval(zname, wires, map[string]int{})
-		if err != nil {
-			fmt.Printf("checkSomme %s: %s=%d %s=%d error: %v\n", zname, xname, inputX, yname, inputY, err)
-			res = false
-			break
-		}
-		if b != expected[i] {
+		if b := eval(zname, wires); b != expected[i] {
 			fmt.Printf("checkSomme %s: %s=%d %s=%d expected %d got %d\n", zname, xname, inputX, yname, inputY, expected[i], b)
-			res = false
-			break
+			return false
 		}
 	}
-	wires[xname] = xvalue
-	wires[yname] = yvalue
-	return res
+	return true
 }
 
 func Part1(input string) int {
 	var wires = parse(input)
-	v, err := run(wires)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return v
+	return run(wires)
 }
 
 func Part2(input string) string {
@@ -214,19 +165,19 @@ func Part2(input string) string {
 	swapWires("z38", "dvq", wires) // z38
 
 	//ctg,dmh,dvq,rpb,rpv,z11,z31,z38
-	for _, zname := range slices.Backward(znodes) {
+	for i := len(znodes) - 2; i >= 0; i-- {
 		// save x and y values
 		for i, zname := range znodes {
 			xname := "x" + zname[1:]
 			yname := "y" + zname[1:]
 			xvalues[i] = wires[xname]
 			yvalues[i] = wires[yname]
-			// set to 0
+			// set x and y to 0
 			wires[xname] = Node{val: 0}
 			wires[yname] = Node{val: 0}
 		}
 
-		ok := checkSomme(zname, wires)
+		ok := checkSomme(znodes[i], wires)
 		if ok {
 			//fmt.Printf("check %s: %v\n", zname, ok)
 		}

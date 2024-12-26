@@ -14,21 +14,21 @@ Mostly written in Go and Rust
 | **08** | | | | [Go](./go/2018/08/day08.go) | [:crab:](./rust/2019/day08) | [Go](./go/2020/08/day08.go)                             |                             [:crab:](./rust/2021/day08) | [Go](./go/2022/08/day08.go) | [Go](./go/2023/08/day08.go) | [Go](./go/2024/08/day08.go) |
 | **09** | | | | [Go](./go/2018/09/day09.go) | [:crab:](./rust/2019/day09) | [Go](./go/2020/09/day09.go)                             | [Go](./go/2021/09/day09.go)                             | [Go](./go/2022/09/day09.go) | [Go](./go/2023/09/day09.go) | [Go](./go/2024/09/day09.go) |
 | **10** | | | | [Go](./go/2018/10/day10.go) | [:crab:](./rust/2019/day10) | [Go](./go/2020/10/day10.go)                             | [Go](./go/2021/10/day10.go) [:crab:](./rust/2021/day10) | [Go](./go/2022/10/day10.go) | [Go](./go/2023/10/day10.go) | [Go](./go/2024/10/day10.go) |
-| **11** | | | | [Go](./go/2018/11/day11.go) | [:crab:](./rust/2019/day11) |                             [:crab:](./rust/2020/day11) | [Go](./go/2021/11/day11.go) [:crab:](./rust/2021/day11) | [Go](./go/2022/11/day11.go) | [Go](./go/2023/11/day11.go) |
-| **12** | | | | [Go](./go/2018/12/day12.go) | [:crab:](./rust/2019/day12) |                             [:crab:](./rust/2020/day12) | [Go](./go/2021/12/day12.go)                           | [Go](./go/2022/12/day12.go) | [Go](./go/2023/12/day12.go) |
-| **13** | | | | [Go](./go/2018/13/day13.go) | [:crab:](./rust/2019/day13) |                             [:crab:](./rust/2020/day13) | [Go](./go/2021/13/day13.go) [:crab:](./rust/2021/day13) | [Go](./go/2022/13/day13.go) | [Go](./go/2023/13/day13.go) |
-| **14** | | | | [Go](./go/2018/14/day14.go) | [:crab:](./rust/2019/day14) |                             [:crab:](./rust/2020/day14) | [Go](./go/2021/14/day14.go)                             | [Go](./go/2022/14/day14.go) | [Go](./go/2023/14/day14.go) |
-| **15** | | | | [Go](./go/2018/15/day15.go) | [:crab:](./rust/2019/day15) |                             [:crab:](./rust/2020/day15) | [Go](./go/2021/15/day15.go)                             | [Go](./go/2022/15/day15.go) | [Go](./go/2023/15/day15.go) |
-| **16** | | | | [Go](./go/2018/16/day16.go) | [:crab:](./rust/2019/day16) |                             [:crab:](./rust/2020/day16) | [Go](./go/2021/16/day16.go)                             | [Go](./go/2022/16/day16.go) | [Go](./go/2023/16/day16.go) |
-| **17** | | | | [Go](./go/2018/17/day17.go) | [:crab:](./rust/2019/day17) |                             [:crab:](./rust/2020/day17) | [Go](./go/2021/17/day17.go)                             | [Go](./go/2022/17/day17.go) | [Go](./go/2023/17/day17.go) |
-| **18** | | | | [Go](./go/2018/18/day18.go) | [:crab:](./rust/2019/day18) |                             [:crab:](./rust/2020/day18) | [Go](./go/2021/18/day18.go)                             | [Go](./go/2022/18/day18.go) | [Go](./go/2023/18/day18.go) |
-| **19** | | | | [Go](./go/2018/19/day19.go) | [:crab:](./rust/2019/day19) | [Go](./go/2020/19/day19.go)                             | [Go](./go/2021/19/day19.go)                             | [Go](./go/2022/19/day19.go) | [Go](./go/2023/19/day19.go) |
-| **20** | | | | [Go](./go/2018/20/day20.go) | [:crab:](./rust/2019/day20) | [Go](./go/2020/20/day20.go)                             | [Go](./go/2021/20/day20.go)                             | [Go](./go/2022/20/day20.go) | [Go](./go/2023/20/day20.go) |
-| **21** | | | | [Go](./go/2018/21/day21.go) | [:crab:](./rust/2019/day21) | [Go](./go/2020/21/day21.go)                             | [Go](./go/2021/21/day21.go)                             | [Go](./go/2022/21/day21.go) | [Go](./go/2023/21/day21.go) |
-| **22** | | | | [Go](./go/2018/22/day22.go) | [:crab:](./rust/2019/day22) | [Go](./go/2020/22/day22.go)                             | [Go](./go/2021/22/day22.go)                             | [Go](./go/2022/22/day22.go) | [Go](./go/2023/22/day22.go) |
-| **23** | | | | [Go](./go/2018/23/day23.go) | [:crab:](./rust/2019/day23) | [Go](./go/2020/23/day23.go)                             | [Go](./go/2021/23/day23.go)                             | [Go](./go/2022/23/day23.go) | [Go](./go/2023/23/day23.go) |
-| **24** | | | | [Go](./go/2018/24/day24.go) | [:crab:](./rust/2019/day24) | [Go](./go/2020/24/day24.go)                             | [Go](./go/2021/24/day24.go)                             | [Go](./go/2022/24/day24.go) | [Go](./go/2023/24/day24.go) |
-| **25** | | | | [Go](./go/2018/25/day25.go) | [:crab:](./rust/2019/day25) | [Go](./go/2020/25/day25.go)                             | [Go](./go/2021/25/day25.go)                             | [Go](./go/2022/25/day25.go) | [Go](./go/2023/25/day25.go) |
+| **11** | | | | [Go](./go/2018/11/day11.go) | [:crab:](./rust/2019/day11) | [Go](./go/2020/11/day11.go)                             | [Go](./go/2021/11/day11.go) [:crab:](./rust/2021/day11) | [Go](./go/2022/11/day11.go) | [Go](./go/2023/11/day11.go) | [Go](./go/2024/11/day11.go) |
+| **12** | | | | [Go](./go/2018/12/day12.go) | [:crab:](./rust/2019/day12) |                             [:crab:](./rust/2020/day12) | [Go](./go/2021/12/day12.go)                           | [Go](./go/2022/12/day12.go) | [Go](./go/2023/12/day12.go) | [Go](./go/2024/12/day12.go) | 
+| **13** | | | | [Go](./go/2018/13/day13.go) | [:crab:](./rust/2019/day13) |                             [:crab:](./rust/2020/day13) | [Go](./go/2021/13/day13.go) [:crab:](./rust/2021/day13) | [Go](./go/2022/13/day13.go) | [Go](./go/2023/13/day13.go) | [Go](./go/2024/13/day13.go) | 
+| **14** | | | | [Go](./go/2018/14/day14.go) | [:crab:](./rust/2019/day14) |                             [:crab:](./rust/2020/day14) | [Go](./go/2021/14/day14.go)                             | [Go](./go/2022/14/day14.go) | [Go](./go/2023/14/day14.go) | [Go](./go/2024/14/day14.go) |
+| **15** | | | | [Go](./go/2018/15/day15.go) | [:crab:](./rust/2019/day15) |                             [:crab:](./rust/2020/day15) | [Go](./go/2021/15/day15.go)                             | [Go](./go/2022/15/day15.go) | [Go](./go/2023/15/day15.go) | [Go](./go/2024/15/day15.go) |
+| **16** | | | | [Go](./go/2018/16/day16.go) | [:crab:](./rust/2019/day16) |                             [:crab:](./rust/2020/day16) | [Go](./go/2021/16/day16.go)                             | [Go](./go/2022/16/day16.go) | [Go](./go/2023/16/day16.go) | [Go](./go/2024/16/day16.go) |
+| **17** | | | | [Go](./go/2018/17/day17.go) | [:crab:](./rust/2019/day17) |                             [:crab:](./rust/2020/day17) | [Go](./go/2021/17/day17.go)                             | [Go](./go/2022/17/day17.go) | [Go](./go/2023/17/day17.go) | [Go](./go/2024/17/day17.go) |
+| **18** | | | | [Go](./go/2018/18/day18.go) | [:crab:](./rust/2019/day18) |                             [:crab:](./rust/2020/day18) | [Go](./go/2021/18/day18.go)                             | [Go](./go/2022/18/day18.go) | [Go](./go/2023/18/day18.go) | [Go](./go/2024/18/day18.go) |
+| **19** | | | | [Go](./go/2018/19/day19.go) | [:crab:](./rust/2019/day19) | [Go](./go/2020/19/day19.go)                             | [Go](./go/2021/19/day19.go)                             | [Go](./go/2022/19/day19.go) | [Go](./go/2023/19/day19.go) | [Go](./go/2024/19/day19.go) |
+| **20** | | | | [Go](./go/2018/20/day20.go) | [:crab:](./rust/2019/day20) | [Go](./go/2020/20/day20.go)                             | [Go](./go/2021/20/day20.go)                             | [Go](./go/2022/20/day20.go) | [Go](./go/2023/20/day20.go) | [Go](./go/2024/20/day20.go) |
+| **21** | | | | [Go](./go/2018/21/day21.go) | [:crab:](./rust/2019/day21) | [Go](./go/2020/21/day21.go)                             | [Go](./go/2021/21/day21.go)                             | [Go](./go/2022/21/day21.go) | [Go](./go/2023/21/day21.go) | [Go](./go/2024/21/day21.go) |
+| **22** | | | | [Go](./go/2018/22/day22.go) | [:crab:](./rust/2019/day22) | [Go](./go/2020/22/day22.go)                             | [Go](./go/2021/22/day22.go)                             | [Go](./go/2022/22/day22.go) | [Go](./go/2023/22/day22.go) | [Go](./go/2024/22/day22.go) |
+| **23** | | | | [Go](./go/2018/23/day23.go) | [:crab:](./rust/2019/day23) | [Go](./go/2020/23/day23.go)                             | [Go](./go/2021/23/day23.go)                             | [Go](./go/2022/23/day23.go) | [Go](./go/2023/23/day23.go) | [Go](./go/2024/23/day23.go) |
+| **24** | | | | [Go](./go/2018/24/day24.go) | [:crab:](./rust/2019/day24) | [Go](./go/2020/24/day24.go)                             | [Go](./go/2021/24/day24.go)                             | [Go](./go/2022/24/day24.go) | [Go](./go/2023/24/day24.go) | [Go](./go/2024/24/day24.go) |
+| **25** | | | | [Go](./go/2018/25/day25.go) | [:crab:](./rust/2019/day25) | [Go](./go/2020/25/day25.go)                             | [Go](./go/2021/25/day25.go)                             | [Go](./go/2022/25/day25.go) | [Go](./go/2023/25/day25.go) | [Go](./go/2024/25/day25.go) |
 
 # Commands
 
@@ -65,10 +65,10 @@ Execution time on an MacBook Air M2
 | [day 11](./go/2024/11/day11.go) | ` 0.230 ms` | ` 12.38 ms` |
 | [day 12](./go/2024/12/day12.go) | ` 10.15 ms` | ` 19.84 ms` |
 | [day 13](./go/2024/13/day13.go) | ` 0.722 ms` | ` 0.730 ms` |
-| [day 14](./go/2024/14/day14.go) | ` 0. ms`    | ` 0.000 ms` |
-| [day 15](./go/2024/15/day15.go) | ` 0. ms`    | ` 0.000 ms` |
-| [day 16](./go/2024/16/day16.go) | ` 0. ms`    | ` 0.000 ms` |
-| [day 17](./go/2024/17/day17.go) | ` 0. ms`    | ` 0.000 ms` |
+| [day 14](./go/2024/14/day14.go) | ` 0.380 ms` | ` 85.94 ms` |
+| [day 15](./go/2024/15/day15.go) | ` 4.978 ms` | ` 5.852 ms` |
+| [day 16](./go/2024/16/day16.go) | ` 11.89 ms` | ` 52.57 ms` |
+| [day 17](./go/2024/17/day17.go) | ` 0.002 ms` | ` 0.119 ms` |
 | [day 18](./go/2024/18/day18.go) | ` 0. ms`    | ` 0.000 ms` |
 | [day 19](./go/2024/19/day19.go) | ` 0. ms`    | ` 0.000 ms` |
 | [day 20](./go/2024/20/day20.go) | ` 0. ms`    | ` 0.000 ms` |

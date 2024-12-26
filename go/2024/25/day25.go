@@ -39,8 +39,7 @@ func isValidKey(lock, key pins) bool {
 func searchKey(lock pins, sortedKeys []pins) int {
 	var res int
 	var perfectKey = pins{5 - lock[0], 5 - lock[1], 5 - lock[2], 5 - lock[3], 5 - lock[4]}
-	var i, found = slices.BinarySearchFunc(sortedKeys, perfectKey, cmpKeys)
-	fmt.Printf("pefectKey: %v, found: %v i:%d\n", perfectKey, found, i)
+	var i, _ = slices.BinarySearchFunc(sortedKeys, perfectKey, cmpKeys)
 	for i < len(sortedKeys) {
 		if isValidKey(lock, sortedKeys[i]) {
 			res++
@@ -78,10 +77,8 @@ func Part1(input string) int {
 			keys = append(keys, p)
 		}
 	}
-	fmt.Printf("%d locks: %v\n", len(locks), locks)
 
 	slices.SortFunc(keys, cmpKeys)
-	fmt.Printf("%d keys: %v\n", len(keys), keys)
 
 	var res int
 	for _, lock := range locks {
@@ -91,13 +88,6 @@ func Part1(input string) int {
 	return res
 }
 
-//func Part2(input string) int {
-//	//var lines = strings.Split(input, "\n")
-//
-//	var res int
-//	return res
-//}
-
 func main() {
 	fmt.Println("--2024 day 25 solution--")
 	var inputDay = utils.Input()
@@ -105,8 +95,4 @@ func main() {
 	start := time.Now()
 	fmt.Println("part1: ", Part1(inputDay))
 	fmt.Println(time.Since(start))
-
-	//start = time.Now()
-	//fmt.Println("part2: ", Part2(inputDay))
-	//fmt.Println(time.Since(start))
 }

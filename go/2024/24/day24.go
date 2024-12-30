@@ -133,7 +133,7 @@ func checkSomme(zname string, wires map[string]Node) bool {
 		wires[xname] = Node{val: inputX}
 		wires[yname] = Node{val: inputY}
 		if b := eval(zname, wires); b != expected[i] {
-			fmt.Printf("checkSomme %s: %s=%d %s=%d expected %d got %d\n", zname, xname, inputX, yname, inputY, expected[i], b)
+			//fmt.Printf("checkSomme %s: %s=%d %s=%d expected %d got %d\n", zname, xname, inputX, yname, inputY, expected[i], b)
 			return false
 		}
 	}
@@ -242,12 +242,10 @@ func Part2(input string) string {
 		}
 
 		ok := checkSomme(znodes[i], wires)
-		if ok {
-			//fmt.Printf("check %s: %v\n", zname, ok)
-		} else {
+		if !ok {
 			swap1, swap2 := repair(znodes[i], wires)
 			if swap1 != "" && swap2 != "" {
-				fmt.Printf("repair %s: %s %s\n", znodes[i], swap1, swap2)
+				//fmt.Printf("repair %s: %s %s\n", znodes[i], swap1, swap2)
 				res = append(res, swap1)
 				res = append(res, swap2)
 				swapWires(swap1, swap2, wires)

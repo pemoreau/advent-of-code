@@ -57,7 +57,7 @@ Execution time on an MacBook Air M2
 | [day 03](./go/2024/03/day03.go) | ` 0.037 ms` | ` 0.062 ms` |
 | [day 04](./go/2024/04/day04.go) | ` 2.976 ms` | ` 3.370 ms` |
 | [day 05](./go/2024/05/day05.go) | ` 0.192 ms` | ` 0.457 ms` |
-| [day 06](./go/2024/06/day06.go) | ` 0.712 ms` | ` 1225 ms`  |
+| [day 06](./go/2024/06/day06.go) | ` 0.712 ms` | ` 405.7 ms` |
 | [day 07](./go/2024/07/day07.go) | ` 0.300 ms` | ` 0.443 ms` |
 | [day 08](./go/2024/08/day08.go) | ` 0.027 ms` | ` 0.095 ms` |
 | [day 09](./go/2024/09/day09.go) | ` 0.943 ms` | ` 0.752 ms` |
@@ -75,7 +75,7 @@ Execution time on an MacBook Air M2
 | [day 21](./go/2024/21/day21.go) | ` 0.034 ms` | ` 0.158 ms` |
 | [day 22](./go/2024/22/day22.go) | ` 21.20 ms` | ` 374.5 ms` |
 | [day 23](./go/2024/23/day23.go) | ` 2.933 ms` | ` 200.6 ms` |
-| [day 24](./go/2024/24/day24.go) | ` 0.421 ms` | ` 1.063 ms` |
+| [day 24](./go/2024/24/day24.go) | ` 0.412 ms` | ` 1.226 ms` |
 | [day 24](./go/2024/25/day25.go) | ` 0.324 ms` |             |
 
 

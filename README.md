@@ -281,3 +281,4 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 24](./go/2018/24/day24.go) |||
 | [day 25](./go/2018/25/day25.go) |||
 
+

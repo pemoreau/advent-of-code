@@ -13,6 +13,28 @@ import (
 //go:embed sample.txt
 var inputTest string
 
+// Bron–Kerbosch
+func BronKerbosch(R, P, X set.Set[string], graph map[string]set.Set[string], C *[][]string) {
+	if P.Len() == 0 && X.Len() == 0 {
+		if R.Len() > 2 {
+			var Rlist []string
+			for v := range R.All() {
+				Rlist = append(Rlist, v)
+			}
+			slices.Sort(Rlist)
+			*C = append(*C, Rlist)
+		}
+		return
+	}
+	for v := range P.All() {
+		var vset = set.NewSet[string]()
+		vset.Add(v)
+		BronKerbosch(R.Union(vset), P.Intersect(graph[v]), X.Intersect(graph[v]), graph, C)
+		P.Remove(v)
+		X.Add(v)
+	}
+}
+
 func Part1(input string) int {
 	var lines = strings.Split(input, "\n")
 
@@ -45,28 +67,6 @@ func Part1(input string) int {
 		}
 	}
 	return cliques.Len()
-}
-
-// Bron–Kerbosch
-func BronKerbosch(R, P, X set.Set[string], graph map[string]set.Set[string], C *[][]string) {
-	if P.Len() == 0 && X.Len() == 0 {
-		if R.Len() > 2 {
-			var Rlist []string
-			for v := range R.All() {
-				Rlist = append(Rlist, v)
-			}
-			slices.Sort(Rlist)
-			*C = append(*C, Rlist)
-		}
-		return
-	}
-	for v := range P.All() {
-		var vset = set.NewSet[string]()
-		vset.Add(v)
-		BronKerbosch(R.Union(vset), P.Intersect(graph[v]), X.Intersect(graph[v]), graph, C)
-		P.Remove(v)
-		X.Add(v)
-	}
 }
 
 func Part2(input string) string {

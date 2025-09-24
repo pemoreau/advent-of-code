@@ -133,11 +133,74 @@ func checkSomme(zname string, wires map[string]Node) bool {
 		wires[xname] = Node{val: inputX}
 		wires[yname] = Node{val: inputY}
 		if b := eval(zname, wires); b != expected[i] {
-			fmt.Printf("checkSomme %s: %s=%d %s=%d expected %d got %d\n", zname, xname, inputX, yname, inputY, expected[i], b)
+			//fmt.Printf("checkSomme %s: %s=%d %s=%d expected %d got %d\n", zname, xname, inputX, yname, inputY, expected[i], b)
 			return false
 		}
 	}
 	return true
+}
+
+func repair(zname string, wires map[string]Node) (string, string) {
+
+	xname := "x" + zname[1:]
+	//yname := "y" + zname[1:]
+	var node3, node4, node5 Node
+	var output1, output2, output4 string
+	var swap1, swap2 string
+	for output, n := range wires {
+		if n.lhs == xname || n.rhs == xname {
+			if n.op == "XOR" {
+				//node1 = n
+				output1 = output
+			} else if n.op == "AND" {
+				//node2 = n
+				output2 = output
+			}
+		}
+	}
+	for output, n := range wires {
+		if n.lhs == output1 || n.rhs == output1 {
+			if n.op == "XOR" {
+				node4 = n
+				output4 = output
+			} else if n.op == "AND" {
+				node3 = n
+				//output3 = output
+			}
+		} else if (n.lhs == output2 || n.rhs == output2) && n.op == "OR" {
+			node5 = n
+			//output5 = output
+		}
+	}
+	// node1: x01 XOR y01 -> A
+	// node2: y01 AND x01 -> B
+	// node3: A AND C -> D
+	// node4: A XOR C -> z01
+	// node5: B OR D -> E
+	//fmt.Printf("node1: %v -> %s\n", node1, output1)
+	//fmt.Printf("node2: %v -> %s\n", node2, output2)
+	//fmt.Printf("node3: %v -> %s\n", node3, output3)
+	//fmt.Printf("node4: %v -> %s\n", node4, output4)
+	//fmt.Printf("node5: %v -> %s\n", node5, output5)
+	if output4 != "" && output4 != zname {
+		swap1 = output4
+		swap2 = zname
+		return swap1, swap2
+	}
+	if node3.op == "" {
+		swap1 = output1
+	} else if (output1 == node5.lhs || output1 == node5.rhs) && node5.op == "OR" {
+		swap1 = output1
+	}
+	if node5.op == "" {
+		swap2 = output2
+	} else if (output2 != node4.lhs && output2 == node4.rhs) && node4.op == "XOR" {
+		swap2 = output2
+	} else if (output2 == node3.lhs || output2 == node3.rhs) && node3.op == "AND" {
+		swap2 = output2
+	}
+
+	return swap1, swap2
 }
 
 func Part1(input string) int {
@@ -159,12 +222,13 @@ func Part2(input string) string {
 	var xvalues = make([]Node, len(znodes))
 	var yvalues = make([]Node, len(znodes))
 
-	swapWires("z11", "rpv", wires) // z11
-	swapWires("rpb", "ctg", wires) // z15
-	swapWires("z31", "dmh", wires) // z31
-	swapWires("z38", "dvq", wires) // z38
+	//swapWires("z11", "rpv", wires) // z11
+	//swapWires("rpb", "ctg", wires) // z15
+	//swapWires("z31", "dmh", wires) // z31
+	//swapWires("z38", "dvq", wires) // z38
 
 	//ctg,dmh,dvq,rpb,rpv,z11,z31,z38
+	var res []string
 	for i := len(znodes) - 2; i >= 0; i-- {
 		// save x and y values
 		for i, zname := range znodes {
@@ -178,8 +242,14 @@ func Part2(input string) string {
 		}
 
 		ok := checkSomme(znodes[i], wires)
-		if ok {
-			//fmt.Printf("check %s: %v\n", zname, ok)
+		if !ok {
+			swap1, swap2 := repair(znodes[i], wires)
+			if swap1 != "" && swap2 != "" {
+				//fmt.Printf("repair %s: %s %s\n", znodes[i], swap1, swap2)
+				res = append(res, swap1)
+				res = append(res, swap2)
+				swapWires(swap1, swap2, wires)
+			}
 		}
 
 		// restore x and y values
@@ -192,7 +262,9 @@ func Part2(input string) string {
 
 	}
 
-	return "ctg,dmh,dvq,rpb,rpv,z11,z31,z38"
+	slices.Sort(res)
+	return strings.Join(res, ",")
+	//return "ctg,dmh,dvq,rpb,rpv,z11,z31,z38"
 }
 
 func main() {

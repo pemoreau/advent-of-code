@@ -29,18 +29,16 @@ type Guard struct {
 func (g *Guard) front(grid *Grid) (game2d.Pos, uint8, bool) {
 	var neighbors = []game2d.Pos{g.Pos.N(), g.Pos.E(), g.Pos.S(), g.Pos.W()}
 	var nextPos = neighbors[g.dir]
-	//v, inside := grid.GetPos(nextPos)
-	var x, y = nextPos.X, nextPos.Y
-	if inside := x >= 0 && x <= grid.MaxX() && y >= 0 && y <= grid.MaxY(); inside {
-		return nextPos, grid.Get(x, y), true
+	if grid.IsValidPos(nextPos) {
+		return nextPos, grid.GetPos(nextPos), true
 	}
 	return nextPos, 0, false
 }
 
-func (g *Guard) move(grid *Grid, path set.Set[Guard]) (inside bool, loop bool) {
+func (g *Guard) move(grid *Grid, visited set.Set[Guard]) (inside bool, loop bool) {
 	if p, v, inside := g.front(grid); !inside {
 		return false, false
-	} else if v != '#' && path.Contains(Guard{p, g.dir}) {
+	} else if v != '#' && visited.Contains(Guard{p, g.dir}) {
 		return true, true
 	} else if v == '#' {
 		g.dir = (g.dir + 1) % 4
@@ -51,29 +49,23 @@ func (g *Guard) move(grid *Grid, path set.Set[Guard]) (inside bool, loop bool) {
 	}
 }
 
-func (g *Guard) run(grid *Grid) (set.Set[Guard], bool) {
-	var path = set.NewSet[Guard]()
-	path.Add(*g)
+func (g *Guard) run(grid *Grid) ([]Guard, bool) {
+	var path []Guard
+	var visited = set.NewSet[Guard]()
+	path = append(path, *g)
+	visited.Add(*g)
 	// returns true if loop
 	for {
 		var inside, loop bool
-		inside, loop = g.move(grid, path)
+		inside, loop = g.move(grid, visited)
 		if loop {
 			return path, true
 		} else if !inside {
 			return path, false
 		}
-		path.Add(*g)
+		path = append(path, *g)
+		visited.Add(*g)
 	}
-}
-
-func (g *Guard) computeTrack(grid *Grid) set.Set[game2d.Pos] {
-	var plot = set.NewSet[game2d.Pos]()
-	path, _ := g.run(grid)
-	for p := range path.All() {
-		plot.Add(p.Pos)
-	}
-	return plot
 }
 
 func findStart(grid *Grid) Guard {
@@ -86,19 +78,26 @@ func findStart(grid *Grid) Guard {
 func Part1(input string) int {
 	var grid = game2d.BuildMatrixCharFromString(input)
 	var guard = findStart(grid)
-	return guard.computeTrack(grid).Len()
+	var track, _ = guard.run(grid)
+	var res = set.NewSet[game2d.Pos]()
+	for _, g := range track {
+		res.Add(g.Pos)
+	}
+	return res.Len()
 }
 
 func Part2(input string) int {
 	var grid = game2d.BuildMatrixCharFromString(input)
 	var start = findStart(grid)
-	var guard = start
-	var track = guard.computeTrack(grid)
+	var track, _ = start.run(grid)
 
 	var plot = set.NewSet[game2d.Pos]()
 	var tried = set.NewSet[game2d.Pos]()
-	for p := range track.All() {
-		var guard = start
+	var previous = start
+	for _, g := range track {
+		var p = g.Pos
+		var guard = previous
+		previous = g
 		if v := grid.GetPos(p); v != '#' {
 			if tried.Contains(p) {
 				continue

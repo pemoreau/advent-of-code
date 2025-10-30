@@ -65,3 +65,30 @@ func CommaSeparatedToNumbers(input string) []int {
 	lines := strings.Split(strings.TrimSuffix(input, "\n"), ",")
 	return StringsToNumbers(lines)
 }
+
+// dedent supprime l'indentation commune des blocs multi-lignes pour plus de lisibilité.
+func Dedent(s string) string {
+	lines := strings.Split(strings.Trim(s, "\n"), "\n")
+	// calcule l'indent min (ignore les lignes vides)
+	min := -1
+	for _, ln := range lines {
+		if strings.TrimSpace(ln) == "" {
+			continue
+		}
+		i := 0
+		for i < len(ln) && ln[i] == ' ' {
+			i++
+		}
+		if min == -1 || i < min {
+			min = i
+		}
+	}
+	if min > 0 {
+		for i, ln := range lines {
+			if len(ln) >= min {
+				lines[i] = ln[min:]
+			}
+		}
+	}
+	return strings.Join(lines, "\n")
+}

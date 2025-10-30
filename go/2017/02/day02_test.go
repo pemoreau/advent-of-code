@@ -2,7 +2,6 @@ package main
 
 import (
 	_ "embed"
-	"strings"
 	"testing"
 
 	"github.com/pemoreau/advent-of-code/go/utils"
@@ -16,33 +15,6 @@ func TestPart1(t *testing.T) {
 	}
 }
 
-// dedent supprime l'indentation commune des blocs multi-lignes pour plus de lisibilité.
-func dedent(s string) string {
-	lines := strings.Split(strings.Trim(s, "\n"), "\n")
-	// calcule l'indent min (ignore les lignes vides)
-	min := -1
-	for _, ln := range lines {
-		if strings.TrimSpace(ln) == "" {
-			continue
-		}
-		i := 0
-		for i < len(ln) && ln[i] == ' ' {
-			i++
-		}
-		if min == -1 || i < min {
-			min = i
-		}
-	}
-	if min > 0 {
-		for i, ln := range lines {
-			if len(ln) >= min {
-				lines[i] = ln[min:]
-			}
-		}
-	}
-	return strings.Join(lines, "\n")
-}
-
 func TestPart2(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -51,7 +23,7 @@ func TestPart2(t *testing.T) {
 	}{
 		{
 			name: "part2",
-			input: dedent(`
+			input: utils.Dedent(`
 				5 9 2 8
   				9 4 7 3
 				3 8 6 5

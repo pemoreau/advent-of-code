@@ -29,8 +29,8 @@ func TestPart[I, E comparable](t *testing.T, tests []Test[I, E]) {
 // dedent supprime l'indentation commune des blocs multi-lignes pour plus de lisibilité.
 func Dedent(s string) string {
 	lines := strings.Split(strings.Trim(s, "\n"), "\n")
-	// calcule l'indent min (ignore les lignes vides)
-	min := -1
+	// calcule l'indent left (ignore les lignes vides)
+	left := -1
 	for _, ln := range lines {
 		if strings.TrimSpace(ln) == "" {
 			continue
@@ -39,14 +39,14 @@ func Dedent(s string) string {
 		for i < len(ln) && ln[i] == ' ' {
 			i++
 		}
-		if min == -1 || i < min {
-			min = i
+		if left == -1 || i < left {
+			left = i
 		}
 	}
-	if min > 0 {
+	if left > 0 {
 		for i, ln := range lines {
-			if len(ln) >= min {
-				lines[i] = ln[min:]
+			if len(ln) >= left {
+				lines[i] = ln[left:]
 			}
 		}
 	}

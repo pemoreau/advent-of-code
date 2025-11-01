@@ -7,22 +7,12 @@ import (
 	"github.com/pemoreau/advent-of-code/go/utils"
 )
 
-func TestPart1Input(t *testing.T) {
-	var inputDay = utils.Input()
-	result := Part1(inputDay)
-	expected := 1044
-	if result != expected {
-		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
+func TestPart(t *testing.T) {
+	var tests = []utils.Test[string, int]{
+		{Func: Part1, Input: utils.Input(), Expected: 1044},
+		{Func: Part2, Input: utils.Input(), Expected: 1054},
 	}
-}
-
-func TestPart2Input(t *testing.T) {
-	var inputDay = utils.Input()
-	result := Part2(inputDay)
-	expected := 1054
-	if result != expected {
-		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-	}
+	utils.TestPart(t, tests)
 }
 
 func BenchmarkPart1(b *testing.B) {

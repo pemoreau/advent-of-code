@@ -11,9 +11,6 @@ import (
 	"github.com/pemoreau/advent-of-code/go/utils"
 )
 
-//go:embed sample.txt
-var inputTest string
-
 func getList(line string) []int {
 	parts := strings.Fields(line)
 	var list []int

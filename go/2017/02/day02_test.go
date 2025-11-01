@@ -7,57 +7,30 @@ import (
 	"github.com/pemoreau/advent-of-code/go/utils"
 )
 
-func TestPart1(t *testing.T) {
-	result := Part1(inputTest)
-	expected := 18
-	if result != expected {
-		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-	}
-}
-
-func TestPart2(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected int
-	}{
+func TestPart(t *testing.T) {
+	var tests = []utils.Test[string, int]{
 		{
-			name: "part2",
-			input: utils.Dedent(`
-				5 9 2 8
-  				9 4 7 3
-				3 8 6 5
+			Func: Part1,
+			Input: utils.Dedent(`
+				5 1 9 5
+                7 5 3
+                2 4 6 8
 			`),
-			expected: 9,
+			Expected: 18,
 		},
+		{Func: Part1, Input: utils.Input(), Expected: 34925},
+		{
+			Func: Part2,
+			Input: utils.Dedent(`
+                5 9 2 8
+    			9 4 7 3
+    			3 8 6 5
+            `),
+			Expected: 9,
+		},
+		{Func: Part2, Input: utils.Input(), Expected: 221},
 	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			got := Part2(tc.input)
-			if got != tc.expected {
-				t.Fatalf("Part2 %s: got %d, want %d", tc.name, got, tc.expected)
-			}
-		})
-	}
-}
-
-func TestPart1Input(t *testing.T) {
-	var inputDay = utils.Input()
-	result := Part1(inputDay)
-	expected := 34925
-	if result != expected {
-		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-	}
-}
-
-func TestPart2Input(t *testing.T) {
-	var inputDay = utils.Input()
-	result := Part2(inputDay)
-	expected := 221
-	if result != expected {
-		t.Errorf("Result is incorrect, got: %d, want: %d.", result, expected)
-	}
+	utils.TestPart(t, tests)
 }
 
 func BenchmarkPart1(b *testing.B) {

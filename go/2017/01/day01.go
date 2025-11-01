@@ -9,9 +9,6 @@ import (
 	"github.com/pemoreau/advent-of-code/go/utils"
 )
 
-//go:embed sample.txt
-var inputTest string
-
 func solve(input string, n int) int {
 	input = strings.TrimSuffix(input, "\n")
 	var res = 0

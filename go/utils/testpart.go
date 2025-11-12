@@ -20,7 +20,7 @@ func TestPart[I, E comparable](t *testing.T, tests []Test[I, E]) {
 		t.Run(fnName, func(t *testing.T) {
 			got := tc.Func(tc.Input)
 			if got != tc.Expected {
-				t.Fatalf("%d-%s: input %s got %d, want %d", i, fnName, tc.Input, got, tc.Expected)
+				t.Fatalf("%d-%s: input %v got %d, want %d", i, fnName, tc.Input, got, tc.Expected)
 			}
 		})
 	}

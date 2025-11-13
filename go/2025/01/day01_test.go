@@ -9,14 +9,8 @@ import (
 
 func TestPart(t *testing.T) {
 	var tests = []utils.Test[string, int]{
-		{Func: Part1, Input: "1", Expected: 0},
-		{Func: Part1, Input: "12", Expected: 3},
-		{Func: Part1, Input: "23", Expected: 2},
-		{Func: Part1, Input: "11", Expected: 2},
-		{Func: Part1, Input: "11", Expected: 2},
-		{Func: Part1, Input: "1024", Expected: 31},
-		{Func: Part1, Input: utils.Input(), Expected: 326},
-		{Func: Part2, Input: utils.Input(), Expected: 363010},
+		{Func: Part1, Input: utils.Input(), Expected: 0},
+		{Func: Part2, Input: utils.Input(), Expected: 0},
 	}
 	utils.TestPart(t, tests)
 }

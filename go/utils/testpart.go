@@ -31,12 +31,12 @@ func Dedent(s string) string {
 	lines := strings.Split(strings.Trim(s, "\n"), "\n")
 	// calcule l'indent left (ignore les lignes vides)
 	left := -1
-	for _, ln := range lines {
-		if strings.TrimSpace(ln) == "" {
+	for _, line := range lines {
+		if strings.TrimSpace(line) == "" {
 			continue
 		}
 		i := 0
-		for i < len(ln) && ln[i] == ' ' {
+		for i < len(line) && line[i] == ' ' {
 			i++
 		}
 		if left == -1 || i < left {

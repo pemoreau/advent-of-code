@@ -20,7 +20,7 @@ func TestPart(t *testing.T) {
 			Input:    "0	2	7	0",
 			Expected: 4,
 		},
-		//{Func: Part2, Input: utils.Input(), Expected: 29227751},
+		{Func: Part2, Input: utils.Input(), Expected: 1086},
 	}
 	utils.TestPart(t, tests)
 }

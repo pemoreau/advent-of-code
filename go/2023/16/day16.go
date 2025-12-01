@@ -3,10 +3,11 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"time"
+
 	"github.com/pemoreau/advent-of-code/go/utils"
 	"github.com/pemoreau/advent-of-code/go/utils/game2d"
 	"github.com/pemoreau/advent-of-code/go/utils/set"
-	"time"
 )
 
 //go:embed sample.txt
@@ -68,6 +69,7 @@ func nextDir(dir int, c uint8) int {
 			return RIGHT
 		}
 	}
+	fmt.Printf("dir=%d c='%c'\n", dir, c)
 	panic("invalid state")
 }
 
@@ -90,8 +92,8 @@ func solve(grid *game2d.MatrixChar, current state) int {
 		}
 		visited.Add(s)
 		energized.Add(s.pos)
-
-		switch nextDir(s.dir, grid.GetPos(s.pos)) {
+		c := grid.GetPos(s.pos)
+		switch nextDir(s.dir, c) {
 		case UP:
 			todo = append(todo, state{pos: s.pos.N(), dir: UP})
 		case RIGHT:

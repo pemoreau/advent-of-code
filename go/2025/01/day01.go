@@ -52,6 +52,27 @@ func Part2(input string) int {
 	return res
 }
 
+func Part2Naive(input string) int {
+	input = strings.TrimSuffix(input, "\n")
+	var lines = strings.Split(input, "\n")
+	var res int
+	var dial = 50
+	for _, order := range lines {
+		v, _ := strconv.Atoi(order[1:])
+		for range v {
+			if order[0] == 'L' {
+				dial = (dial + 100 - 1) % 100
+			} else {
+				dial = (dial + 1) % 100
+			}
+			if dial == 0 {
+				res++
+			}
+		}
+	}
+	return res
+}
+
 func main() {
 	fmt.Println("--2025 day 01 solution--")
 	var inputDay = utils.Input()

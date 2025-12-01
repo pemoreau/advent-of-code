@@ -3,17 +3,53 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/pemoreau/advent-of-code/go/utils"
 )
 
 func Part1(input string) int {
-	return 0
+	input = strings.TrimSuffix(input, "\n")
+	var lines = strings.Split(input, "\n")
+	var res int
+	var dial = 50
+	for _, order := range lines {
+		v, _ := strconv.Atoi(order[1:])
+		v = v % 100
+		if order[0] == 'L' {
+			v = -v
+		}
+		dial = (dial + 100 + v) % 100
+		if dial == 0 {
+			res = res + 1
+		}
+	}
+	return res
 }
 
 func Part2(input string) int {
-	return 0
+	input = strings.TrimSuffix(input, "\n")
+	var lines = strings.Split(input, "\n")
+	var res int
+	var dial = 50
+	for _, order := range lines {
+		v, _ := strconv.Atoi(order[1:])
+		if v >= 100 {
+			var n = v / 100
+			res = res + n
+			v = v % 100
+		}
+		if order[0] == 'L' {
+			v = -v
+		}
+		if dial != 0 && (dial+v <= 0 || dial+v >= 100) {
+			res = res + 1
+		}
+		dial = (dial + 100 + v) % 100
+	}
+	return res
 }
 
 func main() {

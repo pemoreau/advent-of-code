@@ -9,8 +9,41 @@ import (
 
 func TestPart(t *testing.T) {
 	var tests = []utils.Test[string, int]{
-		{Func: Part1, Input: utils.Input(), Expected: 0},
-		{Func: Part2, Input: utils.Input(), Expected: 0},
+		{
+			Func: Part1,
+			Input: utils.Dedent(`
+              L68
+              L30
+              R48
+              L5
+              R60
+              L55
+              L1
+              L99
+              R14
+              L82
+			`),
+			Expected: 3,
+		},
+		{
+			Func: Part2,
+			Input: utils.Dedent(`
+              L68
+              L30
+              R48
+              L5
+              R60
+              L55
+              L1
+              L99
+              R14
+              L82
+			`),
+			Expected: 6,
+		},
+
+		{Func: Part1, Input: utils.Input(), Expected: 1043},
+		{Func: Part2, Input: utils.Input(), Expected: 5963},
 	}
 	utils.TestPart(t, tests)
 }

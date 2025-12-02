@@ -68,6 +68,7 @@ Execution time on an MacBook Air M2
 | [day 10](./go/2025/10/day10.go) |             |             |
 | [day 11](./go/2025/11/day11.go) |             |             |
 | [day 12](./go/2025/12/day12.go) |             |             |
+| **Sum**                        | ` 0.004 s`   | ` 0.015 s`   |
 
 
 # [Year 2024](README-2024.md)
@@ -101,6 +102,7 @@ Execution time on an MacBook Air M2
 | [day 23](./go/2024/23/day23.go) | ` 2.933 ms` | ` 200.6 ms` |
 | [day 24](./go/2024/24/day24.go) | ` 0.412 ms` | ` 1.226 ms` |
 | [day 24](./go/2024/25/day25.go) | ` 0.324 ms` |             |
+| **Sum**                        | ` 0.114 s`  | ` 1.222 s`  |
 
 
 # [Year 2023](README-2023.md)
@@ -138,6 +140,7 @@ Execution time on an MacBook Air M2
 | [day 23](./go/2023/23/day23.go) | ` 4.100 ms` | ` 1120  ms` |
 | [day 24](./go/2023/24/day24.go) | ` 2.500 ms` | ` 37.00 ms` |
 | [day 25](./go/2023/25/day25.go) | graphviz    |             |
+| **Sum**                        | ` 14.940 s` | ` 4.296 s`  |
 
 # [Year 2022](README-2022.md)
 
@@ -174,6 +177,7 @@ Execution time on an MacBook Air M2
 | [day 23](./go/2022/23/day23.go) | ` 13.67 ms`    | ` 1024  ms` |
 | [day 24](./go/2022/24/day24.go) | ` 21.77 ms`    | ` 88.03 ms` |
 | [day 25](./go/2022/25/day25.go) | ` 0.029 ms`    |             |
+| **Sum**                        | ` 0.339 s`     | ` 3.844 s`  |
 
 # [Year 2021](README-2021.md)
 
@@ -210,6 +214,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                             |             |             | [day 23](./go/2021/23/day23.go)            | ` 7.806 ms` | ` 76.21 ms` |
 |                             |             |             | [day 24](./go/2021/24/day24.go)            | ` 660.4 ms` | ` 0.003 ms` |
 |                             |             |             | [day 25](./go/2021/25/day25.go)            | ` 98.00 ms` | ` 0.003 ms` |
+| **Sum**                     | ` 0.048 s`  | ` 0.050 s`  |                                            | ` 0.812 s`  | ` 1.159 s`  |
 
 # [Year 2020](README-2020.md)
 
@@ -246,6 +251,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 |                             |             |             | [day 23](./go/2020/23/day23.go) | ` 0.003 ms`  | ` 1986  ms` |
 |                             |             |             | [day 24](./go/2020/24/day24.go) | ` 1.120 ms`  | ` 164.1 ms` |
 |                             |             |             | [day 25](./go/2020/25/day25.go) | ` 164.4 ms`  |             |
+| **Sum**                        | ` 0.047 s`   | ` 2.687 s`  |                                 | ` 0.215 s`  | ` 2.387 s`  |
 
 # Year 2019
 | Rust                              | part A      | part B      |
@@ -275,6 +281,7 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 23](./rust/2019/day23) |||
 | [day 24](./rust/2019/day24) |||
 | [day 25](./rust/2019/day25) |||
+| **Sum**                         |             |             |
 
 # Year 2018
 
@@ -307,6 +314,7 @@ Execution time on an MacBook Air M2
 | [day 23](./go/2018/23/day23.go) | ` 2.211 ms`    | ` 99547.380 ms`|
 | [day 24](./go/2018/24/day24.go) | ` 19.997 ms`   | ` 1310.438 ms` |
 | [day 25](./go/2018/25/day25.go) | ` 7.822 ms`    |                |
+| **Sum**                         | ` 24.838 s`    | ` 160.603 s`   |
 
 # Year 2017
 
@@ -321,3 +329,4 @@ Execution time on an MacBook Air M2
 | [day 05](./go/2017/05/day05.go) | ` 0.959 ms`   | ` 99.689 ms`  |
 | [day 06](./go/2017/06/day06.go) | ` 6.401 ms`   | ` 6.346 ms`   |
 | [day 07](./go/2017/07/day07.go) | ` 0.189 ms`   | ` 0.000001 ms`|
+| **Sum**                         | ` 0.008 s`    | ` 0.107 s`    |

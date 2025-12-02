@@ -6,23 +6,6 @@ Mostly written in Go and Rust
 |:----:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 | 2025 | [<img src="assets/golang.png" width="24px"/>](./go/2025/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/02/day02.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/03/day03.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/04/day04.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/05/day05.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/06/day06.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/07/day07.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/08/day08.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/09/day09.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/10/day10.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/11/day11.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/12/day12.go) |
 
-| Year | 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 |
-|:----:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| 2025 | [<img src="assets/golang.png" width="24px"/>](./go/2025/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/02/day02.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/03/day03.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/04/day04.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/05/day05.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/06/day06.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/07/day07.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/08/day08.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/09/day09.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/10/day10.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/11/day11.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/12/day12.go) |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| 2024 | [<img src="assets/golang.png" width="24px"/>](./go/2024/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/02/day02.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/03/day03.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/04/day04.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/05/day05.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/06/day06.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/07/day07.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/08/day08.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/09/day09.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/10/day10.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/11/day11.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/12/day12.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/13/day13.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/14/day14.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/15/day15.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/16/day16.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/17/day17.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/18/day18.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/19/day19.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/20/day20.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/21/day21.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/22/day22.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/23/day23.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/24/day24.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/25/day25.go) |
-| 2023 | [<img src="assets/golang.png" width="24px"/>](./go/2023/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/02/day02.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/03/day03.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/04/day04.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/05/day05.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/06/day06.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/07/day07.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/08/day08.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/09/day09.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/10/day10.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/11/day11.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/12/day12.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/13/day13.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/14/day14.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/15/day15.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/16/day16.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/17/day17.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/18/day18.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/19/day19.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/20/day20.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/21/day21.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/22/day22.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/23/day23.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/24/day24.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/25/day25.go) |
-| 2022 | [<img src="assets/golang.png" width="24px"/>](./go/2022/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/02/day02.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/03/day03.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/04/day04.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/05/day05.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/06/day06.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/07/day07.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/08/day08.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/09/day09.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/10/day10.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/11/day11.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/12/day12.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/13/day13.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/14/day14.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/15/day15.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/16/day16.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/17/day17.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/18/day18.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/19/day19.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/20/day20.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/21/day21.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/22/day22.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/23/day23.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/24/day24.go) | [<img src="assets/golang.png" width="24px"/>](./go/2022/25/day25.go) |
-| 2021 | [<img src="assets/golang.png" width="24px"/>](./go/2021/01/day01.go) [:crab:](./rust/2021/day01) | [<img src="assets/golang.png" width="24px"/>](./go/2021/01/day02.go) [:crab:](./rust/2021/day02) | [:crab:](./rust/2021/day03) | [:crab:](./rust/2021/day04) | [:crab:](./rust/2021/day05) | [<img src="assets/golang.png" width="24px"/>](./go/2021/06/day06.go) [:crab:](./rust/2021/day06) | [<img src="assets/golang.png" width="24px"/>](./go/2021/07/day07.go) [:crab:](./rust/2021/day07) | [:crab:](./rust/2021/day08) | [<img src="assets/golang.png" width="24px"/>](./go/2021/09_simplified/day09.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/10/day10.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/11/day11.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/12/day12.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/13/day13.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/14/day14.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/15/day15.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/16/day16.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/17/day17.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/18/day18.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/19/day19.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/20/day20.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/21/day21.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/22/day22.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/23/day23.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/24/day24.go) | [<img src="assets/golang.png" width="24px"/>](./go/2021/25/day25.go) |
-| 2020 | [<img src="assets/golang.png" width="24px"/>](./go/2020/01/day01.go) [:crab:](./rust/2020/day01) | [:crab:](./rust/2020/day02) | [:crab:](./rust/2020/day03) | [:crab:](./rust/2020/day04) | [:crab:](./rust/2020/day05) | [:crab:](./rust/2020/day06) | [<img src="assets/golang.png" width="24px"/>](./go/2020/07/day07.go) | [<img src="assets/golang.png" width="24px"/>](./go/2020/08/day08.go) | [<img src="assets/golang.png" width="24px"/>](./go/2020/09/day09.go) | [<img src="assets/golang.png" width="24px"/>](./go/2020/10/day10.go) | [:crab:](./rust/2020/day11) | [:crab:](./rust/2020/day12) | [:crab:](./rust/2020/day13) | [:crab:](./rust/2020/day14) | [:crab:](./rust/2020/day15) | [:crab:](./rust/2020/day16) | [:crab:](./rust/2020/day17) | [:crab:](./rust/2020/day18) | [<img src="assets/golang.png" width="24px"/>](./go/2020/19/day19.go) | [<img src="assets/golang.png" width="24px"/>](./go/2020/20/day20.go) | [<img src="assets/golang.png" width="24px"/>](./go/2020/21/day21.go) | [<img src="assets/golang.png" width="24px"/>](./go/2020/22/day22.go) | [<img src="assets/golang.png" width="24px"/>](./go/2020/23/day23.go) | [<img src="assets/golang.png" width="24px"/>](./go/2020/24/day24.go) | [<img src="assets/golang.png" width="24px"/>](./go/2020/25/day25.go) |
-| 2019 | [:crab:](./rust/2019/day01) | [:crab:](./rust/2019/day02) | [:crab:](./rust/2019/day03) | [:crab:](./rust/2019/day04) | [:crab:](./rust/2019/day05) | [:crab:](./rust/2019/day06) | [:crab:](./rust/2019/day07) | [:crab:](./rust/2019/day08) | [:crab:](./rust/2019/day09) | [:crab:](./rust/2019/day10) | [:crab:](./rust/2019/day11) | [:crab:](./rust/2019/day12) | [:crab:](./rust/2019/day13) | [:crab:](./rust/2019/day14) | [:crab:](./rust/2019/day15) | [:crab:](./rust/2019/day16) | [:crab:](./rust/2019/day17) | [:crab:](./rust/2019/day18) | [:crab:](./rust/2019/day19) | [:crab:](./rust/2019/day20) | [:crab:](./rust/2019/day21) | [:crab:](./rust/2019/day22) | [:crab:](./rust/2019/day23) | [:crab:](./rust/2019/day24) | [:crab:](./rust/2019/day25) |
-| 2018 | [<img src="assets/golang.png" width="24px"/>](./go/2018/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/02/day02.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/03/day03.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/04/day04.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/05/day05.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/06/day06.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/07/day07.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/08/day08.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/09/day09.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/10/day10.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/11/day11.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/12/day12.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/13/day13.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/14/day14.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/15/day15.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/16/day16.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/17/day17.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/18/day18.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/19/day19.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/20/day20.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/21/day21.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/22/day22.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/23/day23.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/24/day24.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/25/day25.go) |
-| 2017 | [<img src="assets/golang.png" width="24px"/>](./go/2017/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2017/02/day02.go) | [<img src="assets/golang.png" width="24px"/>](./go/2017/03/day03.go) | [<img src="assets/golang.png" width="24px"/>](./go/2017/04/day04.go) | [<img src="assets/golang.png" width="24px"/>](./go/2017/05/day05.go) | [<img src="assets/golang.png" width="24px"/>](./go/2017/06/day06.go) | [<img src="assets/golang.png" width="24px"/>](./go/2017/07/day07.go) |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-|      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| 2016 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-|      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-| 2015 |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-|      |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
-
 |        | 2015 | 2016 | 2017 | 2018 | 2019 |                                               2020                                               | 2021 | 2022 | 2023 |            2024             |
 |------  |:----:|:----:|:----:|:----:|:----:|:------------------------------------------------------------------------------------------------:|:----:|:----:|:----:|:---------------------------:|
 | **01** | | | [<img src="assets/golang.png" width="24px"/>](./go/2017/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2018/01/day01.go) | [:crab:](./rust/2019/day01) | [<img src="assets/golang.png" width="24px"/>](./go/2020/01/day01.go) [:crab:](./rust/2020/day01) | [<img src="assets/golang.png" width="24px"/>](./go/2021/01/day01.go) [:crab:](./rust/2021/day01) | [<img src="assets/golang.png" width="24px"/>](./go/2022/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/01/day01.go) |
@@ -294,30 +277,47 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 25](./rust/2019/day25) |||
 
 # Year 2018
-| Rust                              | part A      | part B      |
-|---------------------------------|-------------|-------------|
-| [day 01](./go/2018/01/day01.go) |||
-| [day 02](./go/2018/02/day02.go) |||
-| [day 03](./go/2018/03/day03.go) |||
-| [day 04](./go/2018/04/day04.go) |||
-| [day 05](./go/2018/05/day05.go) |||
-| [day 06](./go/2018/06/day06.go) |||
-| [day 07](./go/2018/07/day07.go) |||
-| [day 08](./go/2018/08/day08.go) |||
-| [day 09](./go/2018/09/day09.go) |||
-| [day 10](./go/2018/10/day10.go) |||
-| [day 11](./go/2018/11/day11.go) |||
-| [day 12](./go/2018/12/day12.go) |||
-| [day 13](./go/2018/13/day13.go) |||
-| [day 14](./go/2018/14/day14.go) |||
-| [day 15](./go/2018/15/day15.go) |||
-| [day 16](./go/2018/16/day16.go) |||
-| [day 17](./go/2018/17/day17.go) |||
-| [day 18](./go/2018/18/day18.go) |||
-| [day 19](./go/2018/19/day19.go) |||
-| [day 20](./go/2018/20/day20.go) |||
-| [day 21](./go/2018/21/day21.go) |||
-| [day 22](./go/2018/22/day22.go) |||
-| [day 23](./go/2018/23/day23.go) |||
-| [day 24](./go/2018/24/day24.go) |||
-| [day 25](./go/2018/25/day25.go) |||
+
+Execution time on an MacBook Air M2
+
+| Go                              | part A         | part B         |
+|---------------------------------|----------------|----------------|
+| [day 01](./go/2018/01/day01.go) | ` 0.026 ms`    | ` 9.062 ms`    |
+| [day 02](./go/2018/02/day02.go) | ` 0.577 ms`    | ` 0.583 ms`    |
+| [day 03](./go/2018/03/day03.go) | ` 8.513 ms`    | ` 5.605 ms`    |
+| [day 04](./go/2018/04/day04.go) | ` 2.180 ms`    | ` 2.202 ms`    |
+| [day 05](./go/2018/05/day05.go) | ` 0.282 ms`    | ` 7.335 ms`    |
+| [day 06](./go/2018/06/day06.go) | ` 9.055 ms`    | ` 5.266 ms`    |
+| [day 07](./go/2018/07/day07.go) | ` 0.209 ms`    | ` 0.413 ms`    |
+| [day 08](./go/2018/08/day08.go) | ` 0.371 ms`    | ` 0.367 ms`    |
+| [day 09](./go/2018/09/day09.go) | ` 3.322 ms`    | ` 428.208 ms`  |
+| [day 10](./go/2018/10/day10.go) | ` 400.361 ms`  | ` 337.374 ms`  |
+| [day 11](./go/2018/11/day11.go) | ` 3.020 ms`    | ` 25.925 ms`   |
+| [day 12](./go/2018/12/day12.go) | ` 0.184 ms`    | ` 16.645 ms`   |
+| [day 13](./go/2018/13/day13.go) | ` 2.289 ms`    | ` 6.501 ms`    |
+| [day 14](./go/2018/14/day14.go) | ` 7.782 ms`    | ` 309.028 ms`  |
+| [day 15](./go/2018/15/day15.go) | ` 36.768 ms`   | ` 210.730 ms`  |
+| [day 16](./go/2018/16/day16.go) | ` 1.876 ms`    | ` 0.604 ms`    |
+| [day 17](./go/2018/17/day17.go) | ` 12.117 ms`   | ` 12.358 ms`   |
+| [day 18](./go/2018/18/day18.go) | ` 1.465 ms`    | ` 126.286 ms`  |
+| [day 19](./go/2018/19/day19.go) | ` 97.107 ms`   |                |
+| [day 20](./go/2018/20/day20.go) | ` 24220.131 ms`| ` 24979.661 ms`|
+| [day 21](./go/2018/21/day21.go) | ` 0.057 ms`    | ` 32968.482 ms`|
+| [day 22](./go/2018/22/day22.go) | ` 0.176 ms`    | ` 293.027 ms`  |
+| [day 23](./go/2018/23/day23.go) | ` 2.211 ms`    | ` 99547.380 ms`|
+| [day 24](./go/2018/24/day24.go) | ` 19.997 ms`   | ` 1310.438 ms` |
+| [day 25](./go/2018/25/day25.go) | ` 7.822 ms`    |                |
+
+# Year 2017
+
+Execution time on an MacBook Air M2
+
+| Go                              | part A        | part B        |
+|---------------------------------|---------------|---------------|
+| [day 01](./go/2017/01/day01.go) | ` 0.003 ms`   | ` 0.003 ms`   |
+| [day 02](./go/2017/02/day02.go) | ` 0.008 ms`   | ` 0.010 ms`   |
+| [day 03](./go/2017/03/day03.go) | ` 0.352 ms`   | ` 0.013 ms`   |
+| [day 04](./go/2017/04/day04.go) | ` 0.141 ms`   | ` 0.624 ms`   |
+| [day 05](./go/2017/05/day05.go) | ` 0.959 ms`   | ` 99.689 ms`  |
+| [day 06](./go/2017/06/day06.go) | ` 6.401 ms`   | ` 6.346 ms`   |
+| [day 07](./go/2017/07/day07.go) | ` 0.189 ms`   | ` 0.000001 ms`|

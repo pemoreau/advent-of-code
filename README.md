@@ -2,6 +2,10 @@
 
 Mostly written in Go and Rust
 
+| Year | 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 |
+|:----:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| 2025 | [<img src="assets/golang.png" width="24px"/>](./go/2025/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/02/day02.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/03/day03.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/04/day04.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/05/day05.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/06/day06.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/07/day07.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/08/day08.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/09/day09.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/10/day10.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/11/day11.go) | [<img src="assets/golang.png" width="24px"/>](./go/2025/12/day12.go) |
+
 |        | 2015 | 2016 | 2017 | 2018 | 2019 |                                               2020                                               | 2021 | 2022 | 2023 |            2024             |
 |------  |:----:|:----:|:----:|:----:|:----:|:------------------------------------------------------------------------------------------------:|:----:|:----:|:----:|:---------------------------:|
 | **01** | | | | [<img src="assets/golang.png" width="24px"/>](./go/2018/01/day01.go) | [:crab:](./rust/2019/day01) | [<img src="assets/golang.png" width="24px"/>](./go/2020/01/day01.go) [:crab:](./rust/2020/day01) | [<img src="assets/golang.png" width="24px"/>](./go/2021/01/day01.go) [:crab:](./rust/2021/day01) | [<img src="assets/golang.png" width="24px"/>](./go/2022/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2023/01/day01.go) | [<img src="assets/golang.png" width="24px"/>](./go/2024/01/day01.go) |
@@ -45,6 +49,26 @@ Mostly written in Go and Rust
 - `cargo run --release` to run the puzzle in release mode
 - `cargo test` to run unit tests
 - `cargo bench` to run benchmarks
+
+# [Year 2025](README-2025.md)
+
+Execution time on an MacBook Air M2
+
+| Go                              | part A      | part B      |
+|---------------------------------|-------------|-------------|
+| [day 01](./go/2025/01/day01.go) | ` 0.105 ms` | ` 0.118 ms` |
+| [day 02](./go/2025/02/day02.go) | ` 4.277 ms` | ` 15.21 ms` |
+| [day 03](./go/2025/03/day03.go) |             |             |
+| [day 04](./go/2025/04/day04.go) |             |             |
+| [day 05](./go/2025/05/day05.go) |             |             |
+| [day 06](./go/2025/06/day06.go) |             |             |
+| [day 07](./go/2025/07/day07.go) |             |             |
+| [day 08](./go/2025/08/day08.go) |             |             |
+| [day 09](./go/2025/09/day09.go) |             |             |
+| [day 10](./go/2025/10/day10.go) |             |             |
+| [day 11](./go/2025/11/day11.go) |             |             |
+| [day 12](./go/2025/12/day12.go) |             |             |
+
 
 # [Year 2024](README-2024.md)
 
@@ -280,5 +304,3 @@ Execution time on an old Mac Pro (Late 2013), 3,7 GHz Quad-Core Intel Xeon E5
 | [day 23](./go/2018/23/day23.go) |||
 | [day 24](./go/2018/24/day24.go) |||
 | [day 25](./go/2018/25/day25.go) |||
-
-

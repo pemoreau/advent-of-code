@@ -15,6 +15,7 @@ Cargo.lock
 **/*.rs.bk
 go/2020/20/res
 go/initaoc/initaoc
+.gocache
 
 # vim
 **/*.swp

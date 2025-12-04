@@ -12,18 +12,38 @@ func TestPart(t *testing.T) {
 		{
 			Func: Part1,
 			Input: utils.Dedent(`
+..@@.@@@@.
+@@@.@.@.@@
+@@@@@.@.@@
+@.@@@@..@.
+@@.@@@@.@@
+.@@@@@@@.@
+.@.@.@.@@@
+@.@@@.@@@@
+.@@@@@@@@.
+@.@.@@@.@.
 			`),
-			Expected: 0,
+			Expected: 13,
 		},
-		//{
-		//	Func: Part2,
-		//	Input: utils.Dedent(`
-		//	`),
-		//	Expected: 0,
-		//},
+		{
+			Func: Part2,
+			Input: utils.Dedent(`
+..@@.@@@@.
+@@@.@.@.@@
+@@@@@.@.@@
+@.@@@@..@.
+@@.@@@@.@@
+.@@@@@@@.@
+.@.@.@.@@@
+@.@@@.@@@@
+.@@@@@@@@.
+@.@.@@@.@.
+			`),
+			Expected: 43,
+		},
 		//
-		//{Func: Part1, Input: utils.Input(), Expected: 0},
-		//{Func: Part2, Input: utils.Input(), Expected: 0},
+		{Func: Part1, Input: utils.Input(), Expected: 1451},
+		{Func: Part2, Input: utils.Input(), Expected: 8701},
 	}
 	utils.TestPart(t, tests)
 }

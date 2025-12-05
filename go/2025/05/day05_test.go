@@ -12,18 +12,40 @@ func TestPart(t *testing.T) {
 		{
 			Func: Part1,
 			Input: utils.Dedent(`
+3-5
+10-14
+16-20
+12-18
+
+1
+5
+8
+11
+17
+32
 			`),
-			Expected: 0,
+			Expected: 3,
 		},
-		//{
-		//	Func: Part2,
-		//	Input: utils.Dedent(`
-		//	`),
-		//	Expected: 0,
-		//},
+		{
+			Func: Part2,
+			Input: utils.Dedent(`
+3-5
+16-20
+12-18
+10-14
+
+1
+5
+8
+11
+17
+32
+			`),
+			Expected: 14,
+		},
 		//
-		//{Func: Part1, Input: utils.Input(), Expected: 0},
-		//{Func: Part2, Input: utils.Input(), Expected: 0},
+		{Func: Part1, Input: utils.Input(), Expected: 761},
+		{Func: Part2, Input: utils.Input(), Expected: 345755049374932},
 	}
 	utils.TestPart(t, tests)
 }

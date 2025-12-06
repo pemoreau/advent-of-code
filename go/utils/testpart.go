@@ -8,6 +8,9 @@ import (
 	"testing"
 )
 
+// DefaultTabWidth is the number of spaces a tab character represents.
+const DefaultTabWidth = 4
+
 type Test[I, E comparable] struct {
 	Func     func(I) E
 	Input    I
@@ -26,9 +29,32 @@ func TestPart[I, E comparable](t *testing.T, tests []Test[I, E]) {
 	}
 }
 
+// expandLeadingTabs converts leading tab characters in a line to spaces.
+func expandLeadingTabs(line string, tabWidth int) string {
+	var builder strings.Builder
+	originalIndex := 0 // Track index in original string
+	for originalIndex < len(line) {
+		r := rune(line[originalIndex]) // Get rune at current index
+		if r == '\t' {
+			builder.WriteString(strings.Repeat(" ", tabWidth))
+			originalIndex++ // Consume one character from original
+		} else if r == ' ' {
+			builder.WriteRune(r)
+			originalIndex++ // Consume one character from original
+		} else {
+			break // Stop if non-whitespace character
+		}
+	}
+	return builder.String() + line[originalIndex:]
+}
+
 // dedent supprime l'indentation commune des blocs multi-lignes pour plus de lisibilité.
 func Dedent(s string) string {
-	lines := strings.Split(s, "\n")
+	rawLines := strings.Split(s, "\n")
+	var lines []string
+	for _, line := range rawLines {
+		lines = append(lines, expandLeadingTabs(line, DefaultTabWidth))
+	}
 
 	// Trim leading empty lines
 	start := 0
@@ -64,10 +90,21 @@ func Dedent(s string) string {
 	}
 	if left > 0 {
 		for i, ln := range lines {
-			if len(ln) >= left {
-				lines[i] = ln[left:]
+			actualLeadingSpaces := 0
+			for actualLeadingSpaces < len(ln) && ln[actualLeadingSpaces] == ' ' {
+				actualLeadingSpaces++
 			}
+
+			numToTrim := min(left, actualLeadingSpaces)
+			lines[i] = ln[numToTrim:]
 		}
 	}
 	return strings.Join(lines, "\n")
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }

@@ -2,9 +2,10 @@ package game2d
 
 import (
 	"fmt"
-	"golang.org/x/exp/constraints"
 	"iter"
 	"strings"
+
+	"golang.org/x/exp/constraints"
 )
 
 // ---------------------
@@ -44,7 +45,7 @@ func BuildMatrixFunc[T comparable](lines []string, convert func(c int32) T, toSt
 	}
 	var m = NewMatrix[T](len(lines[0]), len(lines), toString)
 	for j, l := range lines {
-		l = strings.TrimSpace(l)
+		//l = strings.TrimSpace(l)
 		for i, c := range l {
 			m.Set(i, j, convert(c))
 		}

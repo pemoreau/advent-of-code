@@ -51,30 +51,28 @@ func Part2(input string) int {
 	input = strings.TrimSuffix(input, "\n")
 	var lines = strings.Split(input, "\n")
 
-	var toString = func(c uint8) string { return fmt.Sprintf("%c", c) }
-	var matrix = game2d.BuildMatrixFunc(lines, func(c int32) uint8 { return uint8(c) }, toString)
-
 	var res int
 	var accu int
 	var numbers []int
-	for i := matrix.MaxX(); i >= 0; i-- {
+	var maxX = len(lines[0]) - 1
+	var maxY = len(lines) - 1
+	for i := maxX; i >= 0; i-- {
 		var n = 0
-		for j := 0; j <= matrix.MaxY()-1; j++ {
-			var c = matrix.Get(i, j)
-			if c == ' ' || c == 0 {
-			} else if matrix.Get(i, j) >= '0' && matrix.Get(i, j) <= '9' {
-				n = 10*n + int(matrix.Get(i, j)-'0')
+		for j := 0; j <= maxY-1; j++ {
+			if c := lines[j][i]; c == ' ' || c == 0 {
+			} else if c >= '0' && c <= '9' {
+				n = 10*n + int(c-'0')
 			} else {
-				fmt.Printf("strange: i = %d j = %d c = '%c'\n", i, j, matrix.Get(i, j))
+				fmt.Printf("strange: i = %d j = %d c = '%c'\n", i, j, c)
 			}
 		}
 		numbers = append(numbers, n)
-		if matrix.Get(i, matrix.MaxY()) == '+' {
+		if c := lines[maxY][i]; c == '+' {
 			accu = 0
 			for _, n := range numbers {
 				accu += n
 			}
-		} else if matrix.Get(i, matrix.MaxY()) == '*' {
+		} else if c == '*' {
 			accu = 1
 			for _, n := range numbers {
 				accu *= n

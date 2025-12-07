@@ -37,17 +37,14 @@ func Part1(input string) int {
 }
 
 func count(grid *game2d.MatrixChar, p game2d.Pos, memo map[game2d.Pos]int) int {
-
 	if v, ok := memo[p]; ok {
 		return v
 	}
-
 	if !grid.IsValidPos(p) {
 		return 1
 	}
 
-	var c = grid.GetPos(p)
-	if c == '.' || c == 'S' {
+	if c := grid.GetPos(p); c == '.' || c == 'S' {
 		var res = count(grid, p.S(), memo)
 		memo[p] = res
 		return res
@@ -62,12 +59,8 @@ func count(grid *game2d.MatrixChar, p game2d.Pos, memo map[game2d.Pos]int) int {
 func Part2(input string) int {
 	var grid = game2d.BuildMatrixCharFromString(input)
 	var start, _ = grid.Find('S')
-
-	var memo = map[game2d.Pos]int{}
-	var res int
-	res = count(grid, start, memo)
-
-	return res
+	var memo = make(map[game2d.Pos]int)
+	return count(grid, start, memo)
 }
 
 func main() {

@@ -3,4 +3,6 @@
 ### To run all tests
 go test ./...
 
+`go test -bench .` to run benchmarks
+
 

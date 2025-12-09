@@ -49,8 +49,7 @@ func parse(input string) (seats []game2d.Pos, rectangles []rectangle) {
 
 func Part1(input string) int {
 	var _, rectangles = parse(input)
-	slices.SortFunc(rectangles, func(a, b rectangle) int { return cmp.Compare(a.area, b.area) })
-	return rectangles[len(rectangles)-1].area
+	return slices.MaxFunc(rectangles, func(a, b rectangle) int { return cmp.Compare(a.area, b.area) }).area
 }
 
 func traversed(r rectangle, seats []game2d.Pos) bool {
@@ -66,14 +65,15 @@ func traversed(r rectangle, seats []game2d.Pos) bool {
 
 func Part2(input string) int {
 	var seats, rectangles = parse(input)
-	var filtered []rectangle
+	var maxArea int
 	for _, r := range rectangles {
 		if !traversed(r, seats) {
-			filtered = append(filtered, r)
+			if r.area > maxArea {
+				maxArea = r.area
+			}
 		}
 	}
-	slices.SortFunc(filtered, func(a, b rectangle) int { return cmp.Compare(a.area, b.area) })
-	return filtered[len(filtered)-1].area
+	return maxArea
 }
 
 func main() {

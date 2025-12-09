@@ -39,8 +39,8 @@ func parse(input string) (seats []game2d.Pos, rectangles []rectangle) {
 		for j := i + 1; j < len(seats); j++ {
 			var a = seats[i]
 			var b = seats[j]
-			var area = (1 + utils.Abs(b.X-a.X)) * (1 + utils.Abs(b.Y-a.Y))
 			var minX, minY, maxX, maxY = minMax(a, b)
+			var area = (1 + maxX - minX) * (1 + maxY - minY)
 			rectangles = append(rectangles, rectangle{minX, minY, maxX, maxY, area})
 		}
 	}

@@ -1,10 +1,8 @@
 package main
 
 import (
-	"cmp"
 	_ "embed"
 	"fmt"
-	"slices"
 	"strings"
 	"time"
 
@@ -25,31 +23,36 @@ func minMax(a, b game2d.Pos) (minX, minY, maxX, maxY int) {
 	return minX, minY, maxX, maxY
 }
 
-func parse(input string) (seats []game2d.Pos, rectangles []rectangle) {
+func solve(input string, filtered func(r rectangle, seats []game2d.Pos) bool) int {
 	input = strings.TrimSuffix(input, "\n")
 	var lines = strings.Split(input, "\n")
 
+	var seats []game2d.Pos
 	for _, line := range lines {
 		var a, b int
 		fmt.Sscanf(line, "%d,%d", &a, &b)
 		seats = append(seats, game2d.Pos{a, b})
 	}
 
+	var maxArea int
 	for i := 0; i < len(seats)-1; i++ {
 		for j := i + 1; j < len(seats); j++ {
 			var a = seats[i]
 			var b = seats[j]
 			var minX, minY, maxX, maxY = minMax(a, b)
 			var area = (1 + maxX - minX) * (1 + maxY - minY)
-			rectangles = append(rectangles, rectangle{minX, minY, maxX, maxY, area})
+			var r = rectangle{minX, minY, maxX, maxY, area}
+			if !filtered(r, seats) && r.area > maxArea {
+				maxArea = r.area
+			}
 		}
 	}
-	return seats, rectangles
+	return maxArea
 }
 
 func Part1(input string) int {
-	var _, rectangles = parse(input)
-	return slices.MaxFunc(rectangles, func(a, b rectangle) int { return cmp.Compare(a.area, b.area) }).area
+	var filtered = func(r rectangle, seats []game2d.Pos) bool { return false }
+	return solve(input, filtered)
 }
 
 func traversed(r rectangle, seats []game2d.Pos) bool {
@@ -64,16 +67,7 @@ func traversed(r rectangle, seats []game2d.Pos) bool {
 }
 
 func Part2(input string) int {
-	var seats, rectangles = parse(input)
-	var maxArea int
-	for _, r := range rectangles {
-		if !traversed(r, seats) {
-			if r.area > maxArea {
-				maxArea = r.area
-			}
-		}
-	}
-	return maxArea
+	return solve(input, traversed)
 }
 
 func main() {

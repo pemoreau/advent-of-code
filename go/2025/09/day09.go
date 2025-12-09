@@ -13,8 +13,16 @@ import (
 )
 
 type rectangle struct {
-	a, b game2d.Pos
-	area int
+	minX, minY, maxX, maxY int
+	area                   int
+}
+
+func minMax(a, b game2d.Pos) (minX, minY, maxX, maxY int) {
+	minX = min(a.X, b.X)
+	minY = min(a.Y, b.Y)
+	maxX = max(a.X, b.X)
+	maxY = max(a.Y, b.Y)
+	return minX, minY, maxX, maxY
 }
 
 func parse(input string) (seats []game2d.Pos, rectangles []rectangle) {
@@ -32,7 +40,8 @@ func parse(input string) (seats []game2d.Pos, rectangles []rectangle) {
 			var a = seats[i]
 			var b = seats[j]
 			var area = (1 + utils.Abs(b.X-a.X)) * (1 + utils.Abs(b.Y-a.Y))
-			rectangles = append(rectangles, rectangle{a, b, area})
+			var minX, minY, maxX, maxY = minMax(a, b)
+			rectangles = append(rectangles, rectangle{minX, minY, maxX, maxY, area})
 		}
 	}
 	return seats, rectangles
@@ -44,27 +53,14 @@ func Part1(input string) int {
 	return rectangles[len(rectangles)-1].area
 }
 
-func traverse(r rectangle, seats []game2d.Pos) bool {
-	var minX = min(r.a.X, r.b.X) + 1
-	var minY = min(r.a.Y, r.b.Y) + 1
-	var maxX = max(r.a.X, r.b.X) - 1
-	var maxY = max(r.a.Y, r.b.Y) - 1
+func traversed(r rectangle, seats []game2d.Pos) bool {
 	for i := 0; i < len(seats); i++ {
-		var s1 = seats[i]
-		var s2 = seats[(i+1)%len(seats)]
-		var miX = min(s1.X, s2.X)
-		var miY = min(s1.Y, s2.Y)
-		var maX = max(s1.X, s2.X)
-		var maY = max(s1.Y, s2.Y)
-		if maY < minY || miY > maxY {
-			continue
-		}
-		if maX < minX || miX > maxX {
+		var minX, minY, maxX, maxY = minMax(seats[i], seats[(i+1)%len(seats)])
+		if maxY < r.minY+1 || minY > r.maxY-1 || maxX < r.minX+1 || minX > r.maxX-1 {
 			continue
 		}
 		return true
 	}
-
 	return false
 }
 
@@ -72,7 +68,7 @@ func Part2(input string) int {
 	var seats, rectangles = parse(input)
 	var filtered []rectangle
 	for _, r := range rectangles {
-		if !traverse(r, seats) {
+		if !traversed(r, seats) {
 			filtered = append(filtered, r)
 		}
 	}

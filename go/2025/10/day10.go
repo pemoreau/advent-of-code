@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"fmt"
 	"math"
-	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -12,20 +11,16 @@ import (
 	"github.com/pemoreau/advent-of-code/go/utils"
 )
 
+type Counter []int
 type machine struct {
-	goal    []int
+	goal    Counter
 	buttons [][]int
-	counter []int
+	counter Counter
 }
 
-func createMachine(goal []int, buttons [][]int, counter []int) machine {
-	copyGoal := make([]int, len(goal))
-	copy(copyGoal, goal)
-	var copyButtons = make([][]int, len(buttons))
-	copy(copyButtons, buttons)
-	var copyCounter = make([]int, len(counter))
-	copy(copyCounter, counter)
-	return machine{copyGoal, copyButtons, copyCounter}
+type ButtonCombinaison struct {
+	counter          Counter
+	nbPressedButtons int
 }
 
 func buildIntList(s string) []int {
@@ -64,68 +59,7 @@ func parse(input string) []machine {
 	return machines
 }
 
-func remove(buttons [][]int, index int) [][]int {
-	var res [][]int
-	for i, b := range buttons {
-		if i != index {
-			res = append(res, b)
-		}
-	}
-	return res
-}
-
-type state struct {
-	buttons [][]int
-	counter []int
-	step    int
-}
-
-func bfs(m machine) (int, bool) {
-	var todo []state
-	todo = append(todo, state{m.buttons, make([]int, len(m.goal)), 0})
-
-	//fmt.Printf("machine: %v\n", m)
-	for len(todo) > 0 {
-		var s = todo[0]
-		todo = todo[1:]
-
-		for i, button := range s.buttons {
-			var nextCounter = make([]int, len(s.counter))
-			copy(nextCounter, s.counter)
-			//fmt.Printf("state = %v\n", s)
-			//fmt.Printf("apply button[%d] = %v\n", i, button)
-			for _, b := range button {
-				nextCounter[b] = (nextCounter[b] + 1) % 2
-			}
-			var nextButtons = remove(s.buttons, i)
-			//fmt.Printf("goal = %v nextConfig = %v\n", m.goal, nextConfig)
-			var nextState = state{nextButtons, nextCounter, s.step + 1}
-			//fmt.Printf("nextState = %v\n", nextState)
-			//if slices.Equal(nextConfig, m.goal) {
-			if slices.Equal(nextCounter, m.goal) {
-				//fmt.Printf("GOAL = %d\n", s.step+1)
-				//fmt.Printf("nextState = %v\n", nextState)
-				return s.step + 1, true
-			}
-			todo = append(todo, nextState)
-		}
-	}
-	return 0, false
-}
-
-func Part1(input string) int {
-	var machines = parse(input)
-	var res int
-	for _, m := range machines {
-		m.counter = m.goal
-		var n, _ = bfs(m)
-		res += n
-	}
-
-	return res
-}
-
-func smallerOrEqual(a, b []int) bool {
+func (a Counter) smallerOrEqual(b Counter) bool {
 	for i := 0; i < len(a); i++ {
 		if a[i] > b[i] {
 			return false
@@ -134,7 +68,7 @@ func smallerOrEqual(a, b []int) bool {
 	return true
 }
 
-func equalsModulo2(a, b []int) bool {
+func (a Counter) equalsModulo2(b Counter) bool {
 	for i := 0; i < len(a); i++ {
 		if a[i]%2 != b[i]%2 {
 			return false
@@ -142,10 +76,13 @@ func equalsModulo2(a, b []int) bool {
 	}
 	return true
 }
-
-type ButtonCombinaison struct {
-	counter          []int
-	nbPressedButtons int
+func (a Counter) isZero() bool {
+	for i := 0; i < len(a); i++ {
+		if a[i] != 0 {
+			return false
+		}
+	}
+	return true
 }
 
 func allCombinaisons(buttons [][]int, m int) []ButtonCombinaison {
@@ -154,7 +91,7 @@ func allCombinaisons(buttons [][]int, m int) []ButtonCombinaison {
 		return []ButtonCombinaison{{counter: make([]int, m), nbPressedButtons: 0}}
 	}
 
-	var res []ButtonCombinaison
+	var res = make([]ButtonCombinaison, 0, 1<<nbButtons)
 	for n := 0; n < (1 << nbButtons); n++ {
 		var counter = make([]int, m)
 		var nbPressedButtons = 0
@@ -170,57 +107,73 @@ func allCombinaisons(buttons [][]int, m int) []ButtonCombinaison {
 	}
 	return res
 }
-
-func solve2(counter []int, combinaisons []ButtonCombinaison) (int, bool) {
-	var stop = true
-	for _, x := range counter {
-		stop = stop && x == 0
+func (goal Counter) solve1(combinaisons []ButtonCombinaison) int {
+	var res = math.MaxInt
+	for _, comb := range combinaisons {
+		if comb.counter.equalsModulo2(goal) {
+			if comb.nbPressedButtons < res {
+				res = comb.nbPressedButtons
+			}
+		}
 	}
-	if stop {
+	return res
+}
+
+func newCounter(size int) Counter {
+	return make([]int, size)
+}
+
+func (counter Counter) solve2(combinaisons []ButtonCombinaison) (int, bool) {
+	if counter.isZero() {
 		return 0, true
 	}
 
-	var mini = math.MaxInt
-	var found = false
-
+	var res = math.MaxInt
 	for _, comb := range combinaisons {
-		if !smallerOrEqual(comb.counter, counter) {
+		if !comb.counter.smallerOrEqual(counter) {
 			continue
 		}
-		if !equalsModulo2(comb.counter, counter) {
+		if !comb.counter.equalsModulo2(counter) {
 			continue
 		}
 
-		var nextCounter = make([]int, len(counter))
+		var nextCounter = newCounter(len(counter))
 		for i := 0; i < len(counter); i++ {
 			nextCounter[i] = (counter[i] - comb.counter[i]) / 2
 		}
-		rec, ok := solve2(nextCounter, combinaisons)
+		rec, ok := nextCounter.solve2(combinaisons)
 		if !ok {
 			continue
 		}
 
-		if n := 2*rec + comb.nbPressedButtons; n < mini {
-			mini = n
+		if n := 2*rec + comb.nbPressedButtons; n < res {
+			res = n
 		}
-		found = true
+	}
+	if res < math.MaxInt {
+		return res, true
+	}
+	return 0, false
+}
+
+func Part1(input string) int {
+	var machines = parse(input)
+	var res int
+	for _, m := range machines {
+		var combinaisons = allCombinaisons(m.buttons, len(m.counter))
+		var n = m.goal.solve1(combinaisons)
+		res += n
 	}
 
-	if !found {
-		return 0, false
-	}
-	return mini, true
+	return res
 }
 
 func Part2(input string) int {
 	var machines = parse(input)
 	var res int
-
 	for _, m := range machines {
-		//fmt.Printf("machines = %v\n", m)
 		var combinaisons = allCombinaisons(m.buttons, len(m.counter))
-		var n, _ = solve2(m.counter, combinaisons)
-		//fmt.Printf("n = %v\n", n)
+		var n, _ = m.counter.solve2(combinaisons)
 		res += n
 	}
 	return res

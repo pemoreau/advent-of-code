@@ -42,7 +42,7 @@ func solve(input string, filtered func(r rectangle, seats []game2d.Pos) bool) in
 			var minX, minY, maxX, maxY = minMax(a, b)
 			var area = (1 + maxX - minX) * (1 + maxY - minY)
 			var r = rectangle{minX, minY, maxX, maxY, area}
-			if !filtered(r, seats) && r.area > maxArea {
+			if r.area > maxArea && !filtered(r, seats) {
 				maxArea = r.area
 			}
 		}

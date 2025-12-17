@@ -7,14 +7,11 @@ import (
 )
 
 func TestPart(t *testing.T) {
-	var sample = utils.Dedent(`
-			`)
-
 	var tests = []utils.Test[string, int]{
-		{Func: Part1, Input: sample, Expected: 0},
+		//{Func: Part1, Input: sample, Expected: 0},
 		//{ Func: Part2, Input: sample, Expected: 0 },
 		//
-		//{Func: Part1, Input: utils.Input(), Expected: 0},
+		{Func: Part1, Input: utils.Input(), Expected: 425},
 		//{Func: Part2, Input: utils.Input(), Expected: 0},
 	}
 	utils.TestPart(t, tests)

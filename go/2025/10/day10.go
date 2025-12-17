@@ -76,6 +76,7 @@ func (a Counter) equalsModulo2(b Counter) bool {
 	}
 	return true
 }
+
 func (a Counter) isZero() bool {
 	for i := 0; i < len(a); i++ {
 		if a[i] != 0 {

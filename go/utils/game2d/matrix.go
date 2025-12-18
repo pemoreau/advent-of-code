@@ -59,14 +59,14 @@ func BuildMatrixInt[T constraints.Integer](lines []string) *Matrix[T] {
 }
 
 func BuildMatrixCharFromString(s string) *MatrixChar {
-	//s = strings.TrimSpace(s)
+	s = strings.TrimSuffix(s, "\n")
 	lines := strings.Split(s, "\n")
 	var toString = func(c uint8) string { return fmt.Sprintf("%c", c) }
 	return BuildMatrixFunc(lines, func(c int32) uint8 { return uint8(c) }, toString)
 }
 
 func BuildMatrixDigitFromString(s string) *MatrixDigit {
-	//s = strings.TrimSpace(s)
+	s = strings.TrimSuffix(s, "\n")
 	lines := strings.Split(s, "\n")
 	var toString = func(c uint8) string { return string('0' + c) }
 	return BuildMatrixFunc(lines, func(c int32) uint8 { return uint8(c - '0') }, toString)
